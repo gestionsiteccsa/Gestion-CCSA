@@ -1,0 +1,171 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+# Ce fichier configure les hooks pre-commit pour la sécurité
+# Installation : pre-commit install
+# Exécution manuelle : pre-commit run --all-files
+
+repos:
+  # ============================================================================
+  # HOOKS DE SÉCURITÉ PYTHON
+  # ============================================================================
+  
+  # Bandit - Analyse statique de sécurité Python
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml', '-r', '.']
+        additional_dependencies: ['bandit[toml]']
+        exclude: ^(tests/|migrations/|env/|venv/|__pycache__/|.pytest_cache/)
+
+  # Detect-secrets - Détection de secrets dans le code
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: ^(tests/|migrations/|env/|venv/|__pycache__/|.pytest_cache/|package-lock.json|yarn.lock|poetry.lock)
+
+  # Semgrep - Analyse de sécurité avancée
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.55.1
+    hooks:
+      - id: semgrep
+        args: ['--config', 'p/python', '--config', 'p/django', '--config', 'p/security-audit', '--error']
+        exclude: ^(tests/|migrations/|env/|venv/|__pycache__/|.pytest_cache/)
+
+  # Safety - Vérification des dépendances vulnérables
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.2
+    hooks:
+      - id: python-safety-dependencies-check
+        files: requirements.*\.txt$
+        args: ['--json']
+
+  # ============================================================================
+  # HOOKS DE QUALITÉ DE CODE
+  # ============================================================================
+  
+  # Trailing whitespace
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+
+  # Black - Formatage du code Python
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3
+        exclude: ^(migrations/|env/|venv/)
+
+  # isort - Tri des imports
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile', 'black']
+        exclude: ^(migrations/|env/|venv/)
+
+  # Flake8 - Linting Python
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        additional_dependencies: [flake8-docstrings, flake8-security]
+        exclude: ^(migrations/|env/|venv/)
+
+  # ============================================================================
+  # HOOKS DE SÉCURITÉ JAVASCRIPT (si applicable)
+  # ============================================================================
+  
+  # ESLint avec plugin security
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        additional_dependencies:
+          - eslint@8.56.0
+          - eslint-plugin-security@1.7.1
+        files: \.(js|jsx|ts|tsx)$
+        types: [file]
+        exclude: ^(node_modules/|dist/|build/)
+        args: ['--config', '.eslintrc.json']
+
+  # ============================================================================
+  # HOOKS SPÉCIFIQUES DJANGO
+  # ============================================================================
+  
+  # Vérification Django
+  - repo: local
+    hooks:
+      - id: django-check
+        name: Django Check
+        entry: python manage.py check
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+        
+      - id: django-check-deploy
+        name: Django Check Deploy
+        entry: python manage.py check --deploy
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+        stages: [push]
+
+  # ============================================================================
+  # HOOKS DE SÉCURITÉ SUPPLÉMENTAIRES
+  # ============================================================================
+  
+  # Gitleaks - Détection de secrets (alternative à detect-secrets)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.1
+    hooks:
+      - id: gitleaks
+        args: ['protect', '--verbose', '--redact', '--staged']
+
+  # Talisman - Détection de secrets (alternative)
+  # Décommenter si vous préférez Talisman
+  # - repo: https://github.com/thoughtworks/talisman
+  #   rev: v1.31.0
+  #   hooks:
+  #     - id: talisman-commit
+  #       entry: cmd --githook pre-commit
+
+# Configuration globale
+default_language_version:
+  python: python3
+
+# Exclusions globales
+exclude: |
+  (?x)^(
+    migrations/|
+    env/|
+    venv/|
+    __pycache__/|
+    .pytest_cache/|
+    node_modules/|
+    dist/|
+    build/|
+    .git/|
+    .tox/|
+    .mypy_cache/|
+    .*\.pyc$
+  )
+
+# Configuration des hooks
+fail_fast: false  # Exécuter tous les hooks même si un échoue

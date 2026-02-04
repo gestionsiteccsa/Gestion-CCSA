@@ -1,0 +1,59 @@
+{
+  "strict_mode": true,
+  "auto_fix": true,
+  "interactive": true,
+  "checks": {
+    "linter": {
+      "enabled": true,
+      "tools": ["flake8"],
+      "auto_fix": ["black", "isort"],
+      "max_line_length": 120,
+      "exclude": ["env", "venv", "__pycache__", "migrations", ".git", "scripts", "logs"]
+    },
+    "tests": {
+      "enabled": true,
+      "coverage_threshold": 80,
+      "test_module": "home.tests"
+    },
+    "django": {
+      "enabled": true,
+      "check_deploy": true,
+      "auto_migrate": false,
+      "check_migrations": true
+    },
+    "security": {
+      "enabled": true,
+      "tools": ["bandit", "safety", "pip-audit"],
+      "severity_threshold": "HIGH",
+      "check_secrets": true
+    },
+    "files": {
+      "enabled": true,
+      "forbidden_files": [".env", "db.sqlite3", ".env.local", ".env.production"],
+      "check_gitignore": true
+    },
+    "git": {
+      "enabled": true,
+      "conventional_commits": true,
+      "allowed_types": ["feat", "fix", "docs", "style", "refactor", "test", "chore", "security", "perf", "ci", "build"],
+      "check_staged_files": true
+    }
+  },
+  "exclude": [
+    "env/",
+    "venv/",
+    "__pycache__/",
+    "migrations/",
+    ".git/",
+    "logs/",
+    "media/",
+    "staticfiles/",
+    "security-reports/",
+    "*.pyc",
+    "*.pyo",
+    "*.log"
+  ],
+  "colors": {
+    "enabled": true
+  }
+}
