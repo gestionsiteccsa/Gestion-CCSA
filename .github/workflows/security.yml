@@ -47,9 +47,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install bandit safety pip-audit semgrep
+        pip install bandit safety pip-audit
         pip install django django-security django-csp django-defender
         pip install detect-secrets truffleHog3
+        # Semgrep n'est pas compatible avec Python 3.12, uniquement 3.13+
+        if [ "${{ matrix.python-version }}" == "3.13" ]; then
+          pip install semgrep
+        fi
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
     
@@ -87,6 +91,8 @@ jobs:
     - name: 🔍 Run Semgrep Security Scan
       id: semgrep
       continue-on-error: true
+      # Semgrep n'est pas compatible avec Python 3.12
+      if: matrix.python-version == '3.13'
       run: |
         echo "::group::Semgrep Security Scan"
         semgrep --config=p/python \
@@ -303,17 +309,25 @@ jobs:
         bandit_counts = count_severity_bandit(f'security-reports/bandit-report-py{py_version}.json')
         report.append(f"| Bandit | {bandit_counts['CRITICAL']} | {bandit_counts['HIGH']} | {bandit_counts['MEDIUM']} | {bandit_counts['LOW']} |")
         
-        semgrep_counts = count_severity_semgrep(f'security-reports/semgrep-report-py{py_version}.json')
-        report.append(f"| Semgrep | {semgrep_counts['CRITICAL']} | {semgrep_counts['HIGH']} | {semgrep_counts['MEDIUM']} | {semgrep_counts['LOW']} |")
+        # Semgrep n'est exécuté que sur Python 3.13
+        if py_version == "3.13":
+            semgrep_counts = count_severity_semgrep(f'security-reports/semgrep-report-py{py_version}.json')
+            report.append(f"| Semgrep | {semgrep_counts['CRITICAL']} | {semgrep_counts['HIGH']} | {semgrep_counts['MEDIUM']} | {semgrep_counts['LOW']} |")
+        else:
+            report.append(f"| Semgrep | N/A | N/A | N/A | N/A | (Python 3.13 only)")
         
         safety_counts = count_severity_safety(f'security-reports/safety-report-py{py_version}.json')
         report.append(f"| Safety | {safety_counts['CRITICAL']} | {safety_counts['HIGH']} | {safety_counts['MEDIUM']} | {safety_counts['LOW']} |")
 
         report.append("")
         
-        # Calculer le total
-        total_critical = bandit_counts['CRITICAL'] + semgrep_counts['CRITICAL'] + safety_counts['CRITICAL']
-        total_high = bandit_counts['HIGH'] + semgrep_counts['HIGH'] + safety_counts['HIGH']
+        # Calculer le total (seulement si semgrep a été exécuté)
+        if py_version == "3.13":
+            total_critical = bandit_counts['CRITICAL'] + semgrep_counts['CRITICAL'] + safety_counts['CRITICAL']
+            total_high = bandit_counts['HIGH'] + semgrep_counts['HIGH'] + safety_counts['HIGH']
+        else:
+            total_critical = bandit_counts['CRITICAL'] + safety_counts['CRITICAL']
+            total_high = bandit_counts['HIGH'] + safety_counts['HIGH']
         
         report.append(f"**Total CRITICAL** : {total_critical}")
         report.append(f"**Total HIGH** : {total_high}")
@@ -346,7 +360,8 @@ jobs:
         report.append("")
         report.append("### Fichiers générés :")
         report.append("- `bandit-report-py{py_version}.json` - Analyse statique Python")
-        report.append("- `semgrep-report-py{py_version}.json` - Analyse avancée")
+        if py_version == "3.13":
+            report.append("- `semgrep-report-py{py_version}.json` - Analyse avancée")
         report.append("- `safety-report-py{py_version}.json` - Vulnérabilités dépendances")
         report.append("- `pip-audit-report-py{py_version}.json` - Audit PyPI")
         report.append("- `detect-secrets-report-py{py_version}.json` - Détection de secrets")
