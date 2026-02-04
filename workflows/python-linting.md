@@ -353,9 +353,17 @@ from ..utils.validators import validate_email
 
 ## 🔧 Configuration Pylint
 
-### Fichier de Configuration
+### Configuration pour Django
 
-Créer un fichier `.pylintrc` à la racine du projet :
+Pour les projets Django, une configuration spécifique est nécessaire car Pylint ne comprend pas nativement les métaclasses Django (managers, QuerySets, etc.).
+
+#### Installation
+
+```bash
+pip install pylint pylint-django
+```
+
+#### Fichier `.pylintrc` pour Django
 
 ```ini
 [MASTER]
@@ -371,11 +379,17 @@ jobs=4
 # Plugins à charger
 load-plugins=pylint_django
 
+# Django settings module (nécessaire pour pylint-django)
+django-settings-module=app.settings
+
 [MESSAGES CONTROL]
 # Désactiver les messages spécifiques
+# E1101: no-member - Faux positifs fréquents avec Django ORM (objects, QuerySet methods)
+# W0212: protected-access - Acceptable dans les tests pour vérifier la logique interne
 disable=
     C0103,  # invalid-name (trop strict pour les variables courtes)
     C0114,  # missing-module-docstring (optionnel pour les petits modules)
+    E1101,  # no-member - Faux positifs avec Django ORM
     R0903,  # too-few-public-methods (acceptable pour les dataclasses)
     R0913,  # too-many-arguments (souvent nécessaire)
     W0613,  # unused-argument (souvent nécessaire pour les callbacks)
@@ -440,18 +454,27 @@ max-branches=12
 max-statements=50
 
 # Maximum de parents pour une classe
-max-parents=7
+# Augmenté pour Django (les vues héritent de nombreuses classes)
+max-parents=10
 
 # Maximum d'attributs pour une classe
 max-attributes=10
 
 [IMPORTS]
 # Autoriser les imports wildcard
-dallow-wildcard-with-all=no
+allow-wildcard-with-all=no
 
 [TYPECHECK]
 # Modules à ignorer pour le type checking
-generated-members=REQUEST,acl_users,aq_parent,objects,DoesNotExist
+# Générés automatiquement par Django (managers, QuerySets)
+generated-members=REQUEST,acl_users,aq_parent,objects,DoesNotExist,QuerySet,Manager
+
+# Classes à considérer comme ayant des membres dynamiques
+# Django ORM ajoute dynamiquement des méthodes aux modèles
+ignored-classes=LoginHistory,UserSession,User,UserProfile,QuerySet,Manager
+
+# Modules à considérer comme ayant des membres dynamiques
+ignored-modules=django.db.models,django.db.models.manager
 
 [VARIABLES]
 # Autoriser les noms courts pour les variables de boucle
@@ -1389,6 +1412,130 @@ class CommandeProcessor:
         }
         handler = priorities.get(commande.priorite, traiter_bas)
         return handler(commande)
+```
+
+---
+
+## 🎯 Bonnes Pratiques pour les Tests Django
+
+### Imports dans les Tests
+
+```python
+# ✅ CORRECT - Imports au niveau supérieur
+"""Tests pour les modèles."""
+
+import time
+from datetime import datetime
+
+from django.test import TestCase
+from django.utils import timezone
+
+from accounts.models import User
+
+
+class UserTests(TestCase):
+    def test_something(self):
+        # Utilisez les imports déjà faits
+        user = User.objects.create_user(...)
+
+
+# ❌ INCORRECT - Imports dans les méthodes (sauf cas exceptionnels)
+class UserTests(TestCase):
+    def test_something(self):
+        import time  # Mauvaise pratique
+        from django.utils import timezone  # Mauvaise pratique
+        user = User.objects.create_user(...)
+```
+
+### Accès aux Membres Protégés dans les Tests
+
+```python
+# ✅ CORRECT - Avec commentaire pylint explicatif
+def test_internal_logic(self):
+    """Teste la logique interne de _create_user."""
+    # pylint: disable=protected-access
+    # Nécessaire pour vérifier la logique interne du manager
+    source = inspect.getsource(UserManager._create_user)
+    self.assertIn("is_superuser", source)
+```
+
+### Faux Positifs Django avec Pylint
+
+```python
+# ✅ CORRECT - Configuration dans .pylintrc
+# Pas besoin de commentaires dans le code
+
+# Dans .pylintrc:
+# [TYPECHECK]
+# generated-members=objects,DoesNotExist,QuerySet,Manager
+# ignored-classes=User,LoginHistory,QuerySet
+# ignored-modules=django.db.models
+
+# Dans le code:
+user = User.objects.get(id=1)  # Pylint ne râle plus
+history = LoginHistory.objects.all()  # Pylint ne râle plus
+```
+
+### Erreurs Courantes et Solutions
+
+#### E1101: no-member avec Django ORM
+
+**Problème** : Pylint ne reconnaît pas les méthodes comme `.objects`, `.filter()`, `.get()`
+
+**Solution** : Ajouter dans `.pylintrc` :
+```ini
+[MESSAGES CONTROL]
+disable=E1101  # no-member
+
+[TYPECHECK]
+generated-members=objects,DoesNotExist,QuerySet,Manager
+ignored-classes=User,LoginHistory,QuerySet,Manager
+ignored-modules=django.db.models,django.db.models.manager
+```
+
+#### C0415: import-outside-toplevel
+
+**Problème** : Import dans une méthode/fonction
+
+**Solution** : Déplacer l'import au niveau supérieur, sauf cas exceptionnels :
+```python
+# ✅ CORRECT - Import au niveau supérieur
+import time
+from django.utils import timezone
+
+def ma_fonction():
+    now = timezone.now()
+
+# ✅ ACCEPTABLE - Import dans méthode avec justification
+class MonAppConfig(AppConfig):
+    def ready(self):
+        # Import ici pour éviter les imports circulaires
+        # pylint: disable=import-outside-toplevel
+        import accounts.signals
+```
+
+#### W0212: protected-access
+
+**Problème** : Accès à un membre protégé (commençant par `_`)
+
+**Solution** : Dans les tests, c'est acceptable avec un commentaire :
+```python
+def test_internal_logic(self):
+    """Teste la logique interne."""
+    # pylint: disable=protected-access
+    # Nécessaire pour tester la logique interne
+    result = obj._methode_privee()
+```
+
+#### R0901: too-many-ancestors
+
+**Problème** : Une classe hérite de trop de classes (par défaut > 7)
+
+**Solution** : Augmenter la limite pour Django dans `.pylintrc` :
+```ini
+[DESIGN]
+# Django CBV héritent de nombreuses classes
+max-parents=10
 ```
 
 ---

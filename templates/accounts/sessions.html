@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Sessions Actives{% endblock %}
+
+{% block content %}
+<h1>Sessions Actives</h1>
+
+{% if sessions %}
+    <table>
+        <thead>
+            <tr>
+                <th>Appareil</th>
+                <th>Adresse IP</th>
+                <th>Dernière activité</th>
+                <th>Statut</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+            <tr>
+                <td>{{ session.user_agent|truncatechars:50 }}</td>
+                <td>{{ session.ip_address|default:"Inconnue" }}</td>
+                <td>{{ session.last_activity }}</td>
+                <td>
+                    {% if session.session_key == current_session_key %}
+                        <strong>Session actuelle</strong>
+                    {% else %}
+                        Active
+                    {% endif %}
+                </td>
+                <td>
+                    {% if session.session_key != current_session_key %}
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="session_key" value="{{ session.session_key }}">
+                            <button type="submit">Déconnecter</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucune session active.</p>
+{% endif %}
+
+<p><a href="{% url 'accounts:profile' %}">Retour au profil</a></p>
+{% endblock %}

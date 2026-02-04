@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier le Profil{% endblock %}
+
+{% block content %}
+<h1>Modifier le Profil</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <h2>Informations utilisateur</h2>
+    {% for field in user_form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% if field.errors %}
+                <div class="errors">
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    
+    <h2>Profil</h2>
+    {% for field in profile_form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% if field.errors %}
+                <div class="errors">
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    
+    <button type="submit">Enregistrer les modifications</button>
+    <a href="{% url 'accounts:profile' %}">Annuler</a>
+</form>
+{% endblock %}

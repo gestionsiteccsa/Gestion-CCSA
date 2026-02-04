@@ -1,0 +1,130 @@
+[MASTER]
+# Fichiers à ignorer
+ignore=CVS,migrations,venv,env,.git,__pycache__,.pytest_cache
+
+# Extensions à analyser
+extension-pkg-whitelist=
+
+# Nombre de jobs parallèles
+jobs=4
+
+# Plugins à charger
+# Note: pylint-django peut avoir des problèmes de compatibilité avec certaines versions
+# Si vous avez des erreurs, commentez la ligne suivante
+# load-plugins=pylint_django
+
+# Django settings module (nécessaire pour pylint-django)
+# django-settings-module=app.settings
+
+[MESSAGES CONTROL]
+# Désactiver les messages spécifiques
+# E1101: no-member - Faux positifs fréquents avec Django ORM (objects, QuerySet methods)
+# W0212: protected-access - Acceptable dans les tests pour vérifier la logique interne
+# R0903: too-few-public-methods - Acceptable pour les dataclasses et modèles Django
+# R0913: too-many-arguments - Souvent nécessaire dans les méthodes de modèles
+# C0415: import-outside-toplevel - Acceptable dans les tests et méthodes spécifiques
+disable=
+    C0103,  # invalid-name (trop strict pour les variables courtes)
+    C0114,  # missing-module-docstring (optionnel pour les petits modules)
+    E1101,  # no-member - Faux positifs avec Django ORM
+    R0903,  # too-few-public-methods (acceptable pour les dataclasses)
+    R0913,  # too-many-arguments (souvent nécessaire)
+    W0613,  # unused-argument (souvent nécessaire pour les callbacks)
+    W0511,  # fixme (autoriser les TODOs)
+    R0801,  # duplicate-code (souvent faux positif)
+
+[REPORTS]
+# Format du rapport
+output-format=colorized
+
+# Afficher le score
+score=yes
+
+[REFACTORING]
+# Nombre maximum de caractères par ligne
+max-line-length=100
+
+[FORMAT]
+# Indentation
+indent-string='    '
+indent-after-paren=4
+
+[BASIC]
+# Noms de variables autorisés
+good-names=i,j,k,ex,Run,_,pk,id
+
+# Noms de variables interdits
+bad-names=foo,bar,baz,toto,tutu,tata
+
+# Expressions régulières pour les noms
+function-rgx=[a-z_][a-z0-9_]{2,50}$
+variable-rgx=[a-z_][a-z0-9_]{2,30}$
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+attr-rgx=[a-z_][a-z0-9_]{2,30}$
+argument-rgx=[a-z_][a-z0-9_]{2,30}$
+class-attribute-rgx=([A-Za-z_][A-Za-z0-9_]{2,50}|(__.*__))$
+inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
+method-rgx=[a-z_][a-z0-9_]{2,50}$
+
+# Minimum de lignes publiques dans une classe
+min-public-methods=1
+
+# Maximum de lignes publiques dans une classe
+max-public-methods=20
+
+[DESIGN]
+# Maximum d'arguments dans une fonction
+max-args=8
+
+# Maximum de locaux dans une fonction
+max-locals=15
+
+# Maximum de retours dans une fonction
+max-returns=6
+
+# Maximum de branches dans une fonction
+max-branches=12
+
+# Maximum de statements dans une fonction
+max-statements=50
+
+# Maximum de parents pour une classe
+# Augmenté pour Django (les vues héritent de nombreuses classes)
+max-parents=10
+
+# Maximum d'attributs pour une classe
+max-attributes=10
+
+[IMPORTS]
+# Autoriser les imports wildcard
+allow-wildcard-with-all=no
+
+[TYPECHECK]
+# Modules à ignorer pour le type checking
+# Générés automatiquement par Django (managers, QuerySets)
+generated-members=REQUEST,acl_users,aq_parent,objects,DoesNotExist,QuerySet,Manager
+
+# Classes à considérer comme ayant des membres dynamiques
+# Django ORM ajoute dynamiquement des méthodes aux modèles
+ignored-classes=LoginHistory,UserSession,User,UserProfile,QuerySet,Manager
+
+# Modules à considérer comme ayant des membres dynamiques
+ignored-modules=django.db.models,django.db.models.manager
+
+[VARIABLES]
+# Autoriser les noms courts pour les variables de boucle
+dummy-variables-rgx=_|dummy|unused
+
+[CLASSES]
+# Vérifier l'ordre des méthodes
+check-protected-access-in-special-methods=no
+
+[EXCEPTIONS]
+# Exceptions à ignorer pour broad-except
+overgeneral-exceptions=builtins.Exception
+
+[STRING]
+# Vérifier les chaînes de caractères
+check-quote-consistency=yes

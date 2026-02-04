@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<h1>Mon Profil</h1>
+
+<section>
+    <h2>Informations personnelles</h2>
+    <p><strong>Email :</strong> {{ user.email }}</p>
+    <p><strong>Prénom :</strong> {{ user.first_name }}</p>
+    <p><strong>Nom :</strong> {{ user.last_name }}</p>
+    <p><strong>Téléphone :</strong> {{ user.phone_number|default:"Non renseigné" }}</p>
+    
+    {% if user.avatar %}
+        <p><strong>Avatar :</strong></p>
+        <img src="{{ user.avatar.url }}" alt="Avatar" width="100">
+    {% endif %}
+</section>
+
+<section>
+    <h2>Profil</h2>
+    <p><strong>Biographie :</strong> {{ profile.bio|default:"Non renseignée" }}</p>
+    <p><strong>Localisation :</strong> {{ profile.location|default:"Non renseignée" }}</p>
+    <p><strong>Site web :</strong> {{ profile.website|default:"Non renseigné" }}</p>
+    <p><strong>Notifications :</strong> {{ profile.notification_enabled|yesno:"Activées,Désactivées" }}</p>
+</section>
+
+<section>
+    <h2>Actions</h2>
+    <ul>
+        <li><a href="{% url 'accounts:profile_edit' %}">Modifier le profil</a></li>
+        <li><a href="{% url 'accounts:password_change' %}">Changer le mot de passe</a></li>
+        <li><a href="{% url 'accounts:sessions' %}">Gérer les sessions actives</a></li>
+    </ul>
+</section>
+
+{% if login_history %}
+<section>
+    <h2>Historique des connexions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Adresse IP</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in login_history %}
+            <tr>
+                <td>{{ entry.timestamp }}</td>
+                <td>{{ entry.ip_address|default:"Inconnue" }}</td>
+                <td>{{ entry.success|yesno:"Réussie,Échouée" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+{% endblock %}

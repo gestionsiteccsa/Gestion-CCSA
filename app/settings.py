@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "csp",
+    "accounts",
     "home",
 ]
 
@@ -140,6 +141,24 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ============================================================================
+# AUTHENTICATION SETTINGS
+# ============================================================================
+
+# Modèle utilisateur personnalisé
+AUTH_USER_MODEL = 'accounts.User'
+
+# URLs de redirection
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Configuration des inscriptions
+# TODO: Ces paramètres seront modifiables par le super admin via l'interface d'administration
+ACCOUNTS_RESTRICT_EMAIL_DOMAIN = True  # Restreindre les inscriptions à un domaine spécifique
+ACCOUNTS_ALLOWED_EMAIL_DOMAIN = 'cc-sudavesnois.fr'  # Domaine autorisé pour les inscriptions
+ACCOUNTS_REGISTRATION_OPEN = True  # Autoriser les nouvelles inscriptions
+
+# ============================================================================
 # SECURITY SETTINGS
 # ============================================================================
 
@@ -179,12 +198,18 @@ else:
 # EMAIL CONFIGURATION
 # ============================================================================
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+if DEBUG:
+    # En développement : emails dans la console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # En production : SMTP
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
 # ============================================================================
