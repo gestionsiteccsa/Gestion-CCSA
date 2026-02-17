@@ -971,16 +971,21 @@
 
     // Restore from localStorage on page load
     function restoreFromLocalStorage() {
-        const saved = localStorage.getItem('event_draft');
-        if (saved && !document.getElementById('{{ form.title.id_for_label }}').value) {
-            const data = JSON.parse(saved);
-            Object.keys(data).forEach(key => {
-                const field = form.querySelector(`[name="${key}"]`);
-                if (field && !field.value && field.type !== 'file') {
-                    field.value = data[key];
-                }
-            });
-            updateProgress();
+        try {
+            const saved = localStorage.getItem('event_draft');
+            if (saved && !document.getElementById('{{ form.title.id_for_label }}').value) {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const field = form.querySelector(`[name="${key}"]`);
+                    if (field && !field.value && field.type !== 'file') {
+                        field.value = data[key];
+                    }
+                });
+                updateProgress();
+            }
+        } catch (e) {
+            console.error('Error restoring from localStorage:', e);
+            localStorage.removeItem('event_draft');
         }
     }
 
