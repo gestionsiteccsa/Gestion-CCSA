@@ -35,7 +35,7 @@
         <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Month Navigation -->
             <div class="flex items-center justify-center sm:justify-start gap-2">
-                <a href="{% url 'events:event_calendar_month' prev_month.year prev_month.month %}" 
+                <a href="{% url 'events:event_calendar_month' prev_year prev_month %}" 
                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                     <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -45,7 +45,7 @@
 
                 <h2 class="text-xl font-bold text-slate-900 min-w-[200px] text-center">{{ month_name }} {{ year }}</h2>
 
-                <a href="{% url 'events:event_calendar_month' next_month.year next_month.month %}" 
+                <a href="{% url 'events:event_calendar_month' next_year next_month %}" 
                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                     <span class="hidden sm:inline">Mois suivant</span>
                     <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
