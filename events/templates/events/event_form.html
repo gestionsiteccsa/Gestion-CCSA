@@ -552,18 +552,6 @@
             </div>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sticky bottom-4">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-slate-700">Progression</span>
-                <span class="text-sm text-slate-500" id="progress-text">0%</span>
-            </div>
-            <div class="w-full bg-slate-200 rounded-full h-2">
-                <div id="progress-bar" class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <p class="text-xs text-slate-500 mt-2" id="progress-hint">Remplissez les champs obligatoires (*) pour créer l'événement</p>
-        </div>
-
         <!-- Actions -->
         <div class="flex flex-wrap gap-3 pt-4">
             <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
@@ -703,9 +691,6 @@
     // Real-time validation
     const form = document.getElementById('event-form');
     const fields = form.querySelectorAll('[data-validate="realtime"]');
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
-    const progressHint = document.getElementById('progress-hint');
 
     // Validation rules
     const validationRules = {
@@ -771,36 +756,7 @@
             }
         }
 
-        updateProgress();
         return isValid;
-    }
-
-    function updateProgress() {
-        const requiredFields = ['title', 'start_date', 'start_time'];
-        let completed = 0;
-
-        requiredFields.forEach(name => {
-            const field = form.querySelector(`[name="${name}"]`);
-            if (field && field.value.trim()) {
-                completed++;
-            }
-        });
-
-        const percent = Math.round((completed / requiredFields.length) * 100);
-        progressBar.style.width = `${percent}%`;
-        progressText.textContent = `${percent}%`;
-
-        if (percent === 100) {
-            progressBar.classList.remove('bg-primary-600');
-            progressBar.classList.add('bg-green-500');
-            progressHint.textContent = 'Tous les champs obligatoires sont remplis !';
-            progressHint.classList.add('text-green-600');
-        } else {
-            progressBar.classList.add('bg-primary-600');
-            progressBar.classList.remove('bg-green-500');
-            progressHint.textContent = `${requiredFields.length - completed} champ${requiredFields.length - completed > 1 ? 's' : ''} obligatoire${requiredFields.length - completed > 1 ? 's' : ''} restant${requiredFields.length - completed > 1 ? 's' : ''}`;
-            progressHint.classList.remove('text-green-600');
-        }
     }
 
     // Attach validation listeners
@@ -814,7 +770,7 @@
                 errorEl.textContent = '';
                 errorEl.className = 'validation-message';
             }
-            updateProgress();
+            
         });
     });
 
@@ -981,7 +937,7 @@
                         field.value = data[key];
                     }
                 });
-                updateProgress();
+                
             }
         } catch (e) {
             console.error('Error restoring from localStorage:', e);
@@ -1035,9 +991,6 @@
             localStorage.removeItem('event_draft');
         }
     });
-
-    // Initialize progress
-    updateProgress();
 
     // Restore from localStorage
     restoreFromLocalStorage();
