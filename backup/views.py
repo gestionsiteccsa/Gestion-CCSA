@@ -1,6 +1,7 @@
 """Vues pour la gestion des sauvegardes (superadmin uniquement)."""
 
 import os
+import shutil
 from datetime import datetime
 
 from django.contrib import messages
@@ -40,19 +41,16 @@ def backup_dashboard(request):
     # Historique des sauvegardes (20 dernières)
     history = BackupHistory.objects.all()[:20]
 
-    # Vérifier l'espace disque disponible
+    # Vérifier l'espace disque disponible (cross-platform Windows/Linux/Mac)
     backup_dir = config.backup_directory
     disk_usage = None
     if os.path.exists(backup_dir):
-        stat = os.statvfs(backup_dir)
-        total = stat.f_blocks * stat.f_frsize
-        free = stat.f_bfree * stat.f_frsize
-        used = total - free
+        usage = shutil.disk_usage(backup_dir)
         disk_usage = {
-            'total': total,
-            'used': used,
-            'free': free,
-            'percent': (used / total) * 100 if total > 0 else 0
+            'total': usage.total,
+            'used': usage.used,
+            'free': usage.free,
+            'percent': (usage.used / usage.total) * 100 if usage.total > 0 else 0
         }
 
     # Lister les fichiers de sauvegarde existants
