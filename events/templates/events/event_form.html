@@ -335,12 +335,12 @@
 
             <div class="accordion-content hidden p-4 pt-0 border-t border-slate-100" id="content-communication">
                 <div class="space-y-3 pt-4">
-                    <label class="checkbox-card {% if form.comm_before.value %}active{% endif %}">
+                    <label class="block cursor-pointer {% if form.comm_before.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.comm_before.name }}" id="{{ form.comm_before.id_for_label }}"
                                {% if form.comm_before.value %}checked{% endif %}
                                class="hidden">
                         <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
-                            <div class="checkbox-card-icon bg-blue-100 text-blue-600">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-blue-100 text-blue-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -352,12 +352,12 @@
                         </div>
                     </label>
 
-                    <label class="checkbox-card {% if form.comm_during.value %}active{% endif %}">
+                    <label class="block cursor-pointer {% if form.comm_during.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.comm_during.name }}" id="{{ form.comm_during.id_for_label }}"
                                {% if form.comm_during.value %}checked{% endif %}
                                class="hidden">
                         <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
-                            <div class="checkbox-card-icon bg-green-100 text-green-600">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-green-100 text-green-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
@@ -369,12 +369,12 @@
                         </div>
                     </label>
 
-                    <label class="checkbox-card {% if form.comm_after.value %}active{% endif %}">
+                    <label class="block cursor-pointer {% if form.comm_after.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.comm_after.name }}" id="{{ form.comm_after.id_for_label }}"
                                {% if form.comm_after.value %}checked{% endif %}
                                class="hidden">
                         <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
-                            <div class="checkbox-card-icon bg-purple-100 text-purple-600">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-purple-100 text-purple-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
@@ -413,12 +413,12 @@
 
             <div class="accordion-content hidden p-4 pt-0 border-t border-slate-100" id="content-options">
                 <div class="space-y-3 pt-4">
-                    <label class="checkbox-card {% if form.needs_filming.value %}active{% endif %}">
+                    <label class="block cursor-pointer {% if form.needs_filming.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.needs_filming.name }}" id="{{ form.needs_filming.id_for_label }}"
                                {% if form.needs_filming.value %}checked{% endif %}
                                class="hidden">
                         <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
-                            <div class="checkbox-card-icon bg-red-100 text-red-600">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-red-100 text-red-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
@@ -430,12 +430,12 @@
                         </div>
                     </label>
 
-                    <label class="checkbox-card {% if form.needs_poster.value %}active{% endif %}">
+                    <label class="block cursor-pointer {% if form.needs_poster.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.needs_poster.name }}" id="{{ form.needs_poster.id_for_label }}"
                                {% if form.needs_poster.value %}checked{% endif %}
                                class="hidden">
                         <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
-                            <div class="checkbox-card-icon bg-orange-100 text-orange-600">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-orange-100 text-orange-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
@@ -447,12 +447,12 @@
                         </div>
                     </label>
 
-                    <label class="checkbox-card {% if form.notify_on_publish.value %}active{% endif %}">
+                    <label class="block cursor-pointer {% if form.notify_on_publish.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.notify_on_publish.name }}" id="{{ form.notify_on_publish.id_for_label }}"
                                {% if form.notify_on_publish.value %}checked{% endif %}
                                class="hidden">
                         <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
-                            <div class="checkbox-card-icon bg-green-100 text-green-600">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-green-100 text-green-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
@@ -570,48 +570,6 @@
 
 {% block extra_css %}
 <style>
-    /* Form Elements */
-    .form-label {
-        @apply block text-sm font-medium text-slate-700 mb-1.5;
-    }
-
-    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors {
-        @apply w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
-               focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-               hover:border-slate-400 transition-colors;
-    }
-
-    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors.error {
-        @apply border-red-500 focus:ring-red-500 focus:border-red-500;
-    }
-
-    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors.valid {
-        @apply border-green-500 focus:ring-green-500 focus:border-green-500;
-    }
-
-    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors resize-y {
-        @apply w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
-               focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-               hover:border-slate-400 transition-colors resize-y;
-    }
-
-    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors resize-y.error {
-        @apply border-red-500 focus:ring-red-500 focus:border-red-500;
-    }
-
-    /* Validation Messages */
-    .validation-message {
-        @apply mt-1 text-xs h-4 transition-all duration-200;
-    }
-
-    .validation-message.error {
-        @apply text-red-600;
-    }
-
-    .validation-message.success {
-        @apply text-green-600;
-    }
-
     /* Accordion with CSS Checkbox */
     .accordion-checkbox {
         display: none;
@@ -651,42 +609,7 @@
         transition: transform 0.3s ease;
     }
 
-    /* Checkbox Cards */
-    .checkbox-card {
-        @apply block cursor-pointer;
-    }
-
-    .checkbox-card-input {
-        @apply hidden;
-    }
-
-    .checkbox-card-content {
-        @apply flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200;
-    }
-
-    .checkbox-card.active .checkbox-card-content {
-        @apply border-primary-500 bg-primary-50 ring-1 ring-primary-500;
-    }
-
-    .checkbox-card-icon {
-        @apply w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0;
-    }
-
-    .checkbox-card-text {
-        @apply flex flex-col;
-    }
-
-    .checkbox-card-title {
-        @apply text-sm font-medium text-slate-900;
-    }
-
-    .checkbox-card-desc {
-        @apply text-xs text-slate-500 mt-0.5;
-    }
-
-    .checkbox-card-input:checked + .checkbox-card-content {
-        @apply border-primary-500 bg-primary-50 ring-1 ring-primary-500;
-    }
+    /* Checkbox Cards - Using Tailwind classes directly */
 
     /* Sector Selector */
     .sector-selector {
