@@ -335,54 +335,63 @@
 
             <div class="accordion-content hidden p-4 pt-0 border-t border-slate-100" id="content-communication">
                 <div class="space-y-3 pt-4">
-                    <label class="block cursor-pointer {% if form.comm_before.value %}active{% endif %}">
+                    <label class="block cursor-pointer relative">
                         <input type="checkbox" name="{{ form.comm_before.name }}" id="{{ form.comm_before.id_for_label }}"
                                {% if form.comm_before.value %}checked{% endif %}
-                               class="hidden">
-                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
+                               class="checkbox-card-input">
+                        <div class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-blue-300 transition-all duration-200 {% if form.comm_before.value %}border-blue-500 bg-blue-50{% endif %}">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-blue-100 text-blue-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col flex-1">
                                 <span class="text-sm font-medium text-slate-900">Avant l'événement</span>
                                 <span class="text-xs text-slate-500 mt-0.5">Communication préalable (réseaux sociaux, affiches, mail)</span>
                             </div>
+                            <svg class="w-5 h-5 text-blue-600 {% if not form.comm_before.value %}hidden{% endif %} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
                     </label>
 
-                    <label class="block cursor-pointer {% if form.comm_during.value %}active{% endif %}">
+                    <label class="block cursor-pointer relative">
                         <input type="checkbox" name="{{ form.comm_during.name }}" id="{{ form.comm_during.id_for_label }}"
                                {% if form.comm_during.value %}checked{% endif %}
-                               class="hidden">
-                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
+                               class="checkbox-card-input">
+                        <div class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-green-300 transition-all duration-200 {% if form.comm_during.value %}border-green-500 bg-green-50{% endif %}">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-green-100 text-green-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col flex-1">
                                 <span class="text-sm font-medium text-slate-900">Pendant l'événement</span>
                                 <span class="text-xs text-slate-500 mt-0.5">Couverture en direct (stories, photos, vidéos)</span>
                             </div>
+                            <svg class="w-5 h-5 text-green-600 {% if not form.comm_during.value %}hidden{% endif %} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
                     </label>
 
-                    <label class="block cursor-pointer {% if form.comm_after.value %}active{% endif %}">
+                    <label class="block cursor-pointer relative">
                         <input type="checkbox" name="{{ form.comm_after.name }}" id="{{ form.comm_after.id_for_label }}"
                                {% if form.comm_after.value %}checked{% endif %}
-                               class="hidden">
-                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
+                               class="checkbox-card-input">
+                        <div class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-purple-300 transition-all duration-200 {% if form.comm_after.value %}border-purple-500 bg-purple-50{% endif %}">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-purple-100 text-purple-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col flex-1">
                                 <span class="text-sm font-medium text-slate-900">Après l'événement</span>
                                 <span class="text-xs text-slate-500 mt-0.5">Bilan et retour en images (article, album photo)</span>
                             </div>
+                            <svg class="w-5 h-5 text-purple-600 {% if not form.comm_after.value %}hidden{% endif %} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
                     </label>
                 </div>
@@ -413,54 +422,63 @@
 
             <div class="accordion-content hidden p-4 pt-0 border-t border-slate-100" id="content-options">
                 <div class="space-y-3 pt-4">
-                    <label class="block cursor-pointer {% if form.needs_filming.value %}active{% endif %}">
+                    <label class="block cursor-pointer relative">
                         <input type="checkbox" name="{{ form.needs_filming.name }}" id="{{ form.needs_filming.id_for_label }}"
                                {% if form.needs_filming.value %}checked{% endif %}
-                               class="hidden">
-                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
+                               class="checkbox-card-input">
+                        <div class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-red-300 transition-all duration-200 {% if form.needs_filming.value %}border-red-500 bg-red-50{% endif %}">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-red-100 text-red-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col flex-1">
                                 <span class="text-sm font-medium text-slate-900">Tournage vidéo</span>
                                 <span class="text-xs text-slate-500 mt-0.5">Demande d'intervention pour filmer l'événement</span>
                             </div>
+                            <svg class="w-5 h-5 text-red-600 {% if not form.needs_filming.value %}hidden{% endif %} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
                     </label>
 
-                    <label class="block cursor-pointer {% if form.needs_poster.value %}active{% endif %}">
+                    <label class="block cursor-pointer relative">
                         <input type="checkbox" name="{{ form.needs_poster.name }}" id="{{ form.needs_poster.id_for_label }}"
                                {% if form.needs_poster.value %}checked{% endif %}
-                               class="hidden">
-                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
+                               class="checkbox-card-input">
+                        <div class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-orange-300 transition-all duration-200 {% if form.needs_poster.value %}border-orange-500 bg-orange-50{% endif %}">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-orange-100 text-orange-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col flex-1">
                                 <span class="text-sm font-medium text-slate-900">Création d'affiche</span>
                                 <span class="text-xs text-slate-500 mt-0.5">Demande de création d'une affiche pour l'événement</span>
                             </div>
+                            <svg class="w-5 h-5 text-orange-600 {% if not form.needs_poster.value %}hidden{% endif %} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
                     </label>
 
-                    <label class="block cursor-pointer {% if form.notify_on_publish.value %}active{% endif %}">
+                    <label class="block cursor-pointer relative">
                         <input type="checkbox" name="{{ form.notify_on_publish.name }}" id="{{ form.notify_on_publish.id_for_label }}"
                                {% if form.notify_on_publish.value %}checked{% endif %}
-                               class="hidden">
-                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
+                               class="checkbox-card-input">
+                        <div class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-green-300 transition-all duration-200 {% if form.notify_on_publish.value %}border-green-500 bg-green-50{% endif %}">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 bg-green-100 text-green-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col flex-1">
                                 <span class="text-sm font-medium text-slate-900">Notification email</span>
                                 <span class="text-xs text-slate-500 mt-0.5">Recevoir un email lors de la confirmation de publication</span>
                             </div>
+                            <svg class="w-5 h-5 text-green-600 {% if not form.notify_on_publish.value %}hidden{% endif %} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </div>
                     </label>
                 </div>
@@ -624,6 +642,24 @@
         @apply flex flex-wrap gap-2;
     }
 
+    /* Checkbox Cards Styling */
+    .checkbox-card-input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .checkbox-card-input:checked + div {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+        box-shadow: 0 0 0 1px #3b82f6;
+    }
+
+    .checkbox-card-input:focus + div {
+        outline: 2px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
     /* Animations */
     @keyframes fade-in {
         from {
@@ -644,8 +680,28 @@
 
 {% block extra_js %}
 <script>
+    // Gestion des checkbox cards
+    document.querySelectorAll('.checkbox-card-input').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const card = this.closest('label').querySelector('div');
+            const checkIcon = card.querySelector('.check-icon');
+            
+            if (this.checked) {
+                // Ajouter les classes de style "sélectionné"
+                card.classList.add('border-blue-500', 'bg-blue-50');
+                card.classList.remove('border-slate-200');
+                if (checkIcon) checkIcon.classList.remove('hidden');
+            } else {
+                // Retirer les classes de style "sélectionné"
+                card.classList.remove('border-blue-500', 'bg-blue-50');
+                card.classList.add('border-slate-200');
+                if (checkIcon) checkIcon.classList.add('hidden');
+            }
+        });
+    });
+
     // Real-time validation
-        const form = document.getElementById('event-form');
+    const form = document.getElementById('event-form');
     const fields = form.querySelectorAll('[data-validate="realtime"]');
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
