@@ -698,53 +698,72 @@
 
 {% block extra_js %}
 <script>
-    // Accordion functionality - Version robuste
+    // Toggle accordion function
+    function toggleAccordion(accordionId) {
+        console.log('Toggling accordion:', accordionId);
+        
+        // Get elements
+        var header = document.querySelector('[data-accordion="' + accordionId + '"]');
+        var content = document.getElementById('content-' + accordionId);
+        
+        if (!header || !content) {
+            console.error('Accordion elements not found:', accordionId);
+            return;
+        }
+        
+        var isHidden = content.style.display === 'none' || content.classList.contains('hidden');
+        var icon = header.querySelector('.accordion-icon');
+        
+        // Close all accordions except essentials
+        if (accordionId !== 'essentials') {
+            document.querySelectorAll('.accordion-content').forEach(function(c) {
+                if (c.id !== 'content-essentials') {
+                    c.style.display = 'none';
+                    c.classList.remove('hidden');
+                }
+            });
+            document.querySelectorAll('.accordion-header').forEach(function(h) {
+                if (h.getAttribute('data-accordion') !== 'essentials') {
+                    h.classList.remove('active');
+                    var i = h.querySelector('.accordion-icon');
+                    if (i) i.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+        
+        // Toggle current
+        if (isHidden) {
+            content.style.display = 'block';
+            header.classList.add('active');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // Initialize accordions
     document.addEventListener('DOMContentLoaded', function() {
-        // Cacher tous les accordéons sauf essentials au chargement
+        console.log('Initializing accordions...');
+        
+        // Hide all accordions except essentials
         document.querySelectorAll('.accordion-content').forEach(function(content) {
             if (content.id !== 'content-essentials') {
                 content.style.display = 'none';
+                content.classList.remove('hidden');
             }
         });
         
+        // Add click handlers
         document.querySelectorAll('.accordion-header').forEach(function(header) {
             header.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
-                var accordion = header.getAttribute('data-accordion');
-                var content = document.getElementById('content-' + accordion);
-                var isActive = header.classList.contains('active');
-                var icon = header.querySelector('.accordion-icon');
-
-                // Close all accordions except essentials
-                document.querySelectorAll('.accordion-header').forEach(function(h) {
-                    var hAccordion = h.getAttribute('data-accordion');
-                    if (hAccordion !== 'essentials') {
-                        h.classList.remove('active');
-                        var hContent = document.getElementById('content-' + hAccordion);
-                        var hIcon = h.querySelector('.accordion-icon');
-                        if (hContent) {
-                            hContent.style.display = 'none';
-                        }
-                        if (hIcon) {
-                            hIcon.style.transform = 'rotate(0deg)';
-                        }
-                    }
-                });
-
-                // Toggle current accordion
-                if (!isActive) {
-                    header.classList.add('active');
-                    if (content) {
-                        content.style.display = 'block';
-                    }
-                    if (icon) {
-                        icon.style.transform = 'rotate(180deg)';
-                    }
-                }
+                var accordionId = header.getAttribute('data-accordion');
+                toggleAccordion(accordionId);
             });
+            header.style.cursor = 'pointer';
         });
+        
+        console.log('Accordions initialized');
+    });
 
         // Real-time validation
         const form = document.getElementById('event-form');
