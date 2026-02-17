@@ -668,8 +668,10 @@
 
 {% block extra_js %}
 <script>
-    // Gestion des checkbox cards
-    document.querySelectorAll('.checkbox-card-input').forEach(function(checkbox) {
+    // Attendre que le DOM soit prêt
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestion des checkbox cards
+        document.querySelectorAll('.checkbox-card-input').forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
             const card = this.closest('label').querySelector('div');
             const checkIcon = card.querySelector('.check-icon');
