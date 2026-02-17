@@ -698,26 +698,52 @@
 
 {% block extra_js %}
 <script>
-    // Accordion functionality
-    document.querySelectorAll('.accordion-header').forEach(header => {
-        header.addEventListener('click', () => {
-            const accordion = header.dataset.accordion;
-            const content = document.getElementById(`content-${accordion}`);
-            const isActive = header.classList.contains('active');
+    // Accordion functionality - Version robuste
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cacher tous les accordéons sauf essentials au chargement
+        document.querySelectorAll('.accordion-content').forEach(function(content) {
+            if (content.id !== 'content-essentials') {
+                content.style.display = 'none';
+            }
+        });
+        
+        document.querySelectorAll('.accordion-header').forEach(function(header) {
+            header.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var accordion = header.getAttribute('data-accordion');
+                var content = document.getElementById('content-' + accordion);
+                var isActive = header.classList.contains('active');
+                var icon = header.querySelector('.accordion-icon');
 
-            // Close all accordions except essentials
-            document.querySelectorAll('.accordion-header').forEach(h => {
-                if (h.dataset.accordion !== 'essentials') {
-                    h.classList.remove('active');
-                    document.getElementById(`content-${h.dataset.accordion}`).classList.add('hidden');
+                // Close all accordions except essentials
+                document.querySelectorAll('.accordion-header').forEach(function(h) {
+                    var hAccordion = h.getAttribute('data-accordion');
+                    if (hAccordion !== 'essentials') {
+                        h.classList.remove('active');
+                        var hContent = document.getElementById('content-' + hAccordion);
+                        var hIcon = h.querySelector('.accordion-icon');
+                        if (hContent) {
+                            hContent.style.display = 'none';
+                        }
+                        if (hIcon) {
+                            hIcon.style.transform = 'rotate(0deg)';
+                        }
+                    }
+                });
+
+                // Toggle current accordion
+                if (!isActive) {
+                    header.classList.add('active');
+                    if (content) {
+                        content.style.display = 'block';
+                    }
+                    if (icon) {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
                 }
             });
-
-            // Toggle current accordion
-            if (!isActive) {
-                header.classList.add('active');
-                content.classList.remove('hidden');
-            }
         });
     });
 
