@@ -763,7 +763,6 @@
         });
         
         console.log('Accordions initialized');
-    });
 
         // Real-time validation
         const form = document.getElementById('event-form');
@@ -1049,9 +1048,6 @@
         }
     }
 
-    // Restore on load
-    restoreFromLocalStorage();
-
     // Save as draft button
     function saveAsDraft() {
         saveToLocalStorage();
@@ -1099,8 +1095,11 @@
         }
     });
 
-        // Initialize progress
-        updateProgress();
-    });
+    // Initialize progress
+    updateProgress();
+
+    // Restore from localStorage
+    restoreFromLocalStorage();
+});
 </script>
 {% endblock %}
