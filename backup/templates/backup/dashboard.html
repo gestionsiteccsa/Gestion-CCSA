@@ -173,8 +173,11 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Type de sauvegarde</label>
-                    <select name="backup_type" class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Type de sauvegarde</label>
+                    <select name="backup_type" 
+                            class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
+                                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+                                   hover:border-slate-400 transition-colors cursor-pointer">
                         <option value="database" {% if config.backup_type == 'database' %}selected{% endif %}>Base de données uniquement</option>
                         <option value="media" {% if config.backup_type == 'media' %}selected{% endif %}>Dossier média uniquement</option>
                         <option value="full" {% if config.backup_type == 'full' %}selected{% endif %}>Complète (DB + Média)</option>
@@ -182,8 +185,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Fréquence</label>
-                    <select name="frequency" class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Fréquence</label>
+                    <select name="frequency" 
+                            class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
+                                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+                                   hover:border-slate-400 transition-colors cursor-pointer">
                         <option value="daily" {% if config.frequency == 'daily' %}selected{% endif %}>Quotidien</option>
                         <option value="weekly" {% if config.frequency == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
                         <option value="monthly" {% if config.frequency == 'monthly' %}selected{% endif %}>Mensuel</option>
@@ -191,22 +197,32 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Dossier de sauvegarde</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Dossier de sauvegarde</label>
                     <input type="text" name="backup_directory" value="{{ config.backup_directory }}" 
-                           class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
+                                  placeholder-slate-400
+                                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+                                  hover:border-slate-400 transition-colors">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Conserver les N dernières sauvegardes</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Conserver les N dernières sauvegardes</label>
                     <input type="number" name="keep_last_n" value="{{ config.keep_last_n }}" min="1" max="100"
-                           class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
+                                  placeholder-slate-400
+                                  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+                                  hover:border-slate-400 transition-colors">
                 </div>
             </div>
 
-            <div class="flex items-center">
+            <div class="flex items-center pt-2">
                 <input type="checkbox" name="is_active" id="is_active" {% if config.is_active %}checked{% endif %}
-                       class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                <label for="is_active" class="ml-2 text-sm text-slate-700">Activer les sauvegardes automatiques</label>
+                       class="w-4 h-4 border border-slate-300 rounded text-primary-600 
+                              focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-0
+                              cursor-pointer">
+                <label for="is_active" class="ml-3 text-sm text-slate-700 cursor-pointer select-none">
+                    Activer les sauvegardes automatiques
+                </label>
             </div>
 
             <div class="flex justify-end">
