@@ -121,6 +121,9 @@
             <span class="tooltip-creator-name"></span>
         </span>
     </div>
+    <div class="tooltip-validation">
+        <span class="tooltip-validation-badge"></span>
+    </div>
 </div>
 
 <!-- Données pour FullCalendar -->
@@ -143,6 +146,7 @@
                 endTime: "{{ event.end_datetime|date:'H:i' }}",
                 {% endif %}
                 createdBy: "{{ event.created_by.get_full_name|escapejs }}",
+                isValidated: {% if event.validation %}{% if event.validation.is_validated %}true{% else %}false{% endif %}{% else %}null{% endif %},
                 sectors: [
                     {% for sector in event.sectors.all %}
                     { name: "{{ sector.name|escapejs }}", color: "{{ sector.color_code }}" }{% if not forloop.last %},{% endif %}
@@ -273,6 +277,37 @@
                 ).join('');
             } else {
                 sectorsContainer.innerHTML = '<span class="tooltip-no-sectors">Aucun secteur</span>';
+            }
+            
+            // Mettre à jour le statut de validation
+            const validationBadge = tooltipEl.querySelector('.tooltip-validation-badge');
+            if (props.isValidated === true) {
+                validationBadge.innerHTML = `
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Validé
+                    </span>
+                `;
+            } else if (props.isValidated === false) {
+                validationBadge.innerHTML = `
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        Refusé
+                    </span>
+                `;
+            } else {
+                validationBadge.innerHTML = `
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        En attente
+                    </span>
+                `;
             }
             
             // Afficher l'infobulle
@@ -525,6 +560,17 @@
         font-size: 0.875rem;
         color: #94a3b8;
         font-style: italic;
+    }
+    
+    .tooltip-validation {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .tooltip-validation-badge {
+        display: flex;
+        justify-content: center;
     }
     
     /* Dates passées grisées */
