@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres des événements - Administration{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Paramètres des événements</h1>
+        <p class="mt-2 text-slate-600">
+            Configurez les paramètres globaux de l'application Événements.
+        </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="rounded-lg p-4 mb-2 {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Formulaire -->
+    <form method="post" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        {% csrf_token %}
+        
+        <!-- Section: Emails -->
+        <div class="p-6 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Configuration des emails
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- Email de notification vidéo -->
+                <div>
+                    <label for="{{ form.video_notification_email.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                        {{ form.video_notification_email.label }}
+                    </label>
+                    {{ form.video_notification_email }}
+                    {% if form.video_notification_email.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.video_notification_email.help_text }}</p>
+                    {% endif %}
+                    {% if form.video_notification_email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.video_notification_email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email d'expédition -->
+                <div>
+                    <label for="{{ form.default_from_email.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                        {{ form.default_from_email.label }}
+                    </label>
+                    {{ form.default_from_email }}
+                    {% if form.default_from_email.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.default_from_email.help_text }}</p>
+                    {% endif %}
+                    {% if form.default_from_email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.default_from_email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Limites -->
+        <div class="p-6 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                </svg>
+                Limites et quotas
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Max événements par utilisateur -->
+                <div>
+                    <label for="{{ form.max_events_per_user.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                        {{ form.max_events_per_user.label }}
+                    </label>
+                    {{ form.max_events_per_user }}
+                    {% if form.max_events_per_user.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.max_events_per_user.help_text }}</p>
+                    {% endif %}
+                    {% if form.max_events_per_user.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.max_events_per_user.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Max images par événement -->
+                <div>
+                    <label for="{{ form.max_images_per_event.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                        {{ form.max_images_per_event.label }}
+                    </label>
+                    {{ form.max_images_per_event }}
+                    {% if form.max_images_per_event.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.max_images_per_event.help_text }}</p>
+                    {% endif %}
+                    {% if form.max_images_per_event.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.max_images_per_event.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Validation automatique -->
+        <div class="p-6 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Validation
+            </h2>
+            
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    {{ form.auto_validate_events }}
+                </div>
+                <div class="ml-3">
+                    <label for="{{ form.auto_validate_events.id_for_label }}" class="font-medium text-slate-700">
+                        {{ form.auto_validate_events.label }}
+                    </label>
+                    {% if form.auto_validate_events.help_text %}
+                    <p class="text-slate-500 text-sm">{{ form.auto_validate_events.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations de modification -->
+        {% if object.updated_at and object.updated_by %}
+        <div class="p-6 bg-slate-50 border-b border-slate-200">
+            <p class="text-sm text-slate-600">
+                <span class="font-medium">Dernière modification:</span> 
+                {{ object.updated_at|date:"d/m/Y \à H:i" }} 
+                par {{ object.updated_by.get_full_name|default:object.updated_by.email }}
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Boutons d'action -->
+        <div class="p-6 flex justify-end space-x-3">
+            <a href="{% url 'home' %}" 
+               class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                Annuler
+            </a>
+            <button type="submit" 
+                    class="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                Enregistrer les paramètres
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

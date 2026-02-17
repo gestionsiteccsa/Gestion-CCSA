@@ -1,0 +1,30 @@
+<label class="inline-flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all hover:shadow-sm {% if widget.attrs.checked %}border-primary-500 bg-primary-50{% else %}border-slate-200 bg-white hover:border-slate-300{% endif %}"
+       for="{{ widget.attrs.id }}"
+       {% if widget.attrs.data_color %}
+       style="border-color: {% if widget.attrs.checked %}{{ widget.attrs.data_color }}{% else %}#e2e8f0{% endif %};"
+       onmouseover="this.style.borderColor='{{ widget.attrs.data_color }}'"
+       onmouseout="{% if not widget.attrs.checked %}this.style.borderColor='#e2e8f0'{% endif %}"
+       {% endif %}>
+    
+    <input type="{{ widget.type }}"
+           name="{{ widget.name }}"
+           value="{{ widget.value }}"
+           id="{{ widget.attrs.id }}"
+           class="sr-only"
+           {% if widget.attrs.checked %}checked{% endif %}
+           {% if widget.attrs.disabled %}disabled{% endif %}
+           {% if widget.attrs.required %}required{% endif %}>
+    
+    {% if widget.attrs.data_color %}
+    <span class="w-4 h-4 rounded mr-2 flex-shrink-0" 
+          style="background-color: {{ widget.attrs.data_color }};"></span>
+    {% endif %}
+    
+    <span class="text-sm font-medium {% if widget.attrs.checked %}text-slate-900{% else %}text-slate-700{% endif %}">{{ widget.label }}</span>
+    
+    {% if widget.attrs.checked %}
+    <svg class="w-4 h-4 ml-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    {% endif %}
+</label>

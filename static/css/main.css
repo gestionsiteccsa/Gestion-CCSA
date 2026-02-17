@@ -1,0 +1,16 @@
+/* Main CSS - Point d'entrée */
+
+/* 1. Base */
+@import 'base/variables.css';
+@import 'base/reset.css';
+
+/* 2. Composants */
+@import 'components/cards.css';
+@import 'components/badges.css';
+@import 'components/timeline.css';
+@import 'components/tooltips.css';
+
+/* 3. Utilitaires */
+@import 'utilities/animations.css';
+
+/* Note: Les fichiers pages/*.css sont chargés conditionnellement dans les templates */

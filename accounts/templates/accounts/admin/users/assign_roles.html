@@ -1,0 +1,190 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="mb-6">
+    <a href="{% url 'accounts:admin_user_list' %}" class="text-sm text-slate-500 hover:text-slate-700">
+        ← Retour aux utilisateurs
+    </a>
+    
+    <h1 class="text-2xl font-bold text-slate-800 mt-2">
+        Attribuer des rôles à {{ target_user.get_full_name|default:target_user.email }}
+    </h1>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Rôles disponibles -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+        <div class="p-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-800">Rôles disponibles</h2>
+            <p class="text-sm text-slate-500">Glissez-déposez vers la droite</p>
+        </div>
+        
+        <div id="available-roles" class="p-4 min-h-[300px] drop-zone">
+            {% for role in all_roles %}
+            {% if role not in user_roles %}
+            <div class="draggable-item bg-slate-50 rounded-lg p-3 mb-2 border border-slate-200"
+                 data-role-id="{{ role.id }}">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full mr-3" style="background-color: {{ role.color }}"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-slate-800">{{ role.name }}</div>
+                        <div class="text-xs text-slate-500">{{ role.description|truncatechars:50 }}</div>
+                    </div>
+                    
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                    </svg>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Rôles assignés -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+        <div class="p-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-800">Rôles assignés</h2>
+            <p class="text-sm text-slate-500">Glissez-déposez pour réorganiser</p>
+        </div>
+        
+        <div id="assigned-roles" class="p-4 min-h-[300px] drop-zone">
+            {% for role in user_roles %}
+            <div class="draggable-item bg-primary-50 rounded-lg p-3 mb-2 border border-primary-200"
+                 data-role-id="{{ role.id }}">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full mr-3" style="background-color: {{ role.color }}"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-slate-800">{{ role.name }}</div>
+                        <div class="text-xs text-slate-500">{{ role.description|truncatechars:50 }}</div>
+                    </div>
+                    
+                    <button onclick="removeRole({{ role.id }})" class="text-red-500 hover:text-red-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="mt-6 flex justify-end">
+    <button onclick="saveRoles()" 
+            class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            id="save-btn">
+        Enregistrer les modifications
+    </button>
+</div>
+
+<script>
+    let availableSortable, assignedSortable;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const availableEl = document.getElementById('available-roles');
+        const assignedEl = document.getElementById('assigned-roles');
+        
+        // Initialiser SortableJS
+        availableSortable = Sortable.create(availableEl, {
+            group: 'roles',
+            animation: 150,
+            ghostClass: 'dragging',
+            dragClass: 'dragging',
+            onAdd: function(evt) {
+                // Style quand un élément arrive
+                evt.item.classList.remove('bg-primary-50', 'border-primary-200');
+                evt.item.classList.add('bg-slate-50', 'border-slate-200');
+            }
+        });
+        
+        assignedSortable = Sortable.create(assignedEl, {
+            group: 'roles',
+            animation: 150,
+            ghostClass: 'dragging',
+            dragClass: 'dragging',
+            onAdd: function(evt) {
+                // Style quand un élément arrive
+                evt.item.classList.remove('bg-slate-50', 'border-slate-200');
+                evt.item.classList.add('bg-primary-50', 'border-primary-200');
+                
+                // Ajouter le bouton de suppression
+                const btn = evt.item.querySelector('button');
+                if (!btn) {
+                    const newBtn = document.createElement('button');
+                    newBtn.onclick = function() { removeRole(evt.item.dataset.roleId); };
+                    newBtn.className = 'text-red-500 hover:text-red-700';
+                    newBtn.innerHTML = `
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    `;
+                    evt.item.querySelector('.flex').appendChild(newBtn);
+                }
+            }
+        });
+    });
+    
+    function removeRole(roleId) {
+        const item = document.querySelector(`[data-role-id="${roleId}"]`);
+        if (item) {
+            const availableEl = document.getElementById('available-roles');
+            availableEl.appendChild(item);
+            
+            // Mettre à jour le style
+            item.classList.remove('bg-primary-50', 'border-primary-200');
+            item.classList.add('bg-slate-50', 'border-slate-200');
+            
+            // Supprimer le bouton
+            const btn = item.querySelector('button');
+            if (btn) btn.remove();
+        }
+    }
+    
+    async function saveRoles() {
+        const btn = document.getElementById('save-btn');
+        const originalText = btn.textContent;
+        
+        btn.disabled = true;
+        btn.textContent = 'Enregistrement...';
+        
+        try {
+            const assignedEl = document.getElementById('assigned-roles');
+            const roleIds = Array.from(assignedEl.children).map(el => el.dataset.roleId);
+            
+            const response = await fetch('{% url "accounts:admin_user_assign_roles" target_user.id %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ role_ids: roleIds })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                btn.textContent = 'Enregistré !';
+                btn.classList.remove('bg-primary-600', 'hover:bg-primary-700');
+                btn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('bg-green-600');
+                    btn.classList.add('bg-primary-600', 'hover:bg-primary-700');
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Erreur inconnue');
+            }
+            
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue: ' + error.message);
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    }
+</script>
+{% endblock %}

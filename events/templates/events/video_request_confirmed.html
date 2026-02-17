@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmation de participation - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+    <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-8 text-center">
+        {% if already_confirmed %}
+        <!-- Déjà confirmé -->
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-6">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 mb-4">Participation déjà confirmée</h1>
+        <p class="text-slate-600 mb-6">
+            Vous avez déjà confirmé votre participation à ce tournage le 
+            <strong>{{ video_request.confirmed_at|date:"d/m/Y à H:i" }}</strong>.
+        </p>
+        {% else %}
+        <!-- Confirmation réussie -->
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 mb-4">Participation confirmée !</h1>
+        <p class="text-slate-600 mb-6">
+            Merci d'avoir confirmé votre participation au tournage vidéo. 
+            L'équipe Communication a été notifiée.
+        </p>
+        {% endif %}
+
+        <!-- Détails de l'événement -->
+        <div class="bg-slate-50 rounded-lg p-6 text-left mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">{{ event.title }}</h2>
+            <div class="space-y-2 text-sm text-slate-600">
+                <p><strong>Date :</strong> {{ event.start_datetime|date:"d/m/Y" }}</p>
+                <p><strong>Heure :</strong> {{ event.start_datetime|time:"H:i" }}{% if event.end_datetime %} - {{ event.end_datetime|time:"H:i" }}{% endif %}</p>
+                <p><strong>Lieu :</strong> {{ event.location }}{% if event.city %}, {{ event.city }}{% endif %}</p>
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="space-y-3">
+            <h3 class="text-sm font-medium text-slate-700 mb-3">Ajouter à votre agenda</h3>
+            
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <!-- Google Calendar -->
+                <a href="{{ google_calendar_url }}" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM8.25 15.75a.75.75 0 01-1.5 0v-3.75a.75.75 0 011.5 0v3.75zm0-6a.75.75 0 01-1.5 0V6a.75.75 0 011.5 0v3.75zm6.75 6a.75.75 0 01-1.5 0v-3.75a.75.75 0 011.5 0v3.75zm0-6a.75.75 0 01-1.5 0V6a.75.75 0 011.5 0v3.75z"/>
+                    </svg>
+                    Google Calendar
+                </a>
+
+                <!-- Outlook -->
+                <a href="{{ outlook_calendar_url }}" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-[#0078D4] hover:bg-[#106EBE]">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.08V19.92Q22 20.26 21.76 20.5 21.5 20.75 21.17 20.75H7.83Q7.5 20.75 7.24 20.5 7 20.26 7 19.92V17H2.83Q2.5 17 2.24 16.76 2 16.5 2 16.17V7.83Q2 7.5 2.24 7.24 2.5 7 2.83 7H7V4.08Q7 3.74 7.24 3.5 7.5 3.25 7.83 3.25M7 13.06L8.18 15.28H9.97L8 12.06L9.93 8.89H8.22L7.13 10.9L7.09 10.96L7.06 11.03Q6.8 10.5 6.5 9.96 6.25 9.43 5.97 8.89H4.16L6.05 12.08L4 15.28H5.78M13.88 19.5V17H8.25V19.5M13.88 15.75V12.63H12V15.75M13.88 11.38V8.25H12V11.38M13.88 7V4.5H8.25V7M20.75 19.5V17H15.13V19.5M20.75 15.75V12.63H15.13V15.75M20.75 11.38V8.25H15.13V11.38M20.75 7V4.5H15.13V7Z"/>
+                    </svg>
+                    Outlook
+                </a>
+
+                <!-- ICS Download -->
+                <a href="{% url 'events:download_ics' event.slug %}" 
+                   class="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Télécharger (.ics)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

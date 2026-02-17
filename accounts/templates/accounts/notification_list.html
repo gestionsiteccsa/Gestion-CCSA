@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Notifications</h1>
+            <p class="mt-2 text-slate-600">
+                {% if unread_count > 0 %}
+                    Vous avez {{ unread_count }} notification{{ unread_count|pluralize:"s" }} non lue{{ unread_count|pluralize:"s" }}
+                {% else %}
+                    Toutes vos notifications ont été lues
+                {% endif %}
+            </p>
+        </div>
+        
+        {% if unread_count > 0 %}
+        <form method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" name="mark_all_read" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Tout marquer comme lu
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- Liste des notifications -->
+    <div class="space-y-4">
+        {% for notification in page_obj %}
+        <div class="bg-white rounded-xl shadow-sm border {% if not notification.is_read %}border-blue-200 bg-blue-50{% else %}border-slate-200{% endif %} p-6 transition-all hover:shadow-md">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <!-- Type et date -->
+                    <div class="flex items-center gap-3 mb-2">
+                        {% if notification.notification_type == 'video_refused' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Refus tournage
+                            </span>
+                        {% elif notification.notification_type == 'video_confirmed' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Confirmation tournage
+                            </span>
+                        {% elif notification.notification_type == 'event_created' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                Nouvel événement
+                            </span>
+                        {% elif notification.notification_type == 'event_validated' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Événement validé
+                            </span>
+                        {% elif notification.notification_type == 'event_rejected' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Événement rejeté
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Notification
+                            </span>
+                        {% endif %}
+                        
+                        <span class="text-xs text-slate-500">{{ notification.created_at|date:"d/m/Y à H:i" }}</span>
+                        
+                        {% if not notification.is_read %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                Non lue
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Titre et message -->
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">{{ notification.title }}</h3>
+                    <p class="text-slate-600 mb-4">{{ notification.message }}</p>
+                    
+                    <!-- Actions -->
+                    <div class="flex items-center gap-3">
+                        {% if notification.link %}
+                        <a href="{{ notification.link }}" 
+                           class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200">
+                            Voir les détails
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                        {% endif %}
+                        
+                        {% if not notification.is_read %}
+                        <button onclick="markAsRead('{{ notification.id }}', this)"
+                                class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-slate-700 bg-slate-100 hover:bg-slate-200">
+                            Marquer comme lue
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-slate-900">Aucune notification</h3>
+            <p class="mt-2 text-slate-600">Vous n'avez pas encore de notifications.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" 
+               class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                ← Précédent
+            </a>
+            {% endif %}
+            
+            <span class="px-4 py-2 text-sm text-slate-600">
+                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" 
+               class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                Suivant →
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function markAsRead(notificationId, button) {
+    fetch(`/accounts/notifications/${notificationId}/mark-read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mettre à jour l'interface
+            const notificationDiv = button.closest('.bg-white');
+            notificationDiv.classList.remove('border-blue-200', 'bg-blue-50');
+            notificationDiv.classList.add('border-slate-200');
+            notificationDiv.classList.remove('bg-blue-50');
+            
+            // Supprimer le bouton
+            button.remove();
+            
+            // Mettre à jour le badge "Non lue"
+            const badge = notificationDiv.querySelector('.bg-blue-100');
+            if (badge) badge.remove();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

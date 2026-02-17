@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Préférences de notification - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Préférences de notification</h1>
+        <p class="mt-2 text-slate-600">
+            Gérez les notifications que vous souhaitez recevoir et par quel canal (application ou email).
+        </p>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <!-- Notifications disponibles -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-slate-900">
+                    Types de notifications
+                </h2>
+                <p class="text-sm text-slate-500 mt-1">
+                    {% if is_communication %}
+                        Vous êtes membre de l'équipe Communication. Toutes les notifications sont disponibles.
+                    {% else %}
+                        En tant qu'utilisateur, vous pouvez recevoir des notifications pour la validation de vos événements et les commentaires.
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="divide-y divide-slate-200">
+                {% for pref in preferences.values %}
+                <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-slate-900">
+                                {{ pref.get_notification_type_display }}
+                            </span>
+                            
+                            <!-- Badge selon le type -->
+                            {% if pref.notification_type == 'event_validated' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                Validation
+                            </span>
+                            {% elif pref.notification_type == 'event_commented' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                Commentaire
+                            </span>
+                            {% elif 'video' in pref.notification_type %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                Vidéo
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Description selon le type -->
+                        <p class="text-xs text-slate-500 mt-1">
+                            {% if pref.notification_type == 'video_refused' %}
+                                Reçu quand un cameraman refuse une demande de tournage
+                            {% elif pref.notification_type == 'video_confirmed' %}
+                                Reçu quand un cameraman confirme un tournage
+                            {% elif pref.notification_type == 'event_created' %}
+                                Reçu quand un nouvel événement est créé
+                            {% elif pref.notification_type == 'event_updated' %}
+                                Reçu quand un événement est modifié
+                            {% elif pref.notification_type == 'event_deleted' %}
+                                Reçu quand un événement est supprimé
+                            {% elif pref.notification_type == 'event_commented' %}
+                                Reçu quand quelqu'un commente un événement
+                            {% elif pref.notification_type == 'event_validated' %}
+                                Reçu quand votre événement est validé par la communication
+                            {% elif pref.notification_type == 'event_rejected' %}
+                                Reçu quand votre événement est rejeté
+                            {% elif pref.notification_type == 'video_request_sent' %}
+                                Reçu quand une demande de tournage est envoyée
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center gap-6 ml-4">
+                        <!-- Notification in-app -->
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" 
+                                   name="in_app_{{ pref.notification_type }}"
+                                   {% if pref.in_app_enabled %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-2 text-sm text-slate-700">
+                                Application
+                            </span>
+                        </label>
+                        
+                        <!-- Notification email -->
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" 
+                                   name="email_{{ pref.notification_type }}"
+                                   {% if pref.email_enabled %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-2 text-sm text-slate-700">
+                                Email
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="flex items-center justify-between pt-4">
+            <a href="{% url 'accounts:profile' %}" 
+               class="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Retour au profil
+            </a>
+            
+            <button type="submit" 
+                    class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Enregistrer les préférences
+            </button>
+        </div>
+    </form>
+
+    <!-- Informations complémentaires -->
+    <div class="mt-8 bg-blue-50 rounded-lg p-4 border border-blue-200">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <h3 class="text-sm font-medium text-blue-900">À propos des notifications</h3>
+                <div class="mt-2 text-sm text-blue-700 space-y-1">
+                    <p><strong>Application :</strong> Les notifications apparaissent dans la cloche en haut à droite de l'écran.</p>
+                    <p><strong>Email :</strong> Les notifications sont envoyées à votre adresse email ({{ user.email }}).</p>
+                    <p class="mt-2">Vous pouvez aussi désactiver toutes les notifications depuis votre <a href="{% url 'accounts:profile' %}" class="underline hover:text-blue-800">profil</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,824 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load event_tags %}
+
+{% block title %}Tableau de bord Communication - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Tableau de bord Communication</h1>
+                <p class="mt-1 text-slate-600">Statistiques et analyses des événements</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <a href="{% url 'events:event_validation_list' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Validation
+                    {% if ref_stats.pending_validation > 0 %}
+                    <span class="ml-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full">{{ ref_stats.pending_validation }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panneau de filtres -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <form method="get" id="dashboard-filters" class="space-y-6">
+            
+            <!-- Ligne 1: Période de référence -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Année -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Année de référence</label>
+                    <select name="year" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        {% for year in available_years %}
+                        <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Type de période -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Type de période</label>
+                    <select name="period_type" id="period-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="year" {% if period_type == 'year' %}selected{% endif %}>Année complète</option>
+                        <option value="quarter" {% if period_type == 'quarter' %}selected{% endif %}>Trimestre</option>
+                        <option value="month" {% if period_type == 'month' %}selected{% endif %}>Mois</option>
+                        <option value="custom" {% if period_type == 'custom' %}selected{% endif %}>Période personnalisée</option>
+                    </select>
+                </div>
+
+                <!-- Trimestre (affiché si period_type=quarter) -->
+                <div id="quarter-select" class="{% if period_type != 'quarter' %}hidden{% endif %}">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Trimestre</label>
+                    <select name="quarter" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="1" {% if selected_quarter == '1' %}selected{% endif %}>T1 (Jan-Mar)</option>
+                        <option value="2" {% if selected_quarter == '2' %}selected{% endif %}>T2 (Avr-Juin)</option>
+                        <option value="3" {% if selected_quarter == '3' %}selected{% endif %}>T3 (Juil-Sep)</option>
+                        <option value="4" {% if selected_quarter == '4' %}selected{% endif %}>T4 (Oct-Déc)</option>
+                    </select>
+                </div>
+
+                <!-- Mois (affiché si period_type=month) -->
+                <div id="month-select" class="{% if period_type != 'month' %}hidden{% endif %}">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Mois</label>
+                    <select name="month" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        {% for month_num, month_name in months_list %}
+                        <option value="{{ month_num }}" {% if selected_month == month_num|stringformat:"s" %}selected{% endif %}>{{ month_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dates personnalisées (affiché si period_type=custom) -->
+            <div id="custom-dates" class="{% if period_type != 'custom' %}hidden{% endif %} grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Date de début</label>
+                    <input type="date" name="date_from" value="{{ date_from|default:'' }}" 
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Date de fin</label>
+                    <input type="date" name="date_to" value="{{ date_to|default:'' }}"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+            </div>
+
+            <!-- Ligne 2: Mode de comparaison -->
+            <div class="border-t border-slate-200 pt-6">
+                <h3 class="text-sm font-medium text-slate-900 mb-3">Mode de comparaison</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Sélection du mode -->
+                    <div class="lg:col-span-2">
+                        <div class="flex flex-wrap gap-3">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="compare_mode" value="none" 
+                                       {% if compare_mode == 'none' %}checked{% endif %}
+                                       class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500">
+                                <span class="ml-2 text-sm text-slate-700">Aucune comparaison</span>
+                            </label>
+                            
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="compare_mode" value="previous_year"
+                                       {% if compare_mode == 'previous_year' %}checked{% endif %}
+                                       class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500">
+                                <span class="ml-2 text-sm text-slate-700">Année précédente</span>
+                            </label>
+                            
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="compare_mode" value="ytd"
+                                       {% if compare_mode == 'ytd' %}checked{% endif %}
+                                       class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500">
+                                <span class="ml-2 text-sm text-slate-700">YTD (Year To Date)</span>
+                            </label>
+                            
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="compare_mode" value="custom"
+                                       {% if compare_mode == 'custom' %}checked{% endif %}
+                                       class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500">
+                                <span class="ml-2 text-sm text-slate-700">Années personnalisées</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sélection des années de comparaison (affiché si mode=custom) -->
+                    <div id="custom-years-select" class="lg:col-span-2 {% if compare_mode != 'custom' %}hidden{% endif %}">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Sélectionner les années à comparer</label>
+                        <div class="flex flex-wrap gap-2">
+                            {% for year in available_years %}
+                            {% if year != selected_year %}
+                            <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" name="compare_years" value="{{ year }}"
+                                       {% if year in compare_years %}checked{% endif %}
+                                       class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                                <span class="ml-2 text-sm text-slate-700">{{ year }}</span>
+                            </label>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ligne 3: Métriques à afficher -->
+            <div class="border-t border-slate-200 pt-6">
+                <h3 class="text-sm font-medium text-slate-900 mb-3">Métriques à afficher</h3>
+                
+                <div class="flex flex-wrap gap-3">
+                    <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" name="metrics" value="total"
+                               {% if 'total' in selected_metrics %}checked{% endif %}
+                               class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <span class="ml-2 text-sm text-slate-700">Total événements</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" name="metrics" value="validated"
+                               {% if 'validated' in selected_metrics %}checked{% endif %}
+                               class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <span class="ml-2 text-sm text-slate-700">Validations</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" name="metrics" value="pending"
+                               {% if 'pending' in selected_metrics %}checked{% endif %}
+                               class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <span class="ml-2 text-sm text-slate-700">En attente</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" name="metrics" value="sectors"
+                               {% if 'sectors' in selected_metrics %}checked{% endif %}
+                               class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <span class="ml-2 text-sm text-slate-700">Secteurs</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" name="metrics" value="cities"
+                               {% if 'cities' in selected_metrics %}checked{% endif %}
+                               class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <span class="ml-2 text-sm text-slate-700">Villes</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" name="metrics" value="creators"
+                               {% if 'creators' in selected_metrics %}checked{% endif %}
+                               class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                        <span class="ml-2 text-sm text-slate-700">Créateurs</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-3 pt-4 border-t border-slate-200">
+                <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Mettre à jour les statistiques
+                </button>
+                
+                <a href="{% url 'events:communication_dashboard' %}" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                    Réinitialiser
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Période affichée -->
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h2 class="text-xl font-semibold text-slate-900">Période : {{ ref_label }}</h2>            
+            {% if comparison_data %}
+            <p class="text-sm text-slate-600 mt-1">
+                Comparaison avec : 
+                {% for comp in comparison_data %}
+                <span class="font-medium">{{ comp.label }}</span>
+                {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+        
+        {% if ytd_stats %}
+        <div class="bg-secondary-50 border border-secondary-200 rounded-lg px-4 py-2">
+            <p class="text-sm text-secondary-800">
+                <span class="font-medium">YTD {{ selected_year }} : </span>
+                {{ ytd_stats.total_events }} événements jusqu'au {{ ytd_end|date:"d/m" }}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- KPI Cards avec comparaisons -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Total événements -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Total événements</p>
+                    <p class="text-3xl font-bold text-slate-900 mt-2">{{ ref_stats.total_events }}</p>
+                </div>
+                <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            {% if evolution %}
+            <div class="mt-4 flex items-center text-sm">
+                {% with ev=evolution.total_events %}
+                <span class="{% if ev.is_increase %}text-green-600{% else %}text-red-600{% endif %} font-medium flex items-center">
+                    {% if ev.is_increase %}
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    {% else %}
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                    </svg>
+                    {% endif %}
+                    {% if ev.percentage_change > 0 %}+{% endif %}{{ ev.percentage_change }}%
+                </span>
+                <span class="text-slate-400 ml-2">vs période précédente</span>
+                {% endwith %}
+            </div>            
+            <div class="mt-2 text-xs text-slate-500">
+                Période précédente : {{ evolution.total_events.previous }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Événements validés -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Validés</p>
+                    <p class="text-3xl font-bold text-slate-900 mt-2">{{ ref_stats.validated_events }}</p>
+                </div>
+                <div class="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-sm">
+                <span class="text-slate-500">Taux de validation: </span>
+                <span class="font-medium text-slate-900">{{ ref_stats.validation_rate }}%</span>
+            </div>
+            
+            {% if evolution %}
+            {% with ev=evolution.validated_events %}
+            <div class="mt-2 text-xs {% if ev.is_increase %}text-green-600{% else %}text-red-600{% endif %}">
+                {% if ev.percentage_change > 0 %}+{% endif %}{{ ev.percentage_change }}% vs période précédente
+            </div>
+            {% endwith %}
+            {% endif %}
+        </div>
+
+        <!-- En attente -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">En attente</p>
+                    <p class="text-3xl font-bold {% if ref_stats.pending_validation > 0 %}text-yellow-600{% else %}text-slate-900{% endif %} mt-2">{{ ref_stats.pending_validation }}</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            {% if evolution %}
+            {% with ev=evolution.pending_validation %}
+            <div class="mt-4 text-xs {% if ev.absolute_change > 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                {% if ev.absolute_change > 0 %}+{% endif %}{{ ev.absolute_change }} vs période précédente
+            </div>
+            {% endwith %}
+            {% endif %}
+        </div>
+
+        <!-- Taux d'activité -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Actifs</p>
+                    <p class="text-3xl font-bold text-slate-900 mt-2">{{ ref_stats.active_events }}</p>
+                </div>
+                <div class="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            {% if ref_stats.total_events > 0 %}
+            <div class="mt-4">
+                <div class="w-full bg-slate-200 rounded-full h-2">
+                    <div class="bg-accent-500 h-2 rounded-full" style="width: {{ ref_stats.active_events|div:ref_stats.total_events|mul:100 }}%"></div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">{{ ref_stats.active_events|div:ref_stats.total_events|mul:100|floatformat:1 }}% du total</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Graphiques comparatifs -->
+    {% if 'total' in selected_metrics %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Évolution des événements</h3>
+            
+            {% if comparison_data %}
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-primary-500"></span>
+                    <span class="text-sm text-slate-600">{{ selected_year }}</span>
+                </div>
+                {% for comp in comparison_data %}
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full" style="background-color: {{ comp.color|default:'#00A86B' }}"></span>
+                    <span class="text-sm text-slate-600">{{ comp.label }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="relative h-80">
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Graphiques détaillés -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {% if 'sectors' in selected_metrics %}
+        <!-- Répartition par secteur -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Répartition par secteur</h3>
+            <div class="relative h-64 flex items-center justify-center">
+                <canvas id="sectorsChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'cities' in selected_metrics %}
+        <!-- Top villes -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Top 10 villes</h3>
+            <div class="relative h-64">
+                <canvas id="citiesChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if 'validated' in selected_metrics or 'pending' in selected_metrics %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Taux de validation -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Statut des validations</h3>
+            <div class="relative h-64 flex items-center justify-center">
+                <canvas id="validationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tableau comparatif -->
+        {% if comparison_data %}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Comparaison détaillée</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase">Métrique</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-slate-500 uppercase">{{ selected_year }}</th>
+                            {% for comp in comparison_data %}
+                            <th class="px-3 py-2 text-right text-xs font-medium text-slate-500 uppercase">{{ comp.label }}</th>
+                            <th class="px-3 py-2 text-right text-xs font-medium text-slate-500 uppercase">Évol.</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr>
+                            <td class="px-3 py-2 text-sm font-medium text-slate-900">Total</td>
+                            <td class="px-3 py-2 text-sm text-right text-slate-900">{{ ref_stats.total_events }}</td>
+                            {% for comp in comparison_data %}
+                            <td class="px-3 py-2 text-sm text-right text-slate-600">{{ comp.stats.total_events }}</td>
+                            <td class="px-3 py-2 text-sm text-right">
+                                {% with diff=ref_stats.total_events|sub:comp.stats.total_events %}
+                                <span class="{% if diff >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if diff >= 0 %}+{% endif %}{{ diff }}
+                                </span>
+                                {% endwith %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2 text-sm font-medium text-slate-900">Validés</td>
+                            <td class="px-3 py-2 text-sm text-right text-slate-900">{{ ref_stats.validated_events }}</td>
+                            {% for comp in comparison_data %}
+                            <td class="px-3 py-2 text-sm text-right text-slate-600">{{ comp.stats.validated_events }}</td>
+                            <td class="px-3 py-2 text-sm text-right">
+                                {% with diff=ref_stats.validated_events|sub:comp.stats.validated_events %}
+                                <span class="{% if diff >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if diff >= 0 %}+{% endif %}{{ diff }}
+                                </span>
+                                {% endwith %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2 text-sm font-medium text-slate-900">En attente</td>
+                            <td class="px-3 py-2 text-sm text-right text-slate-900">{{ ref_stats.pending_validation }}</td>
+                            {% for comp in comparison_data %}
+                            <td class="px-3 py-2 text-sm text-right text-slate-600">{{ comp.stats.pending_validation }}</td>
+                            <td class="px-3 py-2 text-sm text-right">
+                                {% with diff=ref_stats.pending_validation|sub:comp.stats.pending_validation %}
+                                <span class="{% if diff <= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if diff >= 0 %}+{% endif %}{{ diff }}
+                                </span>
+                                {% endwith %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-2 text-sm font-medium text-slate-900">Taux validation</td>
+                            <td class="px-3 py-2 text-sm text-right text-slate-900">{{ ref_stats.validation_rate }}%</td>
+                            {% for comp in comparison_data %}
+                            <td class="px-3 py-2 text-sm text-right text-slate-600">{{ comp.stats.validation_rate }}%</td>
+                            <td class="px-3 py-2 text-sm text-right">
+                                {% with diff=ref_stats.validation_rate|sub:comp.stats.validation_rate %}
+                                <span class="{% if diff >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if diff >= 0 %}+{% endif %}{{ diff|floatformat:1 }}%
+                                </span>
+                                {% endwith %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Listes d'événements -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% if 'total' in selected_metrics %}
+        <!-- Derniers événements -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <h3 class="text-lg font-semibold text-slate-900">Derniers événements créés</h3>
+            </div>
+            <div class="divide-y divide-slate-200">
+                {% for event in recent_events %}
+                <div class="px-6 py-4 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-slate-900 truncate">
+                                <a href="{{ event.get_absolute_url }}" class="hover:text-primary-600">{{ event.title }}</a>
+                            </p>
+                            <p class="text-sm text-slate-500 mt-1">
+                                {{ event.start_datetime|date:"d/m/Y H:i" }} - {{ event.city }}
+                            </p>
+                            <div class="flex items-center mt-2 space-x-2">
+                                {% for sector in event.sectors.all|slice:":3" %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" 
+                                      style="background-color: {{ sector.color_code }}20; color: {{ sector.color_code }};">
+                                    {{ sector.name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="ml-4 flex-shrink-0">
+                            {% if event.validation %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Validé
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                En attente
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="px-6 py-8 text-center text-slate-500">
+                    Aucun événement pour cette période
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'creators' in selected_metrics %}
+        <!-- Top créateurs -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <h3 class="text-lg font-semibold text-slate-900">Top créateurs d'événements</h3>
+            </div>
+            <div class="divide-y divide-slate-200">
+                {% for creator in top_creators %}
+                <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                            {{ creator.created_by__first_name|first|default:creator.created_by__email|first|upper }}{{ creator.created_by__last_name|first|default:""|upper }}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-slate-900">
+                                {{ creator.created_by__first_name|default:"" }} {{ creator.created_by__last_name|default:"" }}
+                            </p>
+                            <p class="text-sm text-slate-500">{{ creator.created_by__email }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-slate-900">{{ creator.event_count }}</p>
+                        <p class="text-xs text-slate-500">événements</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="px-6 py-8 text-center text-slate-500">
+                    Aucun créateur pour cette période
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Données JSON pour les graphiques -->
+{% if 'total' in selected_metrics %}
+{{ chart_data.labels|json_script:"chart-labels" }}
+{{ chart_data.ref_data|json_script:"chart-ref-data" }}
+{% endif %}
+{% if 'sectors' in selected_metrics %}
+{{ sectors_labels|json_script:"sectors-labels" }}
+{{ sectors_data|json_script:"sectors-data" }}
+{{ sectors_colors|json_script:"sectors-colors" }}
+{% endif %}
+{% if 'cities' in selected_metrics %}
+{{ cities_labels|json_script:"cities-labels" }}
+{{ cities_data|json_script:"cities-data" }}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Configuration Chart.js par défaut
+    Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+    Chart.defaults.color = '#64748b';
+
+    // Gestion de l'affichage conditionnel des filtres
+    document.getElementById('period-type').addEventListener('change', function() {
+        const quarterSelect = document.getElementById('quarter-select');
+        const monthSelect = document.getElementById('month-select');
+        const customDates = document.getElementById('custom-dates');
+
+        quarterSelect.classList.add('hidden');
+        monthSelect.classList.add('hidden');
+        customDates.classList.add('hidden');
+
+        if (this.value === 'quarter') {
+            quarterSelect.classList.remove('hidden');
+        } else if (this.value === 'month') {
+            monthSelect.classList.remove('hidden');
+        } else if (this.value === 'custom') {
+            customDates.classList.remove('hidden');
+        }
+    });
+
+    // Gestion de l'affichage des années de comparaison
+    document.querySelectorAll('input[name="compare_mode"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const customYearsSelect = document.getElementById('custom-years-select');
+            if (this.value === 'custom') {
+                customYearsSelect.classList.remove('hidden');
+            } else {
+                customYearsSelect.classList.add('hidden');
+            }
+        });
+    });
+
+    {% if 'total' in selected_metrics %}
+    // Graphique comparatif d'évolution
+    const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+    new Chart(comparisonCtx, {
+        type: 'line',
+        data: {
+            labels: JSON.parse(document.getElementById('chart-labels').textContent),
+            datasets: [
+                {
+                    label: '{{ selected_year }}',
+                    data: JSON.parse(document.getElementById('chart-ref-data').textContent),
+                    borderColor: '#0066CC',
+                    backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#0066CC',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                },
+                {% for dataset in chart_data.comparison_datasets %}
+                {
+                    label: '{{ dataset.label|escapejs }}',
+                    data: {{ dataset.data|escapejs }},
+                    borderColor: '{{ dataset.borderColor }}',
+                    backgroundColor: '{{ dataset.backgroundColor }}',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    borderDash: [5, 5],
+                },
+                {% endfor %}
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#1e293b',
+                    bodyColor: '#475569',
+                    borderColor: '#e2e8f0',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + ' événements';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: '#f1f5f9'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    {% if 'sectors' in selected_metrics %}
+    // Répartition par secteur
+    const sectorsCtx = document.getElementById('sectorsChart').getContext('2d');
+    new Chart(sectorsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: JSON.parse(document.getElementById('sectors-labels').textContent),
+            datasets: [{
+                data: JSON.parse(document.getElementById('sectors-data').textContent),
+                backgroundColor: JSON.parse(document.getElementById('sectors-colors').textContent),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    {% if 'cities' in selected_metrics %}
+    // Top villes
+    const citiesCtx = document.getElementById('citiesChart').getContext('2d');
+    new Chart(citiesCtx, {
+        type: 'bar',
+        data: {
+            labels: JSON.parse(document.getElementById('cities-labels').textContent),
+            datasets: [{
+                label: 'Événements',
+                data: JSON.parse(document.getElementById('cities-data').textContent),
+                backgroundColor: '#00A86B',
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    {% if 'validated' in selected_metrics or 'pending' in selected_metrics %}
+    // Taux de validation
+    const validationCtx = document.getElementById('validationChart').getContext('2d');
+    new Chart(validationCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Validés', 'En attente'],
+            datasets: [{
+                data: {{ validation_data }},
+                backgroundColor: ['#00A86B', '#F59E0B'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

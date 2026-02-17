@@ -1,0 +1,543 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendrier des événements - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <a href="{% url 'events:event_list' %}" class="inline-flex items-center text-slate-600 hover:text-primary-600 mb-2">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Retour à la liste
+                </a>
+                <h1 class="text-3xl font-bold text-slate-900">Calendrier des événements</h1>
+            </div>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'events:event_create' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Créer un événement
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Calendar Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <!-- Navigation Header -->
+        <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Month Navigation -->
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+                <a href="{% url 'events:event_calendar_month' prev_month.year prev_month.month %}" 
+                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Mois précédent</span>
+                </a>
+
+                <h2 class="text-xl font-bold text-slate-900 min-w-[200px] text-center">{{ month_name }} {{ year }}</h2>
+
+                <a href="{% url 'events:event_calendar_month' next_month.year next_month.month %}" 
+                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                    <span class="hidden sm:inline">Mois suivant</span>
+                    <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Today Button -->
+            <a href="{% url 'events:event_calendar' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Aujourd'hui
+            </a>
+        </div>
+
+        <!-- Calendar Container -->
+        <div class="p-6">
+            <div id="calendar" class="min-h-[600px]"></div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="mt-6 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-sm font-medium text-slate-900 mb-3">Légende des secteurs</h3>
+        <div class="flex flex-wrap gap-3">
+            {% for sector in sectors %}
+            <div class="flex items-center">
+                <span class="w-3 h-3 rounded-full mr-2" style="background-color: {{ sector.color_code }};"></span>
+                <span class="text-sm text-slate-600">{{ sector.name }}</span>
+            </div>
+            {% empty %}
+            <p class="text-sm text-slate-500">Aucun secteur défini</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Tooltip Container -->
+<div id="event-tooltip" class="event-tooltip hidden">
+    <div class="tooltip-header">
+        <div class="tooltip-gradient"></div>
+        <h4 class="tooltip-title"></h4>
+    </div>
+    <div class="tooltip-body">
+        <div class="tooltip-info">
+            <svg class="tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span class="tooltip-date"></span>
+        </div>
+        <div class="tooltip-info">
+            <svg class="tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span class="tooltip-location"></span>
+        </div>
+        <div class="tooltip-info tooltip-sectors">
+            <svg class="tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <div class="tooltip-sectors-list"></div>
+        </div>
+    </div>
+    <div class="tooltip-footer">
+        <span class="tooltip-creator">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            <span class="tooltip-creator-name"></span>
+        </span>
+    </div>
+</div>
+
+<!-- Données pour FullCalendar -->
+<script>
+    window.calendarEvents = [
+        {% for event in events %}
+        {
+            title: "{{ event.title|escapejs }}",
+            start: "{{ event.start_datetime|date:'c' }}",
+            {% if event.end_datetime %}end: "{{ event.end_datetime|date:'c' }}",{% endif %}
+            url: "{{ event.get_absolute_url }}",
+            color: "{{ event.sectors.first.color_code|default:'#0066CC' }}",
+            extendedProps: {
+                location: "{{ event.location|escapejs }}",
+                city: "{{ event.city|escapejs }}",
+                startDate: "{{ event.start_datetime|date:'d/m/Y' }}",
+                startTime: "{{ event.start_datetime|date:'H:i' }}",
+                {% if event.end_datetime %}
+                endDate: "{{ event.end_datetime|date:'d/m/Y' }}",
+                endTime: "{{ event.end_datetime|date:'H:i' }}",
+                {% endif %}
+                createdBy: "{{ event.created_by.get_full_name|escapejs }}",
+                sectors: [
+                    {% for sector in event.sectors.all %}
+                    { name: "{{ sector.name|escapejs }}", color: "{{ sector.color_code }}" }{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    window.calendarInitialDate = "{{ current_month|date:'Y-m-d' }}";
+    window.todayDate = "{% now 'Y-m-d' %}";
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const tooltipEl = document.getElementById('event-tooltip');
+        let tooltipTimeout;
+        
+        if (!calendarEl) return;
+        
+        try {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                initialDate: window.calendarInitialDate || new Date(),
+                locale: 'fr',
+                firstDay: 1,
+                headerToolbar: false,
+                events: window.calendarEvents || [],
+                
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                },
+                
+                eventDidMount: function(info) {
+                    const eventEl = info.el;
+                    const event = info.event;
+                    const props = event.extendedProps;
+                    
+                    // Créer le gradient à partir des couleurs des secteurs
+                    let gradientColors = ['#0066CC'];
+                    if (props.sectors && props.sectors.length > 0) {
+                        gradientColors = props.sectors.map(s => s.color);
+                    }
+                    
+                    // Mouse enter - afficher l'infobulle après délai
+                    eventEl.addEventListener('mouseenter', function(e) {
+                        tooltipTimeout = setTimeout(() => {
+                            showTooltip(event, props, gradientColors, eventEl);
+                        }, 200);
+                    });
+                    
+                    // Mouse leave - cacher l'infobulle
+                    eventEl.addEventListener('mouseleave', function() {
+                        clearTimeout(tooltipTimeout);
+                        hideTooltip();
+                    });
+                },
+                
+                dayMaxEvents: true,
+                moreLinkContent: function(args) {
+                    return '+' + args.num + ' de plus';
+                },
+                
+                buttonText: {
+                    today: "Aujourd'hui",
+                    month: 'Mois',
+                    week: 'Semaine',
+                    day: 'Jour',
+                    list: 'Liste'
+                },
+                
+                noEventsContent: 'Aucun événement ce mois-ci',
+                
+                dayCellDidMount: function(info) {
+                    // Vérifier si la date est passée
+                    const cellDate = info.date;
+                    const today = new Date(window.todayDate);
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (cellDate < today) {
+                        info.el.classList.add('fc-day-past');
+                    }
+                }
+            });
+
+            calendar.render();
+        } catch (error) {
+            console.error('Error initializing calendar:', error);
+        }
+        
+        function showTooltip(event, props, gradientColors, targetEl) {
+            // Mettre à jour le titre
+            tooltipEl.querySelector('.tooltip-title').textContent = event.title;
+            
+            // Créer le gradient
+            const gradientEl = tooltipEl.querySelector('.tooltip-gradient');
+            if (gradientColors.length === 1) {
+                gradientEl.style.background = gradientColors[0];
+            } else {
+                const gradientStr = `linear-gradient(135deg, ${gradientColors.join(', ')})`;
+                gradientEl.style.background = gradientStr;
+            }
+            
+            // Mettre à jour la date et l'heure
+            const dateText = `${props.startDate} - ${props.startTime}`;
+            tooltipEl.querySelector('.tooltip-date').textContent = dateText;
+            
+            // Mettre à jour le lieu
+            const locationText = `${props.location}, ${props.city}`;
+            tooltipEl.querySelector('.tooltip-location').textContent = locationText;
+            
+            // Mettre à jour le créateur
+            const creatorEl = tooltipEl.querySelector('.tooltip-creator-name');
+            creatorEl.textContent = props.createdBy || 'Anonyme';
+            
+            // Mettre à jour les secteurs
+            const sectorsContainer = tooltipEl.querySelector('.tooltip-sectors-list');
+            if (props.sectors && props.sectors.length > 0) {
+                sectorsContainer.innerHTML = props.sectors.map(sector => 
+                    `<span class="tooltip-sector-tag" style="background-color: ${sector.color}20; color: ${sector.color}; border: 1px solid ${sector.color}40;">${sector.name}</span>`
+                ).join('');
+            } else {
+                sectorsContainer.innerHTML = '<span class="tooltip-no-sectors">Aucun secteur</span>';
+            }
+            
+            // Afficher l'infobulle
+            tooltipEl.classList.remove('hidden');
+            
+            // Positionner l'infobulle
+            positionTooltip(targetEl);
+        }
+        
+        function hideTooltip() {
+            tooltipEl.classList.add('hidden');
+        }
+        
+        function positionTooltip(targetEl) {
+            const targetRect = targetEl.getBoundingClientRect();
+            const tooltipRect = tooltipEl.getBoundingClientRect();
+            const calendarRect = calendarEl.getBoundingClientRect();
+            
+            // Position par défaut : au-dessus de l'événement
+            let top = targetRect.top - tooltipRect.height - 10;
+            let left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+            
+            // Vérifier si l'infobulle dépasse en haut
+            if (top < calendarRect.top) {
+                // Placer en dessous
+                top = targetRect.bottom + 10;
+            }
+            
+            // Vérifier si l'infobulle dépasse à gauche
+            if (left < calendarRect.left) {
+                left = calendarRect.left + 10;
+            }
+            
+            // Vérifier si l'infobulle dépasse à droite
+            if (left + tooltipRect.width > calendarRect.right) {
+                left = calendarRect.right - tooltipRect.width - 10;
+            }
+            
+            // Appliquer la position
+            tooltipEl.style.top = `${top + window.scrollY}px`;
+            tooltipEl.style.left = `${left + window.scrollX}px`;
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* FullCalendar Custom Styles */
+    .fc {
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .fc .fc-button {
+        background-color: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #475569;
+        font-weight: 500;
+        text-transform: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .fc .fc-button:hover {
+        background-color: #e2e8f0;
+        border-color: #cbd5e1;
+    }
+    
+    .fc .fc-button-primary:not(:disabled).fc-button-active,
+    .fc .fc-button-primary:not(:disabled):active {
+        background-color: #0066CC;
+        border-color: #0066CC;
+    }
+    
+    .fc .fc-daygrid-day.fc-day-today {
+        background-color: #E6F2FF;
+    }
+    
+    .fc .fc-daygrid-day-number {
+        color: #475569;
+        font-weight: 500;
+        padding: 0.5rem;
+    }
+    
+    .fc .fc-col-header-cell-cushion {
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    
+    .fc-event {
+        border-radius: 0.375rem;
+        border: none;
+        padding: 0.125rem 0.375rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+    
+    .fc-event:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .fc-event-title {
+        font-weight: 500;
+    }
+    
+    .fc .fc-more-link {
+        color: #0066CC;
+        font-weight: 500;
+    }
+    
+    .fc .fc-daygrid-day-top {
+        justify-content: center;
+    }
+    
+    .fc .fc-scrollgrid {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .fc .fc-scrollgrid-section-header th {
+        background-color: #f8fafc;
+    }
+    
+    /* Tooltip Styles */
+    .event-tooltip {
+        position: absolute;
+        z-index: 9999;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        min-width: 280px;
+        max-width: 350px;
+        overflow: hidden;
+        animation: tooltipFadeIn 0.2s ease-out;
+    }
+    
+    @keyframes tooltipFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .event-tooltip.hidden {
+        display: none;
+    }
+    
+    .tooltip-header {
+        position: relative;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    
+    .tooltip-gradient {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+    
+    .tooltip-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.4;
+    }
+    
+    .tooltip-body {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .tooltip-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .tooltip-info:last-child {
+        margin-bottom: 0;
+    }
+    
+    .tooltip-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        color: #64748b;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .tooltip-date,
+    .tooltip-location {
+        font-size: 0.875rem;
+        color: #475569;
+    }
+    
+    .tooltip-footer {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+    }
+    
+    .tooltip-creator {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #64748b;
+    }
+    
+    .tooltip-creator svg {
+        color: #64748b;
+    }
+    
+    .tooltip-sectors-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+    }
+    
+    .tooltip-sector-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .tooltip-no-sectors {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        font-style: italic;
+    }
+    
+    /* Dates passées grisées */
+    .fc .fc-day-past {
+        background-color: #f8fafc;
+    }
+    
+    .fc .fc-day-past .fc-daygrid-day-number {
+        color: #94a3b8;
+    }
+    
+    .fc .fc-day-past.fc-day-other {
+        background-color: #f1f5f9;
+    }
+</style>
+{% endblock %}

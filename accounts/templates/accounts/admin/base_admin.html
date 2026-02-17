@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Administration - Gestion des Rôles{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Sidebar styles */
+    .admin-sidebar {
+        width: 260px;
+        min-height: calc(100vh - 64px);
+        background: white;
+        border-right: 1px solid #e2e8f0;
+    }
+    
+    .dark .admin-sidebar {
+        background: #1e293b;
+        border-right-color: #334155;
+    }
+    
+    .admin-sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        margin: 0.25rem 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .admin-sidebar-link:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+    
+    .dark .admin-sidebar-link {
+        color: #94a3b8;
+    }
+    
+    .dark .admin-sidebar-link:hover {
+        background: #334155;
+        color: #f8fafc;
+    }
+    
+    .admin-sidebar-link.active {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .dark .admin-sidebar-link.active {
+        background: #1e3a8a;
+        color: #60a5fa;
+    }
+    
+    .admin-sidebar-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.75rem;
+    }
+    
+    /* Main content */
+    .admin-main {
+        flex: 1;
+        padding: 1.5rem;
+        background: #f8fafc;
+    }
+    
+    .dark .admin-main {
+        background: #0f172a;
+    }
+    
+    /* Drag and drop styles */
+    .draggable-item {
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .draggable-item:active {
+        cursor: grabbing;
+    }
+    
+    .draggable-item.dragging {
+        opacity: 0.5;
+        transform: scale(1.02);
+    }
+    
+    .drop-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 0.5rem;
+        min-height: 100px;
+        transition: all 0.2s;
+    }
+    
+    .drop-zone.drag-over {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    
+    .dark .drop-zone.drag-over {
+        background: #1e3a8a;
+    }
+    
+    /* Matrix table */
+    .permission-matrix {
+        overflow-x: auto;
+    }
+    
+    .permission-matrix table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .permission-matrix th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        white-space: nowrap;
+    }
+    
+    .dark .permission-matrix th {
+        background: #1e293b;
+    }
+    
+    .permission-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    /* Role badges */
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar hidden lg:block">
+        <div class="p-4">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-2">
+                Administration
+            </h2>
+            
+            <nav>
+                <a href="{% url 'accounts:admin_role_list' %}" 
+                   class="admin-sidebar-link {% if request.resolver_match.url_name == 'admin_role_list' or request.resolver_match.url_name == 'admin_role_create' or request.resolver_match.url_name == 'admin_role_edit' %}active{% endif %}">
+                    <svg class="admin-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Rôles
+                </a>
+                
+                <div class="border-t border-slate-200 my-4"></div>
+                
+                <a href="{% url 'accounts:admin_user_list' %}" 
+                   class="admin-sidebar-link {% if request.resolver_match.url_name == 'admin_user_list' or request.resolver_match.url_name == 'admin_user_assign_roles' %}active{% endif %}">
+                    <svg class="admin-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Utilisateurs
+                </a>
+            </nav>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="admin-main">
+        {% block admin_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- SortableJS pour le drag & drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<!-- Alpine.js pour la réactivité -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{% endblock %}

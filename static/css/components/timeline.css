@@ -1,0 +1,124 @@
+/* Timeline */
+
+.timeline {
+    position: relative;
+}
+
+.timeline__scroll-container {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--slate-300) transparent;
+}
+
+.timeline__scroll-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.timeline__scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.timeline__scroll-container::-webkit-scrollbar-thumb {
+    background-color: var(--slate-300);
+    border-radius: 3px;
+}
+
+.timeline__scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--slate-400);
+}
+
+.timeline__line {
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--slate-200);
+}
+
+.timeline__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 1px solid var(--slate-200);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    z-index: 20;
+}
+
+.timeline__nav:hover {
+    background: var(--slate-50);
+    border-color: var(--slate-300);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.timeline__nav:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.timeline__nav--left {
+    left: -10px;
+}
+
+.timeline__nav--right {
+    right: -10px;
+}
+
+.timeline__item {
+    position: relative;
+    flex-shrink: 0;
+    width: 16rem;
+}
+
+.timeline__point {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+}
+
+.timeline__date {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.timeline__date-day {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slate-900);
+}
+
+.timeline__date-month {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--slate-500);
+    text-transform: uppercase;
+    padding-top: 0.75rem;
+}
+
+.timeline__date-time {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--slate-400);
+}
+
+/* Indicateur de scroll */
+.scroll-hint {
+    animation: pulse 2s infinite;
+}

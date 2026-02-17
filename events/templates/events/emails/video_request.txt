@@ -1,0 +1,49 @@
+Demande de tournage vidéo
+========================
+
+Bonjour,
+
+Une nouvelle demande de tournage vidéo a été envoyée par l'équipe Communication.
+
+DÉTAILS DE L'ÉVÉNEMENT
+----------------------
+Titre : {{ event.title }}
+Date : {{ event.start_datetime|date:"d/m/Y" }}
+Heure : {{ event.start_datetime|time:"H:i" }}{% if event.end_datetime %} - {{ event.end_datetime|time:"H:i" }}{% endif %}
+Lieu : {{ event.location }}{% if event.city %}, {{ event.city }}{% endif %}
+
+Envoyé par : {{ sent_by.get_full_name|default:sent_by.email }}
+
+{% if comment %}
+COMMENTAIRE
+-----------
+{{ comment }}
+{% endif %}
+
+CONFIRMER VOTRE PARTICIPATION
+-----------------------------
+Pour confirmer que vous serez présent au tournage, cliquez sur le lien suivant :
+{{ confirmation_url }}
+
+REFUSER / INDISPONIBLE
+----------------------
+Si vous ne pouvez pas assurer le tournage, cliquez sur ce lien :
+{{ refuse_url }}
+
+AJOUTER À VOTRE AGENDA
+----------------------
+Google Calendar : {{ google_calendar_url }}
+Outlook : {{ outlook_calendar_url }}
+Télécharger (fichier ICS) : {{ ics_download_url }}
+
+Vous pouvez consulter l'événement ici :
+{{ event_url }}
+
+Merci de prendre contact avec l'organisateur pour organiser le tournage.
+
+Cordialement,
+L'équipe Communication
+
+---
+Cet email vous a été envoyé automatiquement depuis l'application de gestion des événements.
+Si vous avez des questions, n'hésitez pas à nous contacter : communication@cc-sudavesnois.fr

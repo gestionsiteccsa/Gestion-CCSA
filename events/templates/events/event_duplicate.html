@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-4">
+            <a href="{{ source_event.get_absolute_url }}" class="text-slate-600 hover:text-primary-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">{{ title }}</h1>
+                <p class="mt-1 text-slate-600">Créer une copie de "{{ source_event.title }}"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Formulaire principal -->
+        <div class="lg:col-span-2">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Informations de base -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4">Informations de l'événement</h2>
+
+                    <div class="space-y-4">
+                        <!-- Titre -->
+                        <div>
+                            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                Titre
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" 
+                                   value="{{ form.title.value|default:'' }}"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                   required>
+                            {% if form.title.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                            <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" rows="4"
+                                      class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-y">{{ form.description.value|default:'' }}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Lieu -->
+                            <div>
+                                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Lieu</label>
+                                <input type="text" name="{{ form.location.name }}" id="{{ form.location.id_for_label }}" 
+                                       value="{{ form.location.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+
+                            <!-- Ville -->
+                            <div>
+                                <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Ville</label>
+                                <input type="text" name="{{ form.city.name }}" id="{{ form.city.id_for_label }}" 
+                                       value="{{ form.city.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Date de début -->
+                            <div>
+                                <label for="{{ form.start_datetime.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                    Date et heure de début
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input type="datetime-local" name="{{ form.start_datetime.name }}" id="{{ form.start_datetime.id_for_label }}" 
+                                       value="{{ form.start_datetime.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                       required>
+                            </div>
+
+                            <!-- Date de fin -->
+                            <div>
+                                <label for="{{ form.end_datetime.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">Date et heure de fin</label>
+                                <input type="datetime-local" name="{{ form.end_datetime.name }}" id="{{ form.end_datetime.id_for_label }}" 
+                                       value="{{ form.end_datetime.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secteurs -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4">Secteurs</h2>
+                    <div class="{% if form.sectors.errors %}border-2 border-red-500 rounded-lg p-3 bg-red-50{% endif %}">
+                        {{ form.sectors }}
+                    </div>
+                    {% if form.sectors.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.sectors.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Options de copie -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4">Options de copie</h2>
+
+                    <div class="space-y-3">
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="copy_images" class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">Copier les images</span>
+                                <span class="block text-sm text-slate-500">{{ source_event.images.count }} image(s) seront copiées</span>
+                            </span>
+                        </label>
+
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="copy_documents" class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">Copier les documents</span>
+                                <span class="block text-sm text-slate-500">{{ source_event.documents.count }} document(s) seront copiés</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-3">
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        {{ submit_label }}
+                    </button>
+                    <a href="{{ source_event.get_absolute_url }}" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                        Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar avec infos source -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden sticky top-24">
+                <div class="p-4 border-b border-slate-200 bg-slate-50">
+                    <h3 class="text-lg font-semibold text-slate-900">Événement source</h3>
+                </div>
+
+                <div class="p-4">
+                    {% if source_event.images.first %}
+                    <div class="aspect-video rounded-lg overflow-hidden mb-4">
+                        <img src="{{ source_event.images.first.image.url }}" alt="" class="w-full h-full object-cover">
+                    </div>
+                    {% endif %}
+
+                    <p class="font-medium text-slate-900 mb-2">{{ source_event.title }}</p>
+
+                    <div class="text-sm text-slate-600 space-y-1">
+                        <p>{{ source_event.start_datetime|date:"d/m/Y H:i" }}</p>
+                        <p>{{ source_event.location }}, {{ source_event.city }}</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-1.5 mt-3">
+                        {% for sector in source_event.sectors.all %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" 
+                              style="background-color: {{ sector.color_code }}20; color: {{ sector.color_code }};">
+                            {{ sector.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="my-4 border-slate-200">
+
+                    <a href="{{ source_event.get_absolute_url }}" target="_blank"
+                       class="w-full inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        Voir l'original
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

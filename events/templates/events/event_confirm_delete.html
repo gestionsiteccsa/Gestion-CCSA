@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmer la suppression - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <!-- Header with warning icon -->
+            <div class="bg-red-50 px-6 py-8 text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900">Confirmer la suppression</h1>
+            </div>
+
+            <div class="p-6">
+                <!-- Event info -->
+                <div class="bg-slate-50 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-slate-500 mb-1">Événement à supprimer</p>
+                    <p class="text-lg font-semibold text-slate-900">{{ event.title }}</p>
+                    <div class="mt-2 flex items-center text-sm text-slate-600">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        {{ event.start_datetime|date:"d/m/Y à H:i" }}
+                    </div>
+                    <div class="flex items-center text-sm text-slate-600 mt-1">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        </svg>
+                        {{ event.location }}, {{ event.city }}
+                    </div>
+                </div>
+
+                <!-- Warning message -->
+                <div class="flex items-start mb-6">
+                    <svg class="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-slate-700">Êtes-vous sûr de vouloir supprimer cet événement ?</p>
+                        <p class="text-red-600 font-medium mt-1">Cette action est irréversible.</p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <form method="post" class="flex flex-col sm:flex-row gap-3">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="flex-1 inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Oui, supprimer
+                    </button>
+                    
+                    <a href="{{ event.get_absolute_url }}" 
+                       class="flex-1 inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Annuler
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

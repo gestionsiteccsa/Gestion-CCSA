@@ -1,0 +1,58 @@
+/* Cards */
+
+.card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: all var(--transition-bounce);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* Carte avec bordure à gauche */
+.card-border-left {
+    border-left-width: 4px;
+    border-left-style: solid;
+}
+
+.card-border-success {
+    border-left-color: var(--color-success);
+}
+
+.card-border-warning {
+    border-left-color: var(--color-warning);
+}
+
+.card-border-danger {
+    border-left-color: var(--color-danger);
+}
+
+/* Timeline Card */
+.timeline-card {
+    overflow: visible !important;
+}
+
+.timeline-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Event Card */
+.event-card {
+    transition: all var(--transition-bounce);
+}
+
+.event-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Archives Card */
+.archives-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--slate-200);
+    overflow: hidden;
+}

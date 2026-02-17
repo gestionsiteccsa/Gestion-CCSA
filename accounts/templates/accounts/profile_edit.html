@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier le Profil{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Modifier le Profil</h1>
+        <p class="mt-2 text-slate-600">Mettez à jour vos informations personnelles</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if user_form.non_field_errors or profile_form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                {% for error in user_form.non_field_errors %}
+                    <p class="text-sm text-red-600 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ error }}
+                    </p>
+                {% endfor %}
+                {% for error in profile_form.non_field_errors %}
+                    <p class="text-sm text-red-600 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Informations utilisateur -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h2 class="text-lg font-semibold text-slate-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Informations utilisateur
+                </h2>
+            </div>
+            <div class="p-6 space-y-6">
+                {% for field in user_form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-2">
+                            {{ field.label }}
+                        </label>
+                        <div class="relative">
+                            {{ field }}
+                        </div>
+                        {% if field.help_text %}
+                            <p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
+                                {% for error in field.errors %}
+                                    <p class="text-sm text-red-600 flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Profil -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h2 class="text-lg font-semibold text-slate-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Profil
+                </h2>
+            </div>
+            <div class="p-6 space-y-6">
+                {% for field in profile_form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-2">
+                            {{ field.label }}
+                        </label>
+                        <div class="relative">
+                            {{ field }}
+                        </div>
+                        {% if field.help_text %}
+                            <p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
+                                {% for error in field.errors %}
+                                    <p class="text-sm text-red-600 flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Boutons -->
+        <div class="flex items-center justify-end space-x-4">
+            <a href="{% url 'accounts:profile' %}" class="px-6 py-3 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                Annuler
+            </a>
+            <button type="submit" class="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                Enregistrer les modifications
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="tel"],
+    textarea,
+    select {
+        appearance: none;
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        background-color: #ffffff;
+        color: #0f172a;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="url"]:focus,
+    input[type="tel"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #0066cc;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+    .dark input[type="text"],
+    .dark input[type="email"],
+    .dark input[type="password"],
+    .dark input[type="url"],
+    .dark input[type="tel"],
+    .dark textarea,
+    .dark select {
+        border-color: #475569;
+        background-color: #334155;
+        color: #f8fafc;
+    }
+    .dark input[type="text"]:focus,
+    .dark input[type="email"]:focus,
+    .dark input[type="password"]:focus,
+    .dark input[type="url"]:focus,
+    .dark input[type="tel"]:focus,
+    .dark textarea:focus,
+    .dark select:focus {
+        border-color: #3396ff;
+        box-shadow: 0 0 0 3px rgba(51, 150, 255, 0.1);
+    }
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="url"]::placeholder,
+    input[type="tel"]::placeholder,
+    textarea::placeholder {
+        color: #94a3b8;
+    }
+    input[type="file"] {
+        display: block;
+        width: 100%;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: #64748b;
+    }
+    .dark input[type="file"] {
+        color: #94a3b8;
+    }
+    input[type="file"]::file-selector-button {
+        margin-right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        border: 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        background-color: #e6f2ff;
+        color: #0066cc;
+        cursor: pointer;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background-color: #cce5ff;
+    }
+    .dark input[type="file"]::file-selector-button {
+        background-color: rgba(0, 102, 204, 0.2);
+        color: #66b0ff;
+    }
+    input[type="checkbox"] {
+        height: 1rem;
+        width: 1rem;
+        color: #0066cc;
+        border-color: #cbd5e1;
+        border-radius: 0.25rem;
+    }
+    .dark input[type="checkbox"] {
+        border-color: #475569;
+    }
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+</style>
+{% endblock %}

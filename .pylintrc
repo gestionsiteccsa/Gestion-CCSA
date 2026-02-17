@@ -32,6 +32,7 @@ disable=
     W0613,  # unused-argument (souvent nécessaire pour les callbacks)
     W0511,  # fixme (autoriser les TODOs)
     R0801,  # duplicate-code (souvent faux positif)
+    W1405,  # inconsistent-quotes (guillemets mixtes - non critique)
 
 [REPORTS]
 # Format du rapport
@@ -42,7 +43,7 @@ score=yes
 
 [REFACTORING]
 # Nombre maximum de caractères par ligne
-max-line-length=100
+max-line-length=120
 
 [FORMAT]
 # Indentation
@@ -127,4 +128,4 @@ overgeneral-exceptions=builtins.Exception
 
 [STRING]
 # Vérifier les chaînes de caractères
-check-quote-consistency=yes
+check-quote-consistency=no

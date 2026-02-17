@@ -1,0 +1,82 @@
+<div class="flex flex-wrap gap-3" id="{{ widget.attrs.id|default:'sectors-widget' }}">
+    {% for group_name, group_options, group_index in widget.optgroups %}
+        {% for option in group_options %}
+            <label class="sector-option inline-flex items-center px-3 py-2 rounded-lg border-2 cursor-pointer transition-all hover:shadow-sm bg-white"
+                   for="{{ option.attrs.id }}"
+                   data-color="{{ option.attrs.data_color|default:'#0066CC' }}"
+                   style="border-color: #e2e8f0;"
+                   onmouseover="if(!this.classList.contains('selected')) this.style.borderColor='{{ option.attrs.data_color|default:'#94a3b8' }}'"
+                   onmouseout="if(!this.classList.contains('selected')) this.style.borderColor='#e2e8f0'">
+                
+                <input type="checkbox"
+                       name="{{ option.name }}"
+                       value="{{ option.value }}"
+                       id="{{ option.attrs.id }}"
+                       class="sector-checkbox sr-only"
+                       {% if option.attrs.checked %}checked{% endif %}
+                       {% if widget.attrs.disabled %}disabled{% endif %}
+                       {% if widget.attrs.required %}required{% endif %}>
+                
+                <span class="w-4 h-4 rounded mr-2 flex-shrink-0 sector-color" 
+                      style="background-color: {{ option.attrs.data_color|default:'#0066CC' }};"></span>
+                
+                <span class="text-sm font-medium sector-label text-slate-700">{{ option.label }}</span>
+                
+                <svg class="w-4 h-4 ml-2 check-icon text-transparent" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </label>
+        {% endfor %}
+    {% endfor %}
+</div>
+
+<script>
+(function() {
+    const container = document.getElementById('{{ widget.attrs.id|default:"sectors-widget" }}');
+    if (!container) return;
+    
+    // Initialiser l'état des checkboxes déjà cochées au chargement
+    const checkboxes = container.querySelectorAll('.sector-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+            const label = checkbox.closest('.sector-option');
+            const checkIcon = label.querySelector('.check-icon');
+            const color = label.getAttribute('data-color') || '#0066CC';
+            
+            label.classList.add('selected');
+            label.classList.remove('bg-white');
+            label.style.borderColor = color;
+            label.style.backgroundColor = color + '20';
+            checkIcon.classList.remove('text-transparent');
+            checkIcon.classList.add('text-primary-600');
+        }
+    });
+    
+    container.addEventListener('change', function(e) {
+        if (e.target.classList.contains('sector-checkbox')) {
+            const label = e.target.closest('.sector-option');
+            const checkIcon = label.querySelector('.check-icon');
+            const color = label.getAttribute('data-color') || '#0066CC';
+            
+            if (e.target.checked) {
+                // Sélectionné : bordure et fond de la couleur du secteur, checkmark bleu
+                label.classList.add('selected');
+                label.classList.remove('bg-white');
+                label.style.borderColor = color;
+                label.style.backgroundColor = color + '20'; // 20 = ~12% opacity
+                checkIcon.classList.remove('text-transparent');
+                checkIcon.classList.add('text-primary-600');
+            } else {
+                // Désélectionné : retour à l'état initial
+                label.classList.remove('selected');
+                label.classList.add('bg-white');
+                label.style.borderColor = '#e2e8f0';
+                label.style.backgroundColor = '';
+                checkIcon.classList.add('text-transparent');
+                checkIcon.classList.remove('text-primary-600');
+            }
+        }
+    });
+})();
+</script>

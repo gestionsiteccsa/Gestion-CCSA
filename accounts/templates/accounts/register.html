@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-300px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">Inscription</h1>
+                <p class="text-slate-600">Créez votre compte</p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div>
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                        <div class="checkbox-container">
+                            {{ field }}
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700">
+                                {{ field.label }}
+                            </label>
+                        </div>
+                        {% else %}
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-2">
+                            {{ field.label }}
+                        </label>
+                        <div class="relative">
+                            {{ field }}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
+                                {% for error in field.errors %}
+                                    <p class="text-sm text-red-600 flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                    S'inscrire
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-600">
+                    Déjà un compte ?
+                    <a href="{% url 'accounts:login' %}" class="font-medium text-primary-600 hover:text-primary-500">
+                        Connectez-vous
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        appearance: none;
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        background-color: #ffffff;
+        color: #0f172a;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        border-color: #0066cc;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+    .dark input[type="text"],
+    .dark input[type="email"],
+    .dark input[type="password"] {
+        border-color: #475569;
+        background-color: #334155;
+        color: #f8fafc;
+    }
+    .dark input[type="text"]:focus,
+    .dark input[type="email"]:focus,
+    .dark input[type="password"]:focus {
+        border-color: #3396ff;
+        box-shadow: 0 0 0 3px rgba(51, 150, 255, 0.1);
+    }
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder {
+        color: #94a3b8;
+    }
+    /* Style pour les checkboxes */
+    input[type="checkbox"] {
+        appearance: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 0.25rem;
+        background-color: #ffffff;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+        margin-right: 0.5rem;
+        transition: all 0.2s;
+    }
+    input[type="checkbox"]:checked {
+        background-color: #0066cc;
+        border-color: #0066cc;
+    }
+    input[type="checkbox"]:checked::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 1px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    input[type="checkbox"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+    }
+    /* Dark mode pour checkbox */
+    .dark input[type="checkbox"] {
+        border-color: #475569;
+        background-color: #334155;
+    }
+    .dark input[type="checkbox"]:checked {
+        background-color: #3396ff;
+        border-color: #3396ff;
+    }
+    /* Style pour le conteneur de checkbox */
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .checkbox-container label {
+        margin-bottom: 0;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

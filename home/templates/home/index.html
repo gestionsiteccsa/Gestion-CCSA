@@ -1,9 +1,131 @@
 {% extends "base.html" %}
 
+{% block title %}Accueil - CC Sud-Avesnois{% endblock %}
+
 {% block content %}
 
-<h1>Bienvenue à la page d'accueil</h1>
+<!-- Hero Section -->
+<section class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div class="text-center max-w-3xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+                Gestion des <span class="text-primary-600">événements</span>
+            </h1>
+            
+            <p class="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
+                Application de gestion des événements de la Communauté de Communes Sud-Avesnois.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'events:event_list' %}" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Voir les événements
+                    </a>
+                    <a href="{% url 'events:event_create' %}" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Créer un événement
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                        Se connecter
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 
-<p>Ceci est le contenu de la page d'accueil.</p>
+<!-- Features Section -->
+<section class="py-16 md:py-24 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-slate-900 mb-4">Fonctionnalités</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1: Events -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Événements</h3>
+                <p class="text-slate-600 mb-4">
+                    Créez et gérez vos événements.
+                </p>
+                <a href="{% url 'events:event_list' %}" class="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium">
+                    Accéder
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <!-- Feature 2: Calendar -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Calendrier</h3>
+                <p class="text-slate-600 mb-4">
+                    Visualisez vos événements.
+                </p>
+                <span class="inline-flex items-center text-slate-400 font-medium cursor-not-allowed">
+                    Bientôt disponible
+                </span>
+            </div>
+            
+            <!-- Feature 3: Statistics -->
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Statistiques</h3>
+                <p class="text-slate-600 mb-4">
+                    Suivez vos événements.
+                </p>
+                <span class="inline-flex items-center text-slate-400 font-medium cursor-not-allowed">
+                    Bientôt disponible
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 md:py-20 bg-primary-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Commencer</h2>
+        
+        {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:login' %}" class="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-primary-700 bg-white hover:bg-slate-100 rounded-lg transition-colors shadow-lg">
+                Se connecter
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </a>
+        {% else %}
+            <a href="{% url 'events:event_list' %}" class="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-primary-700 bg-white hover:bg-slate-100 rounded-lg transition-colors shadow-lg">
+                Voir les événements
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </a>
+        {% endif %}
+    </div>
+</section>
 
 {% endblock %}

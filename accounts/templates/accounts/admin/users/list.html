@@ -1,0 +1,134 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Gestion des Utilisateurs</h1>
+            <p class="text-slate-500 mt-1">
+                {{ total_users }} utilisateur{{ total_users|pluralize }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Recherche -->
+<div class="mb-6 bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+    <form method="get" class="flex gap-4">
+        <input type="text" name="search" value="{{ search }}" 
+               placeholder="Rechercher par nom ou email..."
+               class="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+        
+        <button type="submit" 
+                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+            Rechercher
+        </button>
+    </form>
+</div>
+
+<!-- Liste des utilisateurs -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-slate-50">
+                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Utilisateur</th>
+                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Rôles</th>
+                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Statut</th>
+                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Inscription</th>
+                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Actions</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for user in users %}
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="px-4 py-3">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-sm font-semibold mr-3">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
+                            <div>
+                                <div class="font-medium text-slate-800">
+                                    {{ user.get_full_name|default:user.email }}
+                                </div>
+                                <div class="text-xs text-slate-500">{{ user.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="px-4 py-3">
+                        {% for user_role in user.user_roles.all %}
+                        {% if user_role.is_active %}
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mr-1 mb-1"
+                              style="background-color: {{ user_role.role.color }}20; color: {{ user_role.role.color }}">
+                            {{ user_role.role.name }}
+                        </span>
+                        {% endif %}
+                        {% empty %}
+                        <span class="text-slate-400 text-xs">Aucun rôle</span>
+                        {% endfor %}
+                    </td>
+                    
+                    <td class="px-4 py-3">
+                        {% if user.is_active %}
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Actif
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Inactif
+                        </span>
+                        {% endif %}
+                    </td>
+                    
+                    <td class="px-4 py-3 text-slate-600">
+                        {{ user.date_joined|date:"d/m/Y" }}
+                    </td>
+                    
+                    <td class="px-4 py-3">
+                        <div class="flex items-center space-x-2">
+                            <a href="{% url 'accounts:admin_user_assign_roles' user.id %}" 
+                               class="text-sm text-primary-600 hover:text-primary-700">
+                                Attribuer rôles
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-4 py-8 text-center text-slate-500">
+                        Aucun utilisateur trouvé
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if users.has_other_pages %}
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-between items-center">
+        <div class="text-sm text-slate-500">
+            Page {{ users.number }} sur {{ users.paginator.num_pages }}
+        </div>
+        
+        <div class="flex space-x-2">
+            {% if users.has_previous %}
+            <a href="?page={{ users.previous_page_number }}{% if search %}&search={{ search }}{% endif %}" 
+               class="px-3 py-1 border border-slate-300 rounded hover:bg-slate-50">
+                ← Précédent
+            </a>
+            {% endif %}
+            
+            {% if users.has_next %}
+            <a href="?page={{ users.next_page_number }}{% if search %}&search={{ search }}{% endif %}" 
+               class="px-3 py-1 border border-slate-300 rounded hover:bg-slate-50">
+                Suivant →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

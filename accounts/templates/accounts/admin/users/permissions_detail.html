@@ -1,0 +1,105 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="mb-6">
+    <a href="{% url 'accounts:admin_user_list' %}" class="text-sm text-slate-500 hover:text-slate-700">
+        ← Retour aux utilisateurs
+    </a>
+    
+    <h1 class="text-2xl font-bold text-slate-800 mt-2">
+        Permissions de {{ target_user.get_full_name|default:target_user.email }}
+    </h1>
+</div>
+
+<!-- Rôles actifs -->
+<div class="mb-6 bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-slate-800 mb-4">Rôles attribués</h2>
+    
+    <div class="flex flex-wrap gap-2">
+        {% for user_role in user_roles %}
+        <span class="inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium"
+              style="background-color: {{ user_role.role.color }}20; color: {{ user_role.role.color }}; border: 1px solid {{ user_role.role.color }}40">
+            <div class="w-2 h-2 rounded-full mr-2" style="background-color: {{ user_role.role.color }}"></div>
+            {{ user_role.role.name }}
+        </span>
+        {% empty %}
+        <p class="text-slate-500">Aucun rôle attribué</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Permissions effectives -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-slate-800 mb-4">Permissions effectives (Union des rôles)</h2>
+    
+    {% if target_user.is_superuser %}
+    <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            <div>
+                <p class="font-medium text-purple-800">Superadmin</p>
+                <p class="text-sm text-purple-600">Cet utilisateur a accès à toutes les pages et fonctionnalités.</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    
+    {% for app_name, permissions in permissions_by_app.items %}
+    <div class="mb-6">
+        <h3 class="text-md font-semibold text-slate-700 mb-3 flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+            </svg>
+            {{ app_name|title }}
+        </h3>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-slate-50">
+                        <th class="px-4 py-2 text-left font-medium text-slate-700">Vue</th>
+                        <th class="px-4 py-2 text-left font-medium text-slate-700">Méthode</th>
+                        <th class="px-4 py-2 text-left font-medium text-slate-700">URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for perm in permissions %}
+                    <tr class="border-b border-slate-100">
+                        <td class="px-4 py-2">{{ perm.view_name }}</td>
+                        <td class="px-4 py-2">
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium
+                                {% if perm.http_method == 'GET' %}bg-blue-100 text-blue-800
+                                {% elif perm.http_method == 'POST' %}bg-green-100 text-green-800
+                                {% elif perm.http_method == 'PUT' %}bg-yellow-100 text-yellow-800
+                                {% elif perm.http_method == 'DELETE' %}bg-red-100 text-red-800
+                                {% else %}bg-slate-100 text-slate-800{% endif %}">
+                                {{ perm.http_method }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2 text-slate-500 font-mono text-xs">{{ perm.url_pattern }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-slate-500 text-center py-8">
+        Aucune permission effective. Attribuez des rôles à cet utilisateur.
+    </p>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<div class="mt-6">
+    <a href="{% url 'accounts:admin_user_assign_roles' target_user.id %}" 
+       class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Modifier les rôles
+    </a>
+</div>
+{% endblock %}

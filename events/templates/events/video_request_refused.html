@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Refus de participation - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+    <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-8 text-center">
+        {% if already_responded %}
+            {% if response_type == "confirme" %}
+                {# Deja confirme #}
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                    <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900 mb-4">Participation deja confirmee</h1>
+                <p class="text-slate-600 mb-6">
+                    Vous avez deja confirme votre participation a ce tournage le 
+                    <strong>{{ video_request.confirmed_at|date:"d/m/Y a H:i" }}</strong>.
+                </p>
+            {% else %}
+                {# Deja refuse #}
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+                    <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900 mb-4">Demande deja refusee</h1>
+                <p class="text-slate-600 mb-6">
+                    Vous avez deja refuse cette demande le 
+                    <strong>{{ video_request.refused_at|date:"d/m/Y a H:i" }}</strong>.
+                </p>
+            {% endif %}
+        {% else %}
+            {# Refus reussi #}
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+                <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </div>
+            
+            <h1 class="text-2xl font-bold text-slate-900 mb-4">Demande refusee</h1>
+            
+            <p class="text-slate-600 mb-6">
+                Vous avez refuse la demande de tournage video. 
+                L'equipe Communication a ete notifiee.
+            </p>
+        {% endif %}
+
+        {# Details de l'evenement #}
+        <div class="bg-slate-50 rounded-lg p-6 text-left mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">{{ event.title }}</h2>
+            <div class="space-y-2 text-sm text-slate-600">
+                <p><strong>Date :</strong> {{ event.start_datetime|date:"d/m/Y" }}</p>
+                <p><strong>Heure :</strong> {{ event.start_datetime|time:"H:i" }}{% if event.end_datetime %} - {{ event.end_datetime|time:"H:i" }}{% endif %}</p>
+                <p><strong>Lieu :</strong> {{ event.location }}{% if event.city %}, {{ event.city }}{% endif %}</p>
+            </div>
+        </div>
+
+        <p class="text-sm text-slate-500 mt-4">
+            Si vous changez d'avis, veuillez contacter directement l'equipe Communication.
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,48 +1,508 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Mon Site{% endblock %}</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}Espace Administration - CC Sud-Avesnois{% endblock %}</title>
+    {% load static %}
+    {% load event_tags %}
+    
+    <!-- Tailwind CSS v4.1 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuration Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F2FF',
+                            100: '#CCE5FF',
+                            200: '#99CBFF',
+                            300: '#66B0FF',
+                            400: '#3396FF',
+                            500: '#0066CC',
+                            600: '#0052A3',
+                            700: '#003D7A',
+                            800: '#002952',
+                            900: '#001429',
+                        },
+                        secondary: {
+                            50: '#E6F7F0',
+                            100: '#CCEFE1',
+                            200: '#99DFC3',
+                            300: '#66CFA5',
+                            400: '#33BF87',
+                            500: '#00A86B',
+                            600: '#008656',
+                            700: '#006540',
+                            800: '#00432B',
+                            900: '#002215',
+                        },
+                        accent: {
+                            50: '#F0FBE6',
+                            100: '#E1F7CC',
+                            200: '#C3EF99',
+                            300: '#A5E766',
+                            400: '#87DF33',
+                            500: '#7ED321',
+                            600: '#65A91A',
+                            700: '#4C7F14',
+                            800: '#32550D',
+                            900: '#192A07',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'logo/Logo_couleur.png' %}">
+    
+    {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="{% url 'home' %}">Accueil</a></li>
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'accounts:profile' %}">Mon Profil</a></li>
-                    <li>
-                        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit">Déconnexion</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li><a href="{% url 'accounts:login' %}">Connexion</a></li>
-                    <li><a href="{% url 'accounts:register' %}">Inscription</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
+<body class="font-sans bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+    
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'home' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                            <img src="{% static 'logo/Logo_couleur.png' %}" alt="CC Sud-Avesnois" class="h-10 w-auto">
+                            <span class="hidden sm:block text-lg font-semibold text-slate-700">Gestion</span>
+                        </a>
                     </div>
-                {% endfor %}
+                    
+                </div>
+                
+                <!-- Navigation Desktop -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'home' %}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'home' %}text-primary-600 bg-primary-50{% endif %}">
+                        Accueil
+                    </a>
+                    
+
+                    
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'events:event_list' %}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'events' and request.resolver_match.url_name != 'event_validation_list' and request.resolver_match.url_name != 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
+                        Événements
+                    </a>
+                    {% endif %}
+                    
+                    {% has_communication_role as user_has_comm_role %}
+                    {% get_pending_validation_count as pending_count %}
+                    {% if user_has_comm_role %}
+                    <!-- Communication Dropdown -->
+                    <div class="relative" id="communication-nav-menu-container">
+                        <button type="button" id="communication-nav-menu-button" class="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'event_validation_list' or request.resolver_match.url_name == 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                            </svg>
+                            <span>Communication</span>
+                            {% if pending_count > 0 %}
+                            <span class="ml-1 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">{{ pending_count }}</span>
+                            {% endif %}
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Communication Dropdown Menu -->
+                        <div id="communication-nav-menu" class="hidden absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+                            <a href="{% url 'events:communication_dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    Statistiques
+                                </span>
+                            </a>
+                            <a href="{% url 'events:event_validation_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Validation des événements
+                                </span>
+                            </a>
+                            <div class="border-t border-slate-200 my-1"></div>
+                            <a href="{% url 'events:video_email_settings' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Paramètres email vidéo
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                        <!-- Notifications Dropdown -->
+                        {% include "accounts/notification_dropdown.html" %}
+                        
+                        <div class="relative ml-4" id="user-menu-container">
+                            <button type="button" id="user-menu-button" class="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                <span class="w-8 h-8 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                </span>
+                                <span class="hidden lg:block">{{ user.get_full_name|default:user.email }}</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div id="user-menu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+                                <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                    Mon profil
+                                </a>
+                                <a href="{% url 'accounts:notification_preferences' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                    Paramètres de notification
+                                </a>
+                                
+                                {% if user.is_superuser %}
+                                <div class="border-t border-slate-200 my-1"></div>
+                                
+                                <!-- Administration Accordion -->
+                                <div class="admin-accordion">
+                                    <button type="button" class="admin-accordion-toggle w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600 flex items-center justify-between transition-colors">
+                                        <span class="flex items-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            Administration
+                                        </span>
+                                        <svg class="admin-accordion-icon w-4 h-4 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="admin-accordion-content hidden overflow-hidden transition-all duration-200">
+                                        <a href="{% url 'accounts:admin_role_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600 pl-8">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                </svg>
+                                                Gestion des rôles
+                                            </span>
+                                        </a>
+                                        <a href="{% url 'accounts:admin_user_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600 pl-8">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                                </svg>
+                                                Gestion utilisateurs
+                                            </span>
+                                        </a>
+                                        <a href="{% url 'events:event_settings' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600 pl-8">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                </svg>
+                                                Paramètres événements
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                 <div class="border-t border-slate-100 my-1"></div>
+                                
+                                <a href="{% url 'accounts:logs_view' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Logs système
+                                    </span>
+                                </a>
+                                
+                                <form method="post" action="{% url 'accounts:logout' %}" class="block">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                        Déconnexion
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex items-center space-x-2">
+                            <a href="{% url 'accounts:login' %}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                Connexion
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                                S'inscrire
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% endif %}
+                </nav>
+                
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" id="mobile-menu-button" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Ouvrir le menu">
+                        <svg id="menu-open-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <svg id="menu-close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white">
+            <div class="px-4 py-3 space-y-1">
+                <a href="{% url 'home' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'home' %}text-primary-600 bg-primary-50{% endif %}">
+                    Accueil
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'events:event_list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'events' and request.resolver_match.url_name != 'event_validation_list' and request.resolver_match.url_name != 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
+                    Événements
+                </a>
+                {% endif %}
+                
+                {% has_communication_role as user_has_comm_role %}
+                {% get_pending_validation_count as pending_count %}
+                {% if user_has_comm_role %}
+                    <div class="border-t border-slate-100 my-2 pt-2">
+                        <div class="px-3 py-2 text-sm font-medium text-slate-500 flex items-center">
+                        Communication
+                        {% if pending_count > 0 %}
+                        <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded-full">{{ pending_count }}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'events:event_validation_list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'event_validation_list' or request.resolver_match.url_name == 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Validation des événements
+                        </span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_authenticated %}
+                    <div class="border-t border-slate-100 my-2 pt-2">
+                        <div class="px-3 py-2 text-sm text-slate-500">
+                            Connecté en tant que <span class="font-medium text-slate-700">{{ user.get_full_name|default:user.email }}</span>
+                        </div>
+                        <a href="{% url 'accounts:profile' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                            Mon profil
+                        </a>
+                        <a href="{% url 'accounts:notification_preferences' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                            Paramètres de notification
+                        </a>
+                        
+                        {% if user.is_superuser %}
+                        <!-- Administration Accordion Mobile -->
+                        <div class="admin-accordion mt-2 pt-2 border-t border-slate-100">
+                            <button type="button" class="admin-accordion-toggle w-full px-3 py-2 text-sm text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors flex items-center justify-between">
+                                <span class="flex items-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Administration
+                                </span>
+                                <svg class="admin-accordion-icon w-4 h-4 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div class="admin-accordion-content hidden overflow-hidden transition-all duration-200">
+                                <a href="{% url 'accounts:admin_role_list' %}" class="block pl-6 px-3 py-2 text-sm text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                    Gestion des rôles
+                                </a>
+                                <a href="{% url 'accounts:admin_user_list' %}" class="block pl-6 px-3 py-2 text-sm text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                    Gestion utilisateurs
+                                </a>
+                                <a href="{% url 'events:event_settings' %}" class="block pl-6 px-3 py-2 text-sm text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                    Paramètres événements
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left px-3 py-2 mt-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                Déconnexion
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="border-t border-slate-100 my-2 pt-2 space-y-1">
+                        <a href="{% url 'accounts:login' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                            Connexion
+                        </a>
+                        <a href="{% url 'accounts:register' %}" class="block px-3 py-2 text-base font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors">
+                            S'inscrire
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    <!-- Flash Messages -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="rounded-lg p-4 mb-4 {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}" role="alert">
+                    <div class="flex items-center">
+                        {% if message.tags == 'success' %}
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        {% elif message.tags == 'error' %}
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        {% elif message.tags == 'warning' %}
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        {% else %}
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
     </main>
-
-    <footer>
-        <p>&copy; 2026 Mon Site</p>
+    
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <img src="{% static 'logo/Logo_couleur.png' %}" alt="CC Sud-Avesnois" class="h-8 w-auto opacity-80">
+                    <span class="text-sm text-slate-500">© {% now "Y" %} Communauté de Communes Sud-Avesnois</span>
+                </div>
+                <div class="flex items-center space-x-6 text-sm text-slate-500">
+                    <a href="#" class="hover:text-primary-600 transition-colors">Mentions légales</a>
+                    <a href="#" class="hover:text-primary-600 transition-colors">Politique de confidentialité</a>
+                    <a href="#" class="hover:text-primary-600 transition-colors">Contact</a>
+                </div>
+            </div>
+        </div>
     </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOpenIcon = document.getElementById('menu-open-icon');
+        const menuCloseIcon = document.getElementById('menu-close-icon');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            menuOpenIcon.classList.toggle('hidden');
+            menuCloseIcon.classList.toggle('hidden');
+        });
+        
+        // Gestionnaire de menus dropdown
+        const menus = [
+            { button: 'user-menu-button', menu: 'user-menu' },
+            { button: 'communication-nav-menu-button', menu: 'communication-nav-menu' }
+        ];
+
+        // Fonction pour fermer tous les menus sauf celui spécifié
+        function closeAllMenusExcept(exceptMenuId) {
+            menus.forEach(({ menu }) => {
+                if (menu !== exceptMenuId) {
+                    const menuEl = document.getElementById(menu);
+                    if (menuEl) {
+                        menuEl.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // Initialiser chaque menu
+        menus.forEach(({ button, menu }) => {
+            const buttonEl = document.getElementById(button);
+            const menuEl = document.getElementById(menu);
+            
+            if (buttonEl && menuEl) {
+                buttonEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isHidden = menuEl.classList.contains('hidden');
+                    
+                    // Fermer tous les autres menus d'abord
+                    closeAllMenusExcept(menu);
+                    
+                    // Ouvrir/fermer le menu cliqué
+                    if (isHidden) {
+                        menuEl.classList.remove('hidden');
+                    } else {
+                        menuEl.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        // Fermer tous les menus quand on clique ailleurs
+        document.addEventListener('click', (e) => {
+            menus.forEach(({ button, menu }) => {
+                const buttonEl = document.getElementById(button);
+                const menuEl = document.getElementById(menu);
+                
+                if (buttonEl && menuEl) {
+                    if (!buttonEl.contains(e.target) && !menuEl.contains(e.target)) {
+                        menuEl.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // Accordéon Administration
+        document.querySelectorAll('.admin-accordion-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const accordion = toggle.closest('.admin-accordion');
+                const content = accordion.querySelector('.admin-accordion-content');
+                const icon = toggle.querySelector('.admin-accordion-icon');
+                
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                } else {
+                    content.classList.add('hidden');
+                    icon.classList.remove('rotate-180');
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,90 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Gestion des Rôles</h1>
+            <p class="text-slate-500 mt-1">
+                {{ total_roles }} rôle{{ total_roles|pluralize }} configuré{{ total_roles|pluralize }}
+            </p>
+        </div>
+        
+        <a href="{% url 'accounts:admin_role_create' %}" 
+           class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nouveau rôle
+        </a>
+    </div>
+</div>
+
+<!-- Grille des rôles -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for role in roles %}
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full mr-3" style="background-color: {{ role.color }}"></div>
+                    <h3 class="text-lg font-semibold text-slate-800">
+                        {{ role.name }}
+                    </h3>
+                </div>
+                
+                {% if role.is_default %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Par défaut
+                </span>
+                {% endif %}
+            </div>
+            
+            <p class="text-slate-600 text-sm mb-4">
+                {{ role.description|default:"Aucune description" }}
+            </p>
+            
+            <div class="flex items-center text-sm text-slate-500 mb-4">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                {{ role.users_count }} utilisateur{{ role.users_count|pluralize }}
+            </div>
+            
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div class="flex space-x-2">
+                    <a href="{% url 'accounts:admin_role_edit' role.id %}" 
+                       class="text-sm text-primary-600 hover:text-primary-700">
+                        Modifier
+                    </a>
+                    
+                    <span class="text-slate-300">|</span>
+                    
+                    <form method="post" action="{% url 'accounts:admin_role_delete' role.id %}" class="inline" 
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce rôle ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="text-sm text-red-600 hover:text-red-700">
+                            Supprimer
+                        </button>
+                    </form>
+                </div>
+                
+                <span class="text-xs text-slate-400">
+                    {{ role.get_permissions_count }} permissions
+                </span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        <p class="text-slate-500">Aucun rôle créé pour le moment.</p>
+        <a href="{% url 'accounts:admin_role_create' %}" class="text-primary-600 hover:text-primary-700">
+            Créer votre premier rôle
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">{{ title }}</h1>
+        <p class="mt-1 text-slate-600">Remplissez le formulaire ci-dessous pour {% if event %}modifier{% else %}créer{% endif %} votre événement</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="event-form" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Erreurs globales du formulaire -->
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+            <div class="flex">
+                <svg class="w-5 h-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h3 class="text-sm font-medium text-red-800">Erreurs dans le formulaire</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Form -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- General Information -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        Informations générales
+                    </h2>
+
+                    <div class="space-y-4">
+                        <!-- Title -->
+                        <div>
+                            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                {{ form.title.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" 
+                                   value="{{ form.title.value|default:'' }}"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 {% if form.title.errors %}border-red-500{% endif %}"
+                                   placeholder="Titre de l'événement">
+                            {% if form.title.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                {{ form.description.label }}
+                            </label>
+                            <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" rows="4"
+                                      class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-y {% if form.description.errors %}border-red-500{% endif %}"
+                                      placeholder="Description détaillée de l'événement...">{{ form.description.value|default:'' }}</textarea>
+                            {% if form.description.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Location -->
+                            <div>
+                                <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                    {{ form.location.label }}
+                                </label>
+                                <input type="text" name="{{ form.location.name }}" id="{{ form.location.id_for_label }}" 
+                                       value="{{ form.location.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 {% if form.location.errors %}border-red-500{% endif %}"
+                                       placeholder="Nom du lieu">
+                                {% if form.location.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.location.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- City -->
+                            <div>
+                                <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                    {{ form.city.label }}
+                                </label>
+                                <input type="text" name="{{ form.city.name }}" id="{{ form.city.id_for_label }}" 
+                                       value="{{ form.city.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 {% if form.city.errors %}border-red-500{% endif %}"
+                                       placeholder="Ville">
+                                {% if form.city.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.city.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Start DateTime -->
+                            <div>
+                                <label for="{{ form.start_datetime.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                    {{ form.start_datetime.label }}
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input type="datetime-local" name="{{ form.start_datetime.name }}" id="{{ form.start_datetime.id_for_label }}" 
+                                       value="{{ form.start_datetime.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 {% if form.start_datetime.errors %}border-red-500{% endif %}">
+                                {% if form.start_datetime.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.start_datetime.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- End DateTime -->
+                            <div>
+                                <label for="{{ form.end_datetime.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1">
+                                    {{ form.end_datetime.label }}
+                                    <span class="text-slate-400 text-xs ml-1">(optionnel)</span>
+                                </label>
+                                <input type="datetime-local" name="{{ form.end_datetime.name }}" id="{{ form.end_datetime.id_for_label }}" 
+                                       value="{{ form.end_datetime.value|default:'' }}"
+                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 {% if form.end_datetime.errors %}border-red-500{% endif %}">
+                                {% if form.end_datetime.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.end_datetime.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sectors -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                        <div class="w-8 h-8 bg-secondary-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </div>
+                        Secteurs
+                        <span class="text-red-500 ml-1">*</span>
+                    </h2>
+
+                    <div class="{% if form.sectors.errors %}border-2 border-red-500 rounded-lg p-3 bg-red-50{% endif %}">
+                        {{ form.sectors }}
+                    </div>
+                    {% if form.sectors.errors %}
+                    <div class="mt-2 flex items-center text-red-600">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-sm font-medium">{{ form.sectors.errors.0 }}</p>
+                    </div>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-slate-500">Sélectionnez au moins un secteur pour votre événement</p>
+                </div>
+
+                <!-- Communication -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                            </svg>
+                        </div>
+                        Communication
+                    </h2>
+
+                    <div class="space-y-3">
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="{{ form.comm_before.name }}" id="{{ form.comm_before.id_for_label }}" 
+                                   {% if form.comm_before.value %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">{{ form.comm_before.label }}</span>
+                                <span class="block text-sm text-slate-500">Communication avant l'événement</span>
+                            </span>
+                        </label>
+
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="{{ form.comm_during.name }}" id="{{ form.comm_during.id_for_label }}" 
+                                   {% if form.comm_during.value %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">{{ form.comm_during.label }}</span>
+                                <span class="block text-sm text-slate-500">Communication pendant l'événement</span>
+                            </span>
+                        </label>
+
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="{{ form.comm_after.name }}" id="{{ form.comm_after.id_for_label }}" 
+                                   {% if form.comm_after.value %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">{{ form.comm_after.label }}</span>
+                                <span class="block text-sm text-slate-500">Communication après l'événement</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                        <div class="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                            </svg>
+                        </div>
+                        Options
+                    </h2>
+
+                    <div class="space-y-3">
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="{{ form.needs_filming.name }}" id="{{ form.needs_filming.id_for_label }}" 
+                                   {% if form.needs_filming.value %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">{{ form.needs_filming.label }}</span>
+                                <span class="block text-sm text-slate-500">Demande d'intervention pour filmer</span>
+                            </span>
+                        </label>
+
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="{{ form.needs_poster.name }}" id="{{ form.needs_poster.id_for_label }}" 
+                                   {% if form.needs_poster.value %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">{{ form.needs_poster.label }}</span>
+                                <span class="block text-sm text-slate-500">Demande de création d'affiche</span>
+                            </span>
+                        </label>
+
+                        <label class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                            <input type="checkbox" name="{{ form.notify_on_publish.name }}" id="{{ form.notify_on_publish.id_for_label }}" 
+                                   {% if form.notify_on_publish.value %}checked{% endif %}
+                                   class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-slate-900">{{ form.notify_on_publish.label }}</span>
+                                <span class="block text-sm text-slate-500">Recevoir un email lors de la confirmation de la publication</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        Images
+                        <span class="ml-2 text-sm font-normal text-slate-500">(max 10)</span>
+                    </h2>
+
+                    <!-- Upload Zone -->
+                    <div id="image-upload-zone" 
+                         class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer">
+                        <svg class="w-12 h-12 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-slate-600 mb-1">Glissez-déposez vos images ici</p>
+                        <p class="text-sm text-slate-500">ou cliquez pour sélectionner</p>
+                        <p class="text-xs text-slate-400 mt-2">JPG, PNG, WebP - Max 5 Mo par image</p>
+                        <input type="file" name="images" multiple accept="image/jpeg,image/png,image/webp" 
+                               class="hidden" id="image-input">
+                    </div>
+
+                    <!-- Existing Images -->
+                    {% if existing_images %}
+                    <div class="mt-4">
+                        <p class="text-sm font-medium text-slate-700 mb-3">Images existantes</p>
+                        <div id="existing-images" class="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                            {% for image in existing_images %}
+                            <div class="relative group aspect-square rounded-lg overflow-hidden" data-image-id="{{ image.id }}">
+                                <img src="{{ image.image.url }}" alt="" class="w-full h-full object-cover">
+                                <a href="{% url 'events:delete_image' event.slug image.id %}" 
+                                   class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                                   onclick="return confirm('Supprimer cette image ?')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Preview -->
+                    <div id="image-preview" class="mt-4 hidden">
+                        <p class="text-sm font-medium text-slate-700 mb-3">Nouvelles images</p>
+                        <div id="preview-grid" class="grid grid-cols-4 sm:grid-cols-6 gap-3"></div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-3">
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        {{ submit_label }}
+                    </button>
+                    <a href="{% url 'events:event_list' %}" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                        Annuler
+                    </a>
+                </div>
+            </div>
+
+            <!-- Preview Sidebar -->
+            <div class="lg:col-span-1">
+                <div id="event-preview" class="sticky top-24">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-4 border-b border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-900">Prévisualisation</h3>
+                        </div>
+
+                        <div id="preview-images" class="aspect-video bg-slate-100 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+
+                        <div class="p-4">
+                            <div id="preview-sectors" class="flex flex-wrap gap-1.5 mb-3"></div>
+
+                            <h4 id="preview-title" class="text-lg font-semibold text-slate-900 mb-2">Titre de l'événement</h4>
+
+                            <p id="preview-description" class="text-sm text-slate-600 mb-4 line-clamp-3">La description de l'événement apparaîtra ici...</p>
+
+                            <div class="space-y-2 text-sm text-slate-600">
+                                <div id="preview-location" class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    </svg>
+                                    <span>Lieu, Ville</span>
+                                </div>
+
+                                <div id="preview-datetime" class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Date et heure</span>
+                                </div>
+                            </div>
+
+                            <div id="preview-options" class="mt-4 flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Image upload handling
+    const uploadZone = document.getElementById('image-upload-zone');
+    const imageInput = document.getElementById('image-input');
+    const imagePreview = document.getElementById('image-preview');
+    const previewGrid = document.getElementById('preview-grid');
+
+    uploadZone.addEventListener('click', () => imageInput.click());
+
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('border-primary-500', 'bg-primary-50');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('border-primary-500', 'bg-primary-50');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('border-primary-500', 'bg-primary-50');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    imageInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            imagePreview.classList.remove('hidden');
+            previewGrid.innerHTML = '';
+
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.className = 'aspect-square rounded-lg overflow-hidden';
+                        div.innerHTML = `<img src="${e.target.result}" alt="" class="w-full h-full object-cover">`;
+                        previewGrid.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    }
+
+    // Live preview
+    const titleInput = document.getElementById('{{ form.title.id_for_label }}');
+    const descriptionInput = document.getElementById('{{ form.description.id_for_label }}');
+    const locationInput = document.getElementById('{{ form.location.id_for_label }}');
+    const cityInput = document.getElementById('{{ form.city.id_for_label }}');
+    const startInput = document.getElementById('{{ form.start_datetime.id_for_label }}');
+    const endInput = document.getElementById('{{ form.end_datetime.id_for_label }}');
+
+    const previewTitle = document.getElementById('preview-title');
+    const previewDescription = document.getElementById('preview-description');
+    const previewLocation = document.getElementById('preview-location');
+    const previewDatetime = document.getElementById('preview-datetime');
+
+    titleInput.addEventListener('input', (e) => {
+        previewTitle.textContent = e.target.value || 'Titre de l\'événement';
+    });
+
+    descriptionInput.addEventListener('input', (e) => {
+        previewDescription.textContent = e.target.value || 'La description de l\'événement apparaîtra ici...';
+    });
+
+    function updateLocation() {
+        const location = locationInput.value || 'Lieu';
+        const city = cityInput.value || 'Ville';
+        previewLocation.querySelector('span').textContent = `${location}, ${city}`;
+    }
+
+    locationInput.addEventListener('input', updateLocation);
+    cityInput.addEventListener('input', updateLocation);
+
+    function updateDatetime() {
+        const start = startInput.value ? new Date(startInput.value).toLocaleString('fr-FR') : 'Date et heure';
+        previewDatetime.querySelector('span').textContent = start;
+    }
+
+    startInput.addEventListener('change', updateDatetime);
+</script>
+{% endblock %}
