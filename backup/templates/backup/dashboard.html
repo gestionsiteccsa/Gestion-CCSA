@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des Sauvegardes - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Gestion des Sauvegardes</h1>
+                <p class="mt-2 text-slate-600">Sauvegardez votre base de données et vos fichiers média</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if config.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="3"/>
+                    </svg>
+                    {% if config.is_active %}Automatique activé{% else %}Automatique désactivé{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques d'espace disque -->
+    {% if disk_usage %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-900">Espace disque</h2>
+            <span class="text-sm text-slate-500">{{ config.backup_directory }}</span>
+        </div>
+
+        <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary-600 bg-primary-200">
+                        Utilisé
+                    </span>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold inline-block text-primary-600">
+                        {{ disk_usage.percent|floatformat:1 }}%
+                    </span>
+                </div>
+            </div>
+            
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary-200">
+                <div style="width:{{ disk_usage.percent }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500 transition-all duration-500"></div>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="text-sm text-slate-500">Total</p>
+                    <p class="text-lg font-semibold text-slate-900">{{ disk_usage.total|filesizeformat }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Utilisé</p>
+                    <p class="text-lg font-semibold text-slate-900">{{ disk_usage.used|filesizeformat }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Libre</p>
+                    <p class="text-lg font-semibold text-green-600">{{ disk_usage.free|filesizeformat }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions de sauvegarde manuelle -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-slate-900 mb-6">Sauvegarde manuelle</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Base de données -->
+            <button onclick="createBackup('database')" 
+                    id="btn-database"
+                    class="group relative p-6 border-2 border-slate-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all duration-200 text-left">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                        </svg>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Base de données</h3>
+                <p class="text-sm text-slate-600">Sauvegarde uniquement la base de données (PostgreSQL/SQLite/MySQL)</p>
+                
+                <div class="mt-4 hidden" id="spinner-database">
+                    <div class="flex items-center text-sm text-primary-600">
+                        <svg class="animate-spin -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                        Sauvegarde en cours...
+                    </div>
+                </div>
+            </button>
+
+            <!-- Média -->
+            <button onclick="createBackup('media')" 
+                    id="btn-media"
+                    class="group relative p-6 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 text-left">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Dossier média</h3>
+                <p class="text-sm text-slate-600">Sauvegarde uniquement les images et documents uploadés</p>
+                
+                <div class="mt-4 hidden" id="spinner-media">
+                    <div class="flex items-center text-sm text-purple-600">
+                        <svg class="animate-spin -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                        Sauvegarde en cours...
+                    </div>
+                </div>
+            </button>
+
+            <!-- Complète -->
+            <button onclick="createBackup('full')" 
+                    id="btn-full"
+                    class="group relative p-6 border-2 border-slate-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-200 text-left">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Sauvegarde complète</h3>
+                <p class="text-sm text-slate-600">Sauvegarde la base de données ET le dossier média</p>
+                
+                <div class="mt-4 hidden" id="spinner-full">
+                    <div class="flex items-center text-sm text-green-600">
+                        <svg class="animate-spin -ml-1 mr-3 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                        Sauvegarde en cours...
+                    </div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-slate-900 mb-6">Configuration des sauvegardes automatiques</h2>
+        
+        <form method="post" action="{% url 'backup:update_config' %}" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Type de sauvegarde</label>
+                    <select name="backup_type" class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="database" {% if config.backup_type == 'database' %}selected{% endif %}>Base de données uniquement</option>
+                        <option value="media" {% if config.backup_type == 'media' %}selected{% endif %}>Dossier média uniquement</option>
+                        <option value="full" {% if config.backup_type == 'full' %}selected{% endif %}>Complète (DB + Média)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Fréquence</label>
+                    <select name="frequency" class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="daily" {% if config.frequency == 'daily' %}selected{% endif %}>Quotidien</option>
+                        <option value="weekly" {% if config.frequency == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
+                        <option value="monthly" {% if config.frequency == 'monthly' %}selected{% endif %}>Mensuel</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Dossier de sauvegarde</label>
+                    <input type="text" name="backup_directory" value="{{ config.backup_directory }}" 
+                           class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Conserver les N dernières sauvegardes</label>
+                    <input type="number" name="keep_last_n" value="{{ config.keep_last_n }}" min="1" max="100"
+                           class="w-full rounded-lg border-slate-300 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+            </div>
+
+            <div class="flex items-center">
+                <input type="checkbox" name="is_active" id="is_active" {% if config.is_active %}checked{% endif %}
+                       class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+                <label for="is_active" class="ml-2 text-sm text-slate-700">Activer les sauvegardes automatiques</label>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Enregistrer la configuration
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Fichiers de sauvegarde -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900">Fichiers de sauvegarde disponibles</h2>
+        </div>
+
+        {% if backup_files %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fichier</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date de création</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Taille</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-200">
+                    {% for file in backup_files %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-slate-900">{{ file.name }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {{ file.created|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {{ file.size|filesizeformat }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{% url 'backup:download' file.name %}" 
+                                   class="text-primary-600 hover:text-primary-900"
+                                   title="Télécharger">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </a>
+                                <button onclick="deleteBackup('{{ file.name }}', this)" 
+                                        class="text-red-600 hover:text-red-900"
+                                        title="Supprimer">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-slate-500">Aucun fichier de sauvegarde disponible</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Historique -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900">Historique des sauvegardes</h2>
+        </div>
+
+        {% if history %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Taille</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Durée</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Par</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-200">
+                    {% for item in history %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {{ item.started_at|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                {% if item.backup_type == 'database' %}bg-blue-100 text-blue-800
+                                {% elif item.backup_type == 'media' %}bg-purple-100 text-purple-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ item.get_backup_type_display }}
+                            </span>
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
+                                {{ item.get_trigger_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if item.status == 'success' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Succès
+                            </span>
+                            {% elif item.status == 'failed' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" title="{{ item.error_message }}">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                                Échec
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <svg class="animate-spin -ml-1 mr-2 h-3 w-3" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                </svg>
+                                En cours
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {% if item.file_size %}{{ item.get_file_size_display }}{% else %}-{% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {{ item.get_duration }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {% if item.created_by %}
+                                {{ item.created_by.get_full_name|default:item.created_by.email }}
+                            {% else %}
+                                Système
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-slate-500">Aucun historique de sauvegarde</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function createBackup(type) {
+        // Désactiver le bouton et afficher le spinner
+        const btn = document.getElementById('btn-' + type);
+        const spinner = document.getElementById('spinner-' + type);
+        
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        spinner.classList.remove('hidden');
+
+        // Envoyer la requête AJAX
+        fetch('{% url "backup:create_ajax" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: 'type=' + encodeURIComponent(type)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Afficher un message de succès
+                showNotification('Succès', data.message, 'success');
+                // Recharger la page après 2 secondes
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showNotification('Erreur', data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Erreur', 'Une erreur est survenue: ' + error, 'error');
+        })
+        .finally(() => {
+            // Réactiver le bouton
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            spinner.classList.add('hidden');
+        });
+    }
+
+    function deleteBackup(filename, btn) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce fichier de sauvegarde ?')) {
+            return;
+        }
+
+        fetch('{% url "backup:delete" "FILENAME" %}'.replace('FILENAME', encodeURIComponent(filename)), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Succès', data.message, 'success');
+                // Supprimer la ligne du tableau
+                btn.closest('tr').remove();
+            } else {
+                showNotification('Erreur', data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Erreur', 'Une erreur est survenue: ' + error, 'error');
+        });
+    }
+
+    function showNotification(title, message, type) {
+        // Créer une notification toast
+        const notification = document.createElement('div');
+        notification.className = `fixed bottom-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-10 opacity-0 
+            ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+        notification.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${type === 'success' 
+                        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'
+                        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>'
+                    }
+                </svg>
+                <div>
+                    <p class="font-semibold">${title}</p>
+                    <p class="text-sm">${message}</p>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animer l'entrée
+        setTimeout(() => {
+            notification.classList.remove('translate-y-10', 'opacity-0');
+        }, 100);
+        
+        // Supprimer après 5 secondes
+        setTimeout(() => {
+            notification.classList.add('translate-y-10', 'opacity-0');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+</script>
+{% endblock %}

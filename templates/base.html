@@ -171,6 +171,14 @@
                                 <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
                                     Mon profil
                                 </a>
+                                <a href="{% url 'events:my_events' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        Mes événements
+                                    </span>
+                                </a>
                                 <a href="{% url 'accounts:notification_preferences' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
                                     Paramètres de notification
                                 </a>
@@ -216,6 +224,14 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                 </svg>
                                                 Paramètres événements
+                                            </span>
+                                        </a>
+                                        <a href="{% url 'backup:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600 pl-8">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                                </svg>
+                                                Sauvegardes
                                             </span>
                                         </a>
                                     </div>
@@ -308,6 +324,14 @@
                         <a href="{% url 'accounts:profile' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
                             Mon profil
                         </a>
+                        <a href="{% url 'events:my_events' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Mes événements
+                            </span>
+                        </a>
                         <a href="{% url 'accounts:notification_preferences' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
                             Paramètres de notification
                         </a>
@@ -336,6 +360,9 @@
                                 </a>
                                 <a href="{% url 'events:event_settings' %}" class="block pl-6 px-3 py-2 text-sm text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
                                     Paramètres événements
+                                </a>
+                                <a href="{% url 'backup:dashboard' %}" class="block pl-6 px-3 py-2 text-sm text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                    Sauvegardes
                                 </a>
                             </div>
                         </div>

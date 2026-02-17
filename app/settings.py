@@ -7,21 +7,23 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file (for local development)
-if os.path.exists(BASE_DIR / '.env'):
-    load_dotenv(BASE_DIR / '.env')
+if os.path.exists(BASE_DIR / ".env"):
+    load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
-    raise ValueError("SECRET_KEY environment variable is not set. Please set it in GitHub Secrets or .env file.")
+    raise ValueError(
+        "SECRET_KEY environment variable is not set. Please set it in GitHub Secrets or .env file."
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     "accounts",
     "home",
     "events",
+    "backup",
 ]
 
 MIDDLEWARE = [
@@ -75,15 +78,15 @@ WSGI_APPLICATION = "app.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Support both SQLite (dev) and PostgreSQL (production)
-if os.environ.get('DB_ENGINE') == 'django.db.backends.postgresql':
+if os.environ.get("DB_ENGINE") == "django.db.backends.postgresql":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get('DB_NAME'),
-            "USER": os.environ.get('DB_USER'),
-            "PASSWORD": os.environ.get('DB_PASSWORD'),
-            "HOST": os.environ.get('DB_HOST', 'localhost'),
-            "PORT": os.environ.get('DB_PORT', '5432'),
+            "NAME": os.environ.get("DB_NAME"),
+            "USER": os.environ.get("DB_USER"),
+            "PASSWORD": os.environ.get("DB_PASSWORD"),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
         }
     }
 else:
@@ -150,17 +153,21 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ============================================================================
 
 # Modèle utilisateur personnalisé
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
 # URLs de redirection
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
 # Configuration des inscriptions
 # TODO: Ces paramètres seront modifiables par le super admin via l'interface d'administration
-ACCOUNTS_RESTRICT_EMAIL_DOMAIN = True  # Restreindre les inscriptions à un domaine spécifique
-ACCOUNTS_ALLOWED_EMAIL_DOMAIN = 'cc-sudavesnois.fr'  # Domaine autorisé pour les inscriptions
+ACCOUNTS_RESTRICT_EMAIL_DOMAIN = (
+    True  # Restreindre les inscriptions à un domaine spécifique
+)
+ACCOUNTS_ALLOWED_EMAIL_DOMAIN = (
+    "cc-sudavesnois.fr"  # Domaine autorisé pour les inscriptions
+)
 ACCOUNTS_REGISTRATION_OPEN = True  # Autoriser les nouvelles inscriptions
 
 # ============================================================================
@@ -170,14 +177,14 @@ ACCOUNTS_REGISTRATION_OPEN = True  # Autoriser les nouvelles inscriptions
 # Cookie settings (always active for security)
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Strict'
-CSRF_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = "Strict"
+CSRF_COOKIE_SAMESITE = "Strict"
 
 # HTTPS Settings (only in production)
 if not DEBUG:
     # Force HTTPS
     SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
     # HSTS (HTTP Strict Transport Security)
     SECURE_HSTS_SECONDS = 31536000  # 1 year
@@ -191,8 +198,8 @@ if not DEBUG:
     # Security Headers
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 else:
     # Development settings
     SECURE_SSL_REDIRECT = False
@@ -204,40 +211,63 @@ else:
 # ============================================================================
 
 # Configuration SMTP pour l'envoi d'emails (fonctionne en dev et prod)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() == "true"
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "False").lower() == "true"
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 
 # Pour déboguer les emails en développement, décommentez la ligne suivante :
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'nepasrepondre@cc-sudavesnois.fr')
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL", "nepasrepondre@cc-sudavesnois.fr"
+)
 
 # URL du site pour les liens dans les emails
-SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000')
+SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
 
 # ============================================================================
 # CONTENT SECURITY POLICY (CSP)
 # ============================================================================
 
 CONTENT_SECURITY_POLICY = {
-    'DIRECTIVES': {
-        'default-src': ("'self'",),
-        'script-src': ("'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdn.jsdelivr.net",),
-        'script-src-elem': ("'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdn.jsdelivr.net",),
-        'style-src': ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com",),
-        'style-src-elem': ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com",),
-        'font-src': ("'self'", "https://fonts.gstatic.com", "data:"),
-        'img-src': ("'self'", "data:", "https:"),
-        'connect-src': ("'self'", "https://cdn.jsdelivr.net",),
-        'frame-ancestors': ("'none'",),
-        'form-action': ("'self'",),
-        'base-uri': ("'self'",),
-        'object-src': ("'none'",),
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+        "script-src": (
+            "'self'",
+            "'unsafe-inline'",
+            "https://cdn.tailwindcss.com",
+            "https://cdn.jsdelivr.net",
+        ),
+        "script-src-elem": (
+            "'self'",
+            "'unsafe-inline'",
+            "https://cdn.tailwindcss.com",
+            "https://cdn.jsdelivr.net",
+        ),
+        "style-src": (
+            "'self'",
+            "'unsafe-inline'",
+            "https://fonts.googleapis.com",
+        ),
+        "style-src-elem": (
+            "'self'",
+            "'unsafe-inline'",
+            "https://fonts.googleapis.com",
+        ),
+        "font-src": ("'self'", "https://fonts.gstatic.com", "data:"),
+        "img-src": ("'self'", "data:", "https:"),
+        "connect-src": (
+            "'self'",
+            "https://cdn.jsdelivr.net",
+        ),
+        "frame-ancestors": ("'none'",),
+        "form-action": ("'self'",),
+        "base-uri": ("'self'",),
+        "object-src": ("'none'",),
     }
 }
 
@@ -246,52 +276,52 @@ CONTENT_SECURITY_POLICY = {
 # ============================================================================
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'formatter': 'verbose',
-        },
-        'security_file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'security.log',
-            'formatter': 'verbose',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': True,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'django.security': {
-            'handlers': ['security_file', 'console'],
-            'level': 'WARNING',
-            'propagate': False,
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "formatter": "verbose",
         },
-        'django.request': {
-            'handlers': ['security_file', 'console'],
-            'level': 'ERROR',
-            'propagate': False,
+        "security_file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "security.log",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django.security": {
+            "handlers": ["security_file", "console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["security_file", "console"],
+            "level": "ERROR",
+            "propagate": False,
         },
     },
 }
@@ -302,4 +332,4 @@ LOGGING = {
 
 EVENTS_MAX_IMAGES = 10
 EVENTS_MAX_IMAGE_SIZE_MB = 10
-EVENTS_ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
+EVENTS_ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"]
