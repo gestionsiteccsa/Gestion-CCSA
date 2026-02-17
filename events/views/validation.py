@@ -14,7 +14,8 @@ from django.views.generic import DetailView, ListView
 
 from accounts.services import NotificationService
 from events.mixins import CommunicationRequiredMixin
-from events.models import Event, EventChangeLog, EventSettings, EventValidation, VideoRequestLog
+from events.models import (Event, EventChangeLog, EventSettings,
+                           EventValidation, VideoRequestLog)
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ class EventValidationListView(CommunicationRequiredMixin, ListView):
 
     def get_queryset(self):
         """Filtre les événements en attente de validation.
-        
+
         Optimisation: prefetch_related pour éviter les requêtes N+1.
         """
         return (
@@ -43,26 +44,32 @@ class EventValidationListView(CommunicationRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         """Ajoute les compteurs au contexte.
-        
+
         Optimisation: Utilise le paginator pour le count et une seule requête
         pour les statistiques globales.
         """
         context = super().get_context_data(**kwargs)
-        
+
         # Utiliser le paginator pour obtenir le count sans refaire la requête
-        context["pending_count"] = context["paginator"].count if context.get("paginator") else self.get_queryset().count()
-        
+        context["pending_count"] = (
+            context["paginator"].count
+            if context.get("paginator")
+            else self.get_queryset().count()
+        )
+
         # Compter les événements validés via EventValidation (is_validated=True)
         from events.models import EventValidation
-        
+
         context["validated_count"] = EventValidation.objects.filter(
             event__is_active=True, is_validated=True
         ).count()
-        
-        context["rejected_count"] = EventValidation.objects.filter(
-            event__is_active=True, is_validated=False
-        ).exclude(validated_by__isnull=True).count()
-        
+
+        context["rejected_count"] = (
+            EventValidation.objects.filter(event__is_active=True, is_validated=False)
+            .exclude(validated_by__isnull=True)
+            .count()
+        )
+
         return context
 
 
@@ -76,7 +83,9 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
 
     def get_queryset(self):
         """Inclut les relations pour optimisation."""
-        return Event.objects.filter(is_active=True).prefetch_related("sectors", "created_by")
+        return Event.objects.filter(is_active=True).prefetch_related(
+            "sectors", "created_by"
+        )
 
     def _get_validation_status(self, validation):
         """Retourne le statut textuel de la validation."""
@@ -100,18 +109,22 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
         except EventValidation.DoesNotExist:
             context["validation"] = None
             context["validation_status"] = "pending"
-        
+
         # Récupérer les demandes vidéo
-        video_requests = VideoRequestLog.objects.filter(event=self.object).order_by('-sent_at')
-        context['video_requests'] = video_requests
-        context['latest_video_request'] = video_requests.first() if video_requests.exists() else None
-        
+        video_requests = VideoRequestLog.objects.filter(event=self.object).order_by(
+            "-sent_at"
+        )
+        context["video_requests"] = video_requests
+        context["latest_video_request"] = (
+            video_requests.first() if video_requests.exists() else None
+        )
+
         # Vérifier si on peut envoyer plus de demandes (max 4)
-        context['can_send_more'] = video_requests.count() < 4
-        context['total_requests'] = video_requests.count()
-        
+        context["can_send_more"] = video_requests.count() < 4
+        context["total_requests"] = video_requests.count()
+
         # Récupérer l'email de notification vidéo configuré
-        context['video_email'] = EventSettings.get_video_email()
+        context["video_email"] = EventSettings.get_video_email()
 
         return context
 
@@ -168,7 +181,9 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
             if action == "validate":
                 NotificationService.notify_event_validated(self.object, request.user)
             else:
-                NotificationService.notify_event_rejected(self.object, request.user, comment)
+                NotificationService.notify_event_rejected(
+                    self.object, request.user, comment
+                )
 
             messages.success(request, message)
             return redirect("events:event_validation_list")
@@ -183,7 +198,7 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
 
         status_text = "validé" if action == "validate" else "rejeté"
         subject = f"Votre événement '{event.title}' a été {status_text}"
-        
+
         # Construire l'URL de l'événement
         site_url = getattr(settings, "SITE_URL", "https://ccsa.example.com")
         event_url = f"{site_url}{event.get_absolute_url()}"
@@ -211,7 +226,7 @@ Détails de l'événement :
 """
         if comment:
             plain_message += f"\nCommentaire : {comment}\n"
-        
+
         plain_message += f"\nVous pouvez consulter votre événement ici : {event_url}\n\nCordialement,\nL'équipe Communication"
 
         try:
@@ -228,5 +243,5 @@ Détails de l'événement :
             # Log l'erreur mais ne pas bloquer le processus
             logger.error(
                 f"Erreur lors de l'envoi de l'email de validation pour l'événement {event.id}: {e}",
-                exc_info=True
+                exc_info=True,
             )

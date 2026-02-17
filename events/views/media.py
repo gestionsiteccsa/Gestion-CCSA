@@ -29,14 +29,16 @@ def reorder_images(request, slug):
         # Validation du format des données
         if not isinstance(image_order, list):
             return JsonResponse(
-                {"success": False, "error": "Le format doit être une liste"},
-                status=400
+                {"success": False, "error": "Le format doit être une liste"}, status=400
             )
 
         if not all(isinstance(x, int) for x in image_order):
             return JsonResponse(
-                {"success": False, "error": "Tous les éléments doivent être des entiers"},
-                status=400
+                {
+                    "success": False,
+                    "error": "Tous les éléments doivent être des entiers",
+                },
+                status=400,
             )
 
         # Vérifier que tous les IDs existent et appartiennent à l'événement
@@ -47,8 +49,11 @@ def reorder_images(request, slug):
 
         if not requested_ids.issubset(existing_ids):
             return JsonResponse(
-                {"success": False, "error": "Certains IDs d'images n'appartiennent pas à cet événement"},
-                status=400
+                {
+                    "success": False,
+                    "error": "Certains IDs d'images n'appartiennent pas à cet événement",
+                },
+                status=400,
             )
 
         # Mettre à jour l'ordre
@@ -60,20 +65,15 @@ def reorder_images(request, slug):
     except json.JSONDecodeError:
         logger.warning("Tentative de reorder_images avec JSON invalide")
         return JsonResponse(
-            {"success": False, "error": "Format JSON invalide"},
-            status=400
+            {"success": False, "error": "Format JSON invalide"}, status=400
         )
     except ValidationError as e:
         logger.warning(f"Erreur de validation dans reorder_images: {e}")
-        return JsonResponse(
-            {"success": False, "error": str(e)},
-            status=400
-        )
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
     except Exception as e:
         logger.error(f"Erreur inattendue dans reorder_images: {e}", exc_info=True)
         return JsonResponse(
-            {"success": False, "error": "Une erreur interne est survenue"},
-            status=500
+            {"success": False, "error": "Une erreur interne est survenue"}, status=500
         )
 
 
@@ -88,8 +88,7 @@ def delete_image(request, image_id):
         # Vérifier que l'utilisateur est le créateur
         if event.created_by != request.user:
             return JsonResponse(
-                {"success": False, "error": "Permission refusée"},
-                status=403
+                {"success": False, "error": "Permission refusée"}, status=403
             )
 
         image.delete()
@@ -97,14 +96,18 @@ def delete_image(request, image_id):
 
     except EventImage.DoesNotExist:
         return JsonResponse(
-            {"success": False, "error": "Image non trouvée"},
-            status=404
+            {"success": False, "error": "Image non trouvée"}, status=404
         )
     except Exception as e:
-        logger.error(f"Erreur lors de la suppression d'image {image_id}: {e}", exc_info=True)
+        logger.error(
+            f"Erreur lors de la suppression d'image {image_id}: {e}", exc_info=True
+        )
         return JsonResponse(
-            {"success": False, "error": "Une erreur est survenue lors de la suppression"},
-            status=500
+            {
+                "success": False,
+                "error": "Une erreur est survenue lors de la suppression",
+            },
+            status=500,
         )
 
 
@@ -119,7 +122,9 @@ def delete_document(request, document_id):
         if event.created_by != request.user:
             from django.contrib import messages
 
-            messages.error(request, "Vous n'avez pas la permission de supprimer ce document.")
+            messages.error(
+                request, "Vous n'avez pas la permission de supprimer ce document."
+            )
             return redirect(event.get_absolute_url())
 
         document.delete()
@@ -133,7 +138,11 @@ def delete_document(request, document_id):
         messages.error(request, "Document non trouvé.")
     except Exception as e:
         from django.contrib import messages
-        logger.error(f"Erreur lors de la suppression du document {document_id}: {e}", exc_info=True)
+
+        logger.error(
+            f"Erreur lors de la suppression du document {document_id}: {e}",
+            exc_info=True,
+        )
         messages.error(request, "Une erreur est survenue lors de la suppression.")
 
     return redirect(event.get_absolute_url())

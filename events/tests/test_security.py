@@ -1,10 +1,11 @@
 """Tests de sécurité pour l'application events."""
 
+from datetime import timedelta
+
 import pytest
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
-from datetime import timedelta
 
 from accounts.models import User
 from events.models import Event, EventComment, Sector
@@ -27,13 +28,16 @@ class TestXSSProtection:
             start_datetime=timezone.now() + timedelta(days=1),
             created_by=user,
         )
-        
+
         response = client.get(event.get_absolute_url())
         assert response.status_code == 200
         # Vérifier que le script n'est pas présent tel quel
         assert "<script>alert('XSS')</script>" not in response.content.decode()
         # Vérifier qu'il est échappé
-        assert "&lt;script&gt;" in response.content.decode() or "<script>" not in response.content.decode()
+        assert (
+            "&lt;script&gt;" in response.content.decode()
+            or "<script>" not in response.content.decode()
+        )
 
     def test_comment_escaped_in_template(self, client):
         """Test que les commentaires sont échappés."""
@@ -48,13 +52,13 @@ class TestXSSProtection:
             start_datetime=timezone.now() + timedelta(days=1),
             created_by=user,
         )
-        
+
         comment = EventComment.objects.create(
             event=event,
             author=user,
             content="<img src=x onerror=alert('XSS')>",
         )
-        
+
         response = client.get(event.get_absolute_url())
         assert response.status_code == 200
         # Vérifier que le script n'est pas présent
@@ -72,14 +76,17 @@ class TestRateLimiting:
             password="testpass123",
         )
         client.force_login(user)
-        
+
         # Faire 11 requêtes (limite à 10)
         for i in range(11):
             response = client.post(
-                reverse("accounts:notification_mark_read", kwargs={"notification_id": "test"}),
+                reverse(
+                    "accounts:notification_mark_read",
+                    kwargs={"notification_id": "test"},
+                ),
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest",
             )
-        
+
         # La 11ème devrait être rejetée
         assert response.status_code == 429 or response.status_code == 404
 
@@ -90,14 +97,14 @@ class TestRateLimiting:
             password="testpass123",
         )
         client.force_login(user)
-        
+
         # Faire 6 requêtes (limite à 5)
         for i in range(6):
             response = client.post(
                 reverse("accounts:notification_mark_all_read"),
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest",
             )
-        
+
         # La 6ème devrait être rejetée ou retourner succès si pas de notifs
         assert response.status_code in [200, 204, 429]
 
@@ -121,9 +128,9 @@ class TestEventDuplication:
             created_by=user,
         )
         event.sectors.add(sector)
-        
+
         client.force_login(user)
-        
+
         response = client.post(
             reverse("events:event_duplicate", kwargs={"slug": event.slug}),
             {
@@ -136,10 +143,10 @@ class TestEventDuplication:
                 "copy_documents": "",
             },
         )
-        
+
         # Vérifier que la duplication a réussi
         assert response.status_code in [200, 302]
-        
+
         # Vérifier que l'événement a été créé
         assert Event.objects.filter(title="Duplicated Event").exists()
 
@@ -156,11 +163,12 @@ class TestInputValidation:
         )
         # Attribuer le rôle Communication
         from accounts.models import Role, UserRole
+
         role = Role.objects.create(name="Communication")
         UserRole.objects.create(user=user, role=role)
-        
+
         client.force_login(user)
-        
+
         # Tester avec une date invalide
         response = client.get(
             reverse("events:communication_dashboard"),
@@ -170,7 +178,7 @@ class TestInputValidation:
                 "date_to": "2026-02-10",
             },
         )
-        
+
         # Ne devrait pas planter (erreur 500)
         assert response.status_code == 200
 
@@ -181,11 +189,12 @@ class TestInputValidation:
             password="testpass123",
         )
         from accounts.models import Role, UserRole
+
         role = Role.objects.create(name="Communication")
         UserRole.objects.create(user=user, role=role)
-        
+
         client.force_login(user)
-        
+
         # Tester avec date de fin avant date de début
         response = client.get(
             reverse("events:communication_dashboard"),
@@ -195,5 +204,5 @@ class TestInputValidation:
                 "date_to": "2026-02-01",
             },
         )
-        
+
         assert response.status_code == 200

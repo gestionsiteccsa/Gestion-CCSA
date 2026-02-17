@@ -11,7 +11,7 @@ from events.models import EventSettings
 
 class EventSettingsView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Vue pour configurer les paramètres globaux des événements.
-    
+
     Accessible uniquement aux superadmins.
     """
 

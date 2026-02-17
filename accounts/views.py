@@ -1,22 +1,22 @@
 """Views pour l'app accounts."""
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth import (authenticate, login, logout,
+                                 update_session_auth_hash)
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import PasswordResetCompleteView as BasePasswordResetCompleteView
-from django.contrib.auth.views import PasswordResetConfirmView as BasePasswordResetConfirmView
-from django.contrib.auth.views import PasswordResetDoneView as BasePasswordResetDoneView
-from django.contrib.auth.views import PasswordResetView as BasePasswordResetView
+from django.contrib.auth.views import \
+    PasswordResetCompleteView as BasePasswordResetCompleteView
+from django.contrib.auth.views import \
+    PasswordResetConfirmView as BasePasswordResetConfirmView
+from django.contrib.auth.views import \
+    PasswordResetDoneView as BasePasswordResetDoneView
+from django.contrib.auth.views import \
+    PasswordResetView as BasePasswordResetView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 
-from .forms import (
-    PasswordChangeForm,
-    UserLoginForm,
-    UserProfileForm,
-    UserRegistrationForm,
-    UserUpdateForm,
-)
+from .forms import (PasswordChangeForm, UserLoginForm, UserProfileForm,
+                    UserRegistrationForm, UserUpdateForm)
 from .models import LoginHistory, UserSession
 
 
@@ -40,7 +40,8 @@ def register_view(request):
         if form.is_valid():
             form.save()
             messages.success(
-                request, "Compte créé avec succès ! Vous pouvez maintenant vous connecter."
+                request,
+                "Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
             )
             return redirect("accounts:login")
     else:
@@ -114,7 +115,9 @@ def logout_view(request):
         # Désactiver la session utilisateur
         if request.user.is_authenticated:
             UserSession.objects.filter(
-                user=request.user, session_key=request.session.session_key or "", is_active=True
+                user=request.user,
+                session_key=request.session.session_key or "",
+                is_active=True,
             ).update(is_active=False)
 
         logout(request)
@@ -251,23 +254,31 @@ from .models import Notification
 def notification_list(request):
     """Page listant toutes les notifications de l'utilisateur."""
     notifications = Notification.objects.filter(user=request.user)
-    
+
     # Pagination
     paginator = Paginator(notifications, 20)  # 20 notifications par page
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     # Marquer comme lues les notifications affichées
-    if request.method == 'POST':
-        if 'mark_all_read' in request.POST:
-            Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-            messages.success(request, "Toutes les notifications ont été marquées comme lues.")
-            return redirect('accounts:notification_list')
-    
-    return render(request, 'accounts/notification_list.html', {
-        'page_obj': page_obj,
-        'unread_count': Notification.get_unread_count(request.user),
-    })
+    if request.method == "POST":
+        if "mark_all_read" in request.POST:
+            Notification.objects.filter(user=request.user, is_read=False).update(
+                is_read=True
+            )
+            messages.success(
+                request, "Toutes les notifications ont été marquées comme lues."
+            )
+            return redirect("accounts:notification_list")
+
+    return render(
+        request,
+        "accounts/notification_list.html",
+        {
+            "page_obj": page_obj,
+            "unread_count": Notification.get_unread_count(request.user),
+        },
+    )
 
 
 @login_required
@@ -275,35 +286,39 @@ def notification_dropdown(request):
     """Vue partielle pour le dropdown des notifications (AJAX)."""
     notifications = Notification.get_recent_for_user(request.user, limit=5)
     unread_count = Notification.get_unread_count(request.user)
-    
-    return render(request, 'accounts/notification_dropdown.html', {
-        'notifications': notifications,
-        'unread_count': unread_count,
-    })
+
+    return render(
+        request,
+        "accounts/notification_dropdown.html",
+        {
+            "notifications": notifications,
+            "unread_count": unread_count,
+        },
+    )
 
 
 @require_POST
 def _check_rate_limit(request, action, max_requests=10, window=60):
     """
     Vérifie le rate limiting pour une action.
-    
+
     Args:
         request: La requête HTTP
         action: L'identifiant de l'action (ex: 'mark_read', 'mark_all')
         max_requests: Nombre max de requêtes autorisées
         window: Fenêtre de temps en secondes
-    
+
     Returns:
         tuple: (allowed: bool, remaining: int, reset_time: int)
     """
     from django.core.cache import cache
-    
+
     cache_key = f"rate_limit_{action}_{request.user.id}"
     current = cache.get(cache_key, 0)
-    
+
     if current >= max_requests:
         return False, 0, window
-    
+
     cache.set(cache_key, current + 1, window)
     return True, max_requests - current - 1, window
 
@@ -312,22 +327,31 @@ def _check_rate_limit(request, action, max_requests=10, window=60):
 def notification_mark_read(request, notification_id):
     """Marquer une notification comme lue (AJAX)."""
     # Rate limiting: max 10 requêtes par minute
-    allowed, remaining, reset_time = _check_rate_limit(request, 'mark_read', max_requests=10, window=60)
-    
+    allowed, remaining, reset_time = _check_rate_limit(
+        request, "mark_read", max_requests=10, window=60
+    )
+
     if not allowed:
-        return JsonResponse({
-            'success': False,
-            'error': 'Trop de requêtes. Veuillez réessayer dans une minute.',
-            'retry_after': reset_time
-        }, status=429)
-    
-    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Trop de requêtes. Veuillez réessayer dans une minute.",
+                "retry_after": reset_time,
+            },
+            status=429,
+        )
+
+    notification = get_object_or_404(
+        Notification, id=notification_id, user=request.user
+    )
     notification.mark_as_read()
-    
-    return JsonResponse({
-        'success': True,
-        'unread_count': Notification.get_unread_count(request.user),
-    })
+
+    return JsonResponse(
+        {
+            "success": True,
+            "unread_count": Notification.get_unread_count(request.user),
+        }
+    )
 
 
 @require_POST
@@ -335,21 +359,28 @@ def notification_mark_read(request, notification_id):
 def notification_mark_all_read(request):
     """Marquer toutes les notifications comme lues (AJAX)."""
     # Rate limiting: max 5 requêtes par minute (opération plus lourde)
-    allowed, remaining, reset_time = _check_rate_limit(request, 'mark_all', max_requests=5, window=60)
-    
+    allowed, remaining, reset_time = _check_rate_limit(
+        request, "mark_all", max_requests=5, window=60
+    )
+
     if not allowed:
-        return JsonResponse({
-            'success': False,
-            'error': 'Trop de requêtes. Veuillez réessayer dans une minute.',
-            'retry_after': reset_time
-        }, status=429)
-    
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Trop de requêtes. Veuillez réessayer dans une minute.",
+                "retry_after": reset_time,
+            },
+            status=429,
+        )
+
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-    
-    return JsonResponse({
-        'success': True,
-        'unread_count': 0,
-    })
+
+    return JsonResponse(
+        {
+            "success": True,
+            "unread_count": 0,
+        }
+    )
 
 
 @login_required
@@ -360,12 +391,12 @@ def notification_preferences(request):
     # Récupérer ou créer les préférences
     preferences = UserNotificationPreference.get_user_preferences(request.user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         updated = False
 
         for pref in preferences.values():
-            in_app_key = f'in_app_{pref.notification_type}'
-            email_key = f'email_{pref.notification_type}'
+            in_app_key = f"in_app_{pref.notification_type}"
+            email_key = f"email_{pref.notification_type}"
 
             # Mettre à jour les préférences
             pref.in_app_enabled = in_app_key in request.POST
@@ -374,13 +405,19 @@ def notification_preferences(request):
             updated = True
 
         if updated:
-            messages.success(request, "Vos préférences de notification ont été mises à jour.")
+            messages.success(
+                request, "Vos préférences de notification ont été mises à jour."
+            )
 
-        return redirect('accounts:notification_preferences')
+        return redirect("accounts:notification_preferences")
 
-    return render(request, 'accounts/notification_preferences.html', {
-        'preferences': preferences,
-    })
+    return render(
+        request,
+        "accounts/notification_preferences.html",
+        {
+            "preferences": preferences,
+        },
+    )
 
 
 @login_required
@@ -388,40 +425,59 @@ def logs_view(request):
     """Page de logs système (superuser uniquement)."""
     if not request.user.is_superuser:
         messages.error(request, "Vous n'avez pas la permission d'accéder à cette page.")
-        return redirect('home:index')
-    
+        return redirect("home:index")
+
     # Lire les logs depuis le fichier
     import os
+
     from django.conf import settings
-    
-    log_file = os.path.join(settings.BASE_DIR, 'logs', 'django.log')
+
+    log_file = os.path.join(settings.BASE_DIR, "logs", "django.log")
     logs = []
-    
+
     if os.path.exists(log_file):
-        with open(log_file, 'r', encoding='utf-8') as f:
+        with open(log_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
             # Parser les dernières lignes (format standard Django)
             for line in lines[-100:]:  # Dernières 100 lignes
-                if 'ERROR' in line or 'WARNING' in line or 'INFO' in line:
-                    parts = line.split(' ', 3)
+                if "ERROR" in line or "WARNING" in line or "INFO" in line:
+                    parts = line.split(" ", 3)
                     if len(parts) >= 4:
-                        logs.append({
-                            'timestamp': ' '.join(parts[:2]),
-                            'level': parts[2] if parts[2] in ['ERROR', 'WARNING', 'INFO', 'DEBUG'] else 'INFO',
-                            'module': parts[3].split(':')[0] if ':' in parts[3] else 'unknown',
-                            'message': parts[3].split(':', 1)[1].strip() if ':' in parts[3] else parts[3],
-                        })
-    
+                        logs.append(
+                            {
+                                "timestamp": " ".join(parts[:2]),
+                                "level": (
+                                    parts[2]
+                                    if parts[2] in ["ERROR", "WARNING", "INFO", "DEBUG"]
+                                    else "INFO"
+                                ),
+                                "module": (
+                                    parts[3].split(":")[0]
+                                    if ":" in parts[3]
+                                    else "unknown"
+                                ),
+                                "message": (
+                                    parts[3].split(":", 1)[1].strip()
+                                    if ":" in parts[3]
+                                    else parts[3]
+                                ),
+                            }
+                        )
+
     # Appliquer les filtres
-    level_filter = request.GET.get('level')
-    module_filter = request.GET.get('module')
-    
+    level_filter = request.GET.get("level")
+    module_filter = request.GET.get("module")
+
     if level_filter:
-        logs = [log for log in logs if log['level'] == level_filter]
-    
+        logs = [log for log in logs if log["level"] == level_filter]
+
     if module_filter:
-        logs = [log for log in logs if module_filter in log['module']]
-    
-    return render(request, 'accounts/logs.html', {
-        'logs': logs,
-    })
+        logs = [log for log in logs if module_filter in log["module"]]
+
+    return render(
+        request,
+        "accounts/logs.html",
+        {
+            "logs": logs,
+        },
+    )

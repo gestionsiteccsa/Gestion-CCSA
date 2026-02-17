@@ -5,7 +5,7 @@ Toutes les vues sont maintenant organisées dans le package events/views/.
 
 Pour importer une vue, utilisez :
     from events.views import EventListView
-    
+
 Ou directement depuis le sous-module :
     from events.views.base import EventListView
 """

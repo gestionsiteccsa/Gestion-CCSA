@@ -20,10 +20,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--count", type=int, default=15, help="Nombre d'événements à créer (défaut: 15)"
+            "--count",
+            type=int,
+            default=15,
+            help="Nombre d'événements à créer (défaut: 15)",
         )
         parser.add_argument(
-            "--user", type=str, help="Email de l'utilisateur créateur (défaut: premier utilisateur)"
+            "--user",
+            type=str,
+            help="Email de l'utilisateur créateur (défaut: premier utilisateur)",
         )
 
     def handle(self, *args, **options):
@@ -35,13 +40,17 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(email=user_email)
             except User.DoesNotExist:
-                self.stdout.write(self.style.ERROR(f"Utilisateur {user_email} non trouvé"))
+                self.stdout.write(
+                    self.style.ERROR(f"Utilisateur {user_email} non trouvé")
+                )
                 return
         else:
             user = User.objects.first()
             if not user:
                 self.stdout.write(
-                    self.style.ERROR("Aucun utilisateur trouvé. Créez un utilisateur d'abord.")
+                    self.style.ERROR(
+                        "Aucun utilisateur trouvé. Créez un utilisateur d'abord."
+                    )
                 )
                 return
 
@@ -158,7 +167,9 @@ class Command(BaseCommand):
                 )
             )
 
-        self.stdout.write(self.style.SUCCESS(f"\n{created_count} événement(s) créé(s) avec succès"))
+        self.stdout.write(
+            self.style.SUCCESS(f"\n{created_count} événement(s) créé(s) avec succès")
+        )
 
         if num_overlapping_pairs > 0:
             self.stdout.write(

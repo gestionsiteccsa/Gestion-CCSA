@@ -2,6 +2,7 @@
 
 from datetime import date, timedelta
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.db.models import Q
 from django.shortcuts import redirect
@@ -102,7 +103,11 @@ class EventListView(ListView):
 
         if cities is None:
             cities_queryset = Event.objects.filter(is_active=True)
-            cities = list(cities_queryset.values_list("city", flat=True).distinct().order_by("city"))
+            cities = list(
+                cities_queryset.values_list("city", flat=True)
+                .distinct()
+                .order_by("city")
+            )
             cache.set(cache_key, cities, 3600)  # Cache pendant 1 heure
 
         context["cities"] = cities
@@ -111,8 +116,8 @@ class EventListView(ListView):
         context["selected_sectors"] = self.request.GET.getlist("sector")
         # Conserver les paramètres de filtre pour la pagination (en excluant 'page')
         filter_params = self.request.GET.copy()
-        if 'page' in filter_params:
-            filter_params.pop('page')
+        if "page" in filter_params:
+            filter_params.pop("page")
         context["filter_params"] = filter_params.urlencode()
 
         # Événements à venir dans les 30 prochains jours pour la timeline
@@ -124,9 +129,9 @@ class EventListView(ListView):
             start_datetime__date__lte=thirty_days_later,
         )
         # Optimisation: prefetch_related pour éviter les requêtes N+1
-        context["upcoming_events"] = upcoming_queryset.prefetch_related("sectors", "validation").order_by(
-            "start_datetime"
-        )[:10]
+        context["upcoming_events"] = upcoming_queryset.prefetch_related(
+            "sectors", "validation"
+        ).order_by("start_datetime")[:10]
 
         return context
 
@@ -231,3 +236,77 @@ class EventDetailView(DetailView):
         context = self.get_context_data(object=self.object)
         context["comment_form"] = form
         return self.render_to_response(context)
+
+
+class MyEventsView(LoginRequiredMixin, ListView):
+    """Vue pour afficher les événements créés par l'utilisateur connecté."""
+
+    model = Event
+    template_name = "events/my_events.html"
+    context_object_name = "events"
+    paginate_by = 12
+
+    def get_queryset(self):
+        """Retourne uniquement les événements créés par l'utilisateur."""
+        queryset = Event.objects.filter(
+            created_by=self.request.user,
+            is_active=True
+        ).prefetch_related("sectors", "validation")
+
+        # Filtre par statut de validation
+        status = self.request.GET.get("status")
+        if status:
+            if status == "validated":
+                queryset = queryset.filter(validation__is_validated=True)
+            elif status == "pending":
+                queryset = queryset.filter(validation__isnull=True)
+            elif status == "rejected":
+                queryset = queryset.filter(validation__is_validated=False)
+
+        # Filtre par type (passés/à venir)
+        event_type = self.request.GET.get("type")
+        today = timezone.now()
+        if event_type == "upcoming":
+            queryset = queryset.filter(start_datetime__gte=today)
+        elif event_type == "past":
+            queryset = queryset.filter(start_datetime__lt=today)
+
+        return queryset.order_by("-start_datetime")
+
+    def get_context_data(self, **kwargs):
+        """Ajoute les statistiques et filtres au contexte."""
+        context = super().get_context_data(**kwargs)
+
+        # Statistiques
+        user_events = Event.objects.filter(
+            created_by=self.request.user, is_active=True
+        )
+
+        context["total_events"] = user_events.count()
+        context["validated_count"] = user_events.filter(
+            validation__is_validated=True
+        ).count()
+        context["pending_count"] = user_events.filter(
+            validation__isnull=True
+        ).count()
+        context["rejected_count"] = user_events.filter(
+            validation__is_validated=False
+        ).count()
+
+        # Événements à venir
+        today = timezone.now()
+        context["upcoming_count"] = user_events.filter(
+            start_datetime__gte=today
+        ).count()
+
+        # Filtres actuels
+        context["current_status"] = self.request.GET.get("status", "")
+        context["current_type"] = self.request.GET.get("type", "")
+
+        # Conserver les paramètres de filtre pour la pagination
+        filter_params = self.request.GET.copy()
+        if "page" in filter_params:
+            filter_params.pop("page")
+        context["filter_params"] = filter_params.urlencode()
+
+        return context

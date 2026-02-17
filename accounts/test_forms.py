@@ -3,19 +3,15 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 
-from accounts.forms import (
-    PasswordChangeForm,
-    UserLoginForm,
-    UserProfileForm,
-    UserRegistrationForm,
-    UserUpdateForm,
-)
+from accounts.forms import (PasswordChangeForm, UserLoginForm, UserProfileForm,
+                            UserRegistrationForm, UserUpdateForm)
 
 User = get_user_model()
 
 
 @override_settings(
-    ACCOUNTS_RESTRICT_EMAIL_DOMAIN=True, ACCOUNTS_ALLOWED_EMAIL_DOMAIN="cc-sudavesnois.fr"
+    ACCOUNTS_RESTRICT_EMAIL_DOMAIN=True,
+    ACCOUNTS_ALLOWED_EMAIL_DOMAIN="cc-sudavesnois.fr",
 )
 class UserRegistrationFormTests(TestCase):
     """Tests pour le formulaire d'inscription."""

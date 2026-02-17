@@ -49,7 +49,13 @@ class UserAdmin(BaseUserAdmin):
         (
             "Permissions",
             {
-                "fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions"),
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
             },
         ),
         (
@@ -102,7 +108,14 @@ class LoginHistoryAdmin(admin.ModelAdmin):
     ]
 
     search_fields = ["user__email", "ip_address"]
-    readonly_fields = ["user", "timestamp", "ip_address", "user_agent", "success", "failure_reason"]
+    readonly_fields = [
+        "user",
+        "timestamp",
+        "ip_address",
+        "user_agent",
+        "success",
+        "failure_reason",
+    ]
 
     def has_add_permission(self, request):
         """Désactive l'ajout manuel d'historique."""

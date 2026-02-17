@@ -10,6 +10,7 @@ urlpatterns = [
     # Liste et calendrier
     path("", views.EventListView.as_view(), name="event_list"),
     path("calendrier/", views.EventCalendarView.as_view(), name="event_calendar"),
+    path("mes-evenements/", views.MyEventsView.as_view(), name="my_events"),
     path(
         "calendrier/<int:year>/<int:month>/",
         views.EventCalendarView.as_view(),
@@ -66,7 +67,9 @@ urlpatterns = [
     path("creer/", views.EventCreateView.as_view(), name="event_create"),
     path("<slug:slug>/", views.EventDetailView.as_view(), name="event_detail"),
     path("<slug:slug>/modifier/", views.EventUpdateView.as_view(), name="event_update"),
-    path("<slug:slug>/supprimer/", views.EventDeleteView.as_view(), name="event_delete"),
+    path(
+        "<slug:slug>/supprimer/", views.EventDeleteView.as_view(), name="event_delete"
+    ),
     # Gestion des images
     path(
         "<slug:slug>/images/reorder/",

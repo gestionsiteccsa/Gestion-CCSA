@@ -9,7 +9,8 @@ User = get_user_model()
 
 
 @override_settings(
-    ACCOUNTS_RESTRICT_EMAIL_DOMAIN=True, ACCOUNTS_ALLOWED_EMAIL_DOMAIN="cc-sudavesnois.fr"
+    ACCOUNTS_RESTRICT_EMAIL_DOMAIN=True,
+    ACCOUNTS_ALLOWED_EMAIL_DOMAIN="cc-sudavesnois.fr",
 )
 class RegistrationViewTests(TestCase):
     """Tests pour la vue d'inscription."""

@@ -12,28 +12,30 @@ class SecurityTests(TestCase):
 
     def test_csrf_protection_enabled(self):
         """Test que la protection CSRF est active"""
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse("home"))
         # Vérifier que le token CSRF est présent dans le contexte
-        self.assertIn('csrf_token', response.context or {})
+        self.assertIn("csrf_token", response.context or {})
 
     def test_security_headers_present(self):
         """Test que les headers de sécurité sont présents"""
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse("home"))
 
         # X-Frame-Options
-        self.assertEqual(response.get('X-Frame-Options'), 'DENY')
+        self.assertEqual(response.get("X-Frame-Options"), "DENY")
 
         # X-Content-Type-Options
-        self.assertEqual(response.get('X-Content-Type-Options'), 'nosniff')
+        self.assertEqual(response.get("X-Content-Type-Options"), "nosniff")
 
         # Referrer-Policy (peut être 'same-origin' ou 'strict-origin-when-cross-origin')
-        referrer_policy = response.get('Referrer-Policy')
-        self.assertIn(referrer_policy, ['strict-origin-when-cross-origin', 'same-origin'])
+        referrer_policy = response.get("Referrer-Policy")
+        self.assertIn(
+            referrer_policy, ["strict-origin-when-cross-origin", "same-origin"]
+        )
 
     def test_csp_headers_present(self):
         """Test que les headers CSP sont présents"""
-        response = self.client.get(reverse('home'))
-        csp_header = response.get('Content-Security-Policy')
+        response = self.client.get(reverse("home"))
+        csp_header = response.get("Content-Security-Policy")
 
         # Vérifier que le header CSP existe
         self.assertIsNotNone(csp_header)
@@ -49,8 +51,8 @@ class SecurityTests(TestCase):
         # Vérifier la configuration des cookies en production
         self.assertTrue(settings.SESSION_COOKIE_HTTPONLY)
         self.assertTrue(settings.CSRF_COOKIE_HTTPONLY)
-        self.assertEqual(settings.SESSION_COOKIE_SAMESITE, 'Strict')
-        self.assertEqual(settings.CSRF_COOKIE_SAMESITE, 'Strict')
+        self.assertEqual(settings.SESSION_COOKIE_SAMESITE, "Strict")
+        self.assertEqual(settings.CSRF_COOKIE_SAMESITE, "Strict")
 
     def test_debug_mode_configurable(self):
         """Test que DEBUG est configurable via environnement"""
@@ -60,7 +62,7 @@ class SecurityTests(TestCase):
     def test_secret_key_configured(self):
         """Test que SECRET_KEY est configurée"""
         self.assertIsNotNone(settings.SECRET_KEY)
-        self.assertNotEqual(settings.SECRET_KEY, '')
+        self.assertNotEqual(settings.SECRET_KEY, "")
         self.assertGreater(len(settings.SECRET_KEY), 20)
 
     def test_allowed_hosts_configured(self):
@@ -78,18 +80,18 @@ class AuthenticationSecurityTests(TestCase):
 
     def test_admin_requires_authentication(self):
         """Test que l'admin nécessite une authentification"""
-        response = self.client.get('/admin/')
+        response = self.client.get("/admin/")
         # Doit rediriger vers la page de login
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/admin/login/', response['Location'])
+        self.assertIn("/admin/login/", response["Location"])
 
     def test_csrf_required_for_post(self):
         """Test que CSRF est requis pour les requêtes POST"""
         # Tentative de POST sans token CSRF
-        response = self.client.post('/admin/login/', {
-            'username': 'test',
-            'password': 'test'  # pragma: allowlist secret
-        })
+        response = self.client.post(
+            "/admin/login/",
+            {"username": "test", "password": "test"},  # pragma: allowlist secret
+        )
         # Doit être refusé (403 Forbidden)
         self.assertEqual(response.status_code, 403)
 
@@ -100,15 +102,15 @@ class DatabaseSecurityTests(TestCase):
     def test_database_credentials_not_in_settings(self):
         """Test que les credentials DB ne sont pas en dur dans settings"""
         # Vérifier que les credentials viennent des variables d'environnement
-        db_config = settings.DATABASES['default']
+        db_config = settings.DATABASES["default"]
 
         # Si c'est PostgreSQL, vérifier que les valeurs ne sont pas hardcodées
-        if db_config['ENGINE'] == 'django.db.backends.postgresql':
+        if db_config["ENGINE"] == "django.db.backends.postgresql":
             # Les valeurs doivent venir des variables d'environnement
             # On vérifie juste que la configuration existe
-            self.assertIn('NAME', db_config)
-            self.assertIn('USER', db_config)
-            self.assertIn('PASSWORD', db_config)
+            self.assertIn("NAME", db_config)
+            self.assertIn("USER", db_config)
+            self.assertIn("PASSWORD", db_config)
 
 
 class PasswordValidationTests(TestCase):
@@ -119,10 +121,16 @@ class PasswordValidationTests(TestCase):
         self.assertGreater(len(settings.AUTH_PASSWORD_VALIDATORS), 0)
 
         # Vérifier les validateurs standards
-        validator_names = [v['NAME'] for v in settings.AUTH_PASSWORD_VALIDATORS]
+        validator_names = [v["NAME"] for v in settings.AUTH_PASSWORD_VALIDATORS]
 
-        self.assertIn('django.contrib.auth.password_validation.MinimumLengthValidator', validator_names)
-        self.assertIn('django.contrib.auth.password_validation.CommonPasswordValidator', validator_names)
+        self.assertIn(
+            "django.contrib.auth.password_validation.MinimumLengthValidator",
+            validator_names,
+        )
+        self.assertIn(
+            "django.contrib.auth.password_validation.CommonPasswordValidator",
+            validator_names,
+        )
 
 
 class HttpsSecurityTests(TestCase):
@@ -133,7 +141,7 @@ class HttpsSecurityTests(TestCase):
         SECURE_SSL_REDIRECT=True,
         SECURE_HSTS_SECONDS=31536000,
         SECURE_HSTS_INCLUDE_SUBDOMAINS=True,
-        SECURE_HSTS_PRELOAD=True
+        SECURE_HSTS_PRELOAD=True,
     )
     def test_https_settings_in_production(self):
         """Test que les paramètres HTTPS sont actifs en production"""

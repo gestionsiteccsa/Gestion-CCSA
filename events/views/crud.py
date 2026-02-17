@@ -35,7 +35,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             # Sauvegarder l'événement sans commit pour pouvoir sauvegarder les M2M après
             self.object = form.save(commit=False)
             self.object.save()
-            
+
             # Sauvegarder les relations many-to-many
             form.save_m2m()
 
@@ -86,7 +86,13 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             old_instance = Event.objects.get(pk=self.object.pk)
             old_data = {
                 field: getattr(old_instance, field)
-                for field in ["title", "description", "location", "start_datetime", "end_datetime"]
+                for field in [
+                    "title",
+                    "description",
+                    "location",
+                    "start_datetime",
+                    "end_datetime",
+                ]
             }
 
             # Sauvegarder

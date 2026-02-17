@@ -86,7 +86,10 @@ class UserModelTests(TestCase):
 
         with self.assertRaises(IntegrityError):
             User.objects.create_user(
-                email=self.email, password="AnotherPass123!", first_name="Another", last_name="User"
+                email=self.email,
+                password="AnotherPass123!",
+                first_name="Another",
+                last_name="User",
             )
 
     def test_get_full_name(self):
@@ -235,7 +238,10 @@ class LoginHistoryModelTests(TestCase):
     def test_login_history_creation(self):
         """Teste la création d'un historique de connexion."""
         history = LoginHistory.objects.create(
-            user=self.user, ip_address="192.168.1.1", user_agent="Mozilla/5.0", success=True
+            user=self.user,
+            ip_address="192.168.1.1",
+            user_agent="Mozilla/5.0",
+            success=True,
         )
 
         self.assertEqual(history.user, self.user)
@@ -247,14 +253,20 @@ class LoginHistoryModelTests(TestCase):
     def test_login_history_ordering(self):
         """Teste que l'historique est ordonné par date décroissante."""
         history1 = LoginHistory.objects.create(
-            user=self.user, ip_address="192.168.1.1", success=True, timestamp=timezone.now()
+            user=self.user,
+            ip_address="192.168.1.1",
+            success=True,
+            timestamp=timezone.now(),
         )
 
         # Attendre un peu pour avoir des timestamps différents
         time.sleep(0.1)
 
         history2 = LoginHistory.objects.create(
-            user=self.user, ip_address="192.168.1.2", success=True, timestamp=timezone.now()
+            user=self.user,
+            ip_address="192.168.1.2",
+            success=True,
+            timestamp=timezone.now(),
         )
 
         histories = list(LoginHistory.objects.all())
@@ -308,7 +320,10 @@ class UserSessionModelTests(TestCase):
     def test_active_sessions_manager(self):
         """Teste le manager des sessions actives."""
         active_session = UserSession.objects.create(
-            user=self.user, session_key="active_session", ip_address="192.168.1.1", is_active=True
+            user=self.user,
+            session_key="active_session",
+            ip_address="192.168.1.1",
+            is_active=True,
         )
 
         inactive_session = UserSession.objects.create(

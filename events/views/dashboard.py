@@ -33,7 +33,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             # Validation de plage (1900-2100)
             if not (1900 <= selected_year <= 2100):
                 selected_year = today.year
-                messages.warning(self.request, "Année invalide. Utilisation de l'année en cours.")
+                messages.warning(
+                    self.request, "Année invalide. Utilisation de l'année en cours."
+                )
         except (ValueError, TypeError):
             selected_year = today.year
 
@@ -59,7 +61,8 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
 
         # Métriques à afficher
         selected_metrics = self.request.GET.getlist(
-            "metrics", ["total", "validated", "pending", "sectors", "cities", "creators"]
+            "metrics",
+            ["total", "validated", "pending", "sectors", "cities", "creators"],
         )
 
         # ===== CALCUL DES PÉRIODES =====
@@ -84,7 +87,8 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             except ValueError:
                 # Si dates invalides, utiliser l'année en cours
                 messages.error(
-                    self.request, "Format de date invalide. Utilisation de l'année en cours."
+                    self.request,
+                    "Format de date invalide. Utilisation de l'année en cours.",
                 )
                 ref_start = date(selected_year, 1, 1)
                 ref_end = date(selected_year, 12, 31)
@@ -145,14 +149,21 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             prev_end = ref_end.replace(year=prev_year)
             prev_stats = self._calculate_period_stats(prev_start, prev_end)
             comparison_data.append(
-                {"year": prev_year, "label": f"{prev_year}", "stats": prev_stats, "is_ytd": False}
+                {
+                    "year": prev_year,
+                    "label": f"{prev_year}",
+                    "stats": prev_stats,
+                    "is_ytd": False,
+                }
             )
 
         elif compare_mode == "ytd":
             # Comparer avec l'année précédente en YTD
             prev_year = selected_year - 1
             prev_ytd_end = ytd_end.replace(year=prev_year)
-            prev_ytd_stats = self._calculate_period_stats(date(prev_year, 1, 1), prev_ytd_end)
+            prev_ytd_stats = self._calculate_period_stats(
+                date(prev_year, 1, 1), prev_ytd_end
+            )
             comparison_data.append(
                 {
                     "year": prev_year,
@@ -170,14 +181,21 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
                     comp_end = ref_end.replace(year=year)
                     comp_stats = self._calculate_period_stats(comp_start, comp_end)
                     comparison_data.append(
-                        {"year": year, "label": str(year), "stats": comp_stats, "is_ytd": False}
+                        {
+                            "year": year,
+                            "label": str(year),
+                            "stats": comp_stats,
+                            "is_ytd": False,
+                        }
                     )
 
         # ===== CALCUL DES ÉVOLUTIONS =====
 
         if comparison_data:
             primary_comparison = comparison_data[0]  # Première année de comparaison
-            evolution = self._calculate_evolution(ref_stats, primary_comparison["stats"])
+            evolution = self._calculate_evolution(
+                ref_stats, primary_comparison["stats"]
+            )
         else:
             evolution = None
 
@@ -272,18 +290,25 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             .count()
         )
 
-        pending_validation = base_queryset.filter(is_active=True, validation__isnull=True).count()
+        pending_validation = base_queryset.filter(
+            is_active=True, validation__isnull=True
+        ).count()
 
         total_with_validation = base_queryset.filter(validation__isnull=False).count()
         validation_rate = (
-            (validated_events / total_with_validation * 100) if total_with_validation > 0 else 0
+            (validated_events / total_with_validation * 100)
+            if total_with_validation > 0
+            else 0
         )
 
         # Répartition par secteur (optimisé - une seule requête)
-        sectors_with_counts = Sector.objects.filter(
-            is_active=True, events__in=base_queryset.filter(is_active=True)
-        ).annotate(event_count=Count("events", distinct=True)).filter(event_count__gt=0).order_by(
-            "-event_count"
+        sectors_with_counts = (
+            Sector.objects.filter(
+                is_active=True, events__in=base_queryset.filter(is_active=True)
+            )
+            .annotate(event_count=Count("events", distinct=True))
+            .filter(event_count__gt=0)
+            .order_by("-event_count")
         )
 
         sectors_data = list(sectors_with_counts.values_list("event_count", flat=True))
@@ -307,7 +332,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
 
         # Top créateurs
         top_creators = (
-            base_queryset.values("created_by__first_name", "created_by__last_name", "created_by__email")
+            base_queryset.values(
+                "created_by__first_name", "created_by__last_name", "created_by__email"
+            )
             .annotate(event_count=Count("id"))
             .order_by("-event_count")[:10]
         )
@@ -327,7 +354,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             "recent_events": base_queryset.select_related("created_by")
             .prefetch_related("sectors")
             .order_by("-created_at")[:10],
-            "pending_events": base_queryset.filter(is_active=True, validation__isnull=True)
+            "pending_events": base_queryset.filter(
+                is_active=True, validation__isnull=True
+            )
             .select_related("created_by")
             .prefetch_related("sectors")
             .order_by("-created_at")[:10],
@@ -346,7 +375,12 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
         """Calcule les évolutions entre deux périodes."""
         evolution = {}
 
-        metrics = ["total_events", "active_events", "validated_events", "pending_validation"]
+        metrics = [
+            "total_events",
+            "active_events",
+            "validated_events",
+            "pending_validation",
+        ]
 
         for metric in metrics:
             current = current_stats.get(metric, 0)
@@ -379,11 +413,15 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             else:
                 return f"{start_date.strftime('%b')} - {end_date.strftime('%b %Y')}"
         else:
-            return f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}"
+            return (
+                f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}"
+            )
 
-    def _prepare_comparison_chart_data(self, selected_year, comparison_data, ref_start, ref_end):
+    def _prepare_comparison_chart_data(
+        self, selected_year, comparison_data, ref_start, ref_end
+    ):
         """Prépare les données pour les graphiques comparatifs.
-        
+
         Optimisation: Utilise une seule requête avec TruncMonth et annotation
         au lieu de N requêtes (une par mois par année).
         """
@@ -453,4 +491,8 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
                 }
             )
 
-        return {"labels": labels, "ref_data": ref_data, "comparison_datasets": comparison_datasets}
+        return {
+            "labels": labels,
+            "ref_data": ref_data,
+            "comparison_datasets": comparison_datasets,
+        }

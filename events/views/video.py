@@ -21,49 +21,55 @@ from accounts.models import Role, UserRole
 from accounts.services import NotificationService
 from events.forms import VideoNotificationSettingsForm
 from events.mixins import CommunicationRequiredMixin
-from events.models import Event, EventSettings, VideoNotificationSettings, VideoRequestLog
+from events.models import (Event, EventSettings, VideoNotificationSettings,
+                           VideoRequestLog)
 
 logger = logging.getLogger(__name__)
 
 
-def ratelimit(key='ip', rate='10/m', block=False):
+def ratelimit(key="ip", rate="10/m", block=False):
     """Décorateur de rate limiting simple basé sur le cache Django."""
+
     def decorator(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
             # Générer la clé de cache
-            if key == 'user':
+            if key == "user":
                 if request.user.is_authenticated:
-                    cache_key = f'ratelimit_{func.__name__}_user_{request.user.id}'
+                    cache_key = f"ratelimit_{func.__name__}_user_{request.user.id}"
                 else:
                     cache_key = f'ratelimit_{func.__name__}_ip_{request.META.get("REMOTE_ADDR", "unknown")}'
             else:
                 cache_key = f'ratelimit_{func.__name__}_ip_{request.META.get("REMOTE_ADDR", "unknown")}'
-            
+
             # Parser le rate (ex: '10/m' -> 10 requêtes par minute)
-            count, period = rate.split('/')
+            count, period = rate.split("/")
             count = int(count)
-            timeout = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}.get(period, 60)
-            
+            timeout = {"s": 1, "m": 60, "h": 3600, "d": 86400}.get(period, 60)
+
             # Vérifier le nombre de requêtes
             current = cache.get(cache_key, 0)
             if current >= count:
                 if block:
                     return JsonResponse(
-                        {'error': 'Trop de requêtes. Veuillez réessayer plus tard.'},
-                        status=429
+                        {"error": "Trop de requêtes. Veuillez réessayer plus tard."},
+                        status=429,
                     )
                 else:
                     logger.warning(f"Rate limit dépassé pour {cache_key}")
             else:
                 cache.set(cache_key, current + 1, timeout)
-            
+
             return func(request, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
-class VideoEmailSettingsView(LoginRequiredMixin, CommunicationRequiredMixin, UpdateView):
+class VideoEmailSettingsView(
+    LoginRequiredMixin, CommunicationRequiredMixin, UpdateView
+):
     """Vue pour configurer l'email de notification vidéo."""
 
     model = VideoNotificationSettings
@@ -73,24 +79,25 @@ class VideoEmailSettingsView(LoginRequiredMixin, CommunicationRequiredMixin, Upd
 
     def get_object(self, queryset=None):
         """Récupère ou crée les paramètres.
-        
+
         Ne crée pas avec d'email par défaut - doit être configuré manuellement.
         """
         settings_obj, created = VideoNotificationSettings.objects.get_or_create(
-            pk=1,
-            defaults={}
+            pk=1, defaults={}
         )
         return settings_obj
 
     def form_valid(self, form):
         """Sauvegarde les paramètres avec l'utilisateur qui a modifié."""
         form.instance.updated_by = self.request.user
-        messages.success(self.request, "L'email de notification vidéo a été mis à jour.")
+        messages.success(
+            self.request, "L'email de notification vidéo a été mis à jour."
+        )
         return super().form_valid(form)
 
 
 @login_required
-@ratelimit(key='user', rate='5/m', block=True)
+@ratelimit(key="user", rate="5/m", block=True)
 def send_video_request(request, slug):
     """Envoie une demande de tournage vidéo par email."""
     event = get_object_or_404(Event, slug=slug)
@@ -101,7 +108,9 @@ def send_video_request(request, slug):
         if not UserRole.objects.filter(
             user=request.user, role=communication_role, is_active=True
         ).exists():
-            messages.error(request, "Vous n'avez pas la permission d'envoyer cette demande.")
+            messages.error(
+                request, "Vous n'avez pas la permission d'envoyer cette demande."
+            )
             return redirect("events:event_validation", slug=event.slug)
     except Role.DoesNotExist:
         messages.error(request, "Rôle Communication non trouvé.")
@@ -127,7 +136,9 @@ def send_video_request(request, slug):
 
     # Vérifier la limite de 3 relances (4 demandes max au total)
     if total_requests >= 4:
-        messages.error(request, "Vous avez atteint la limite de 3 relances pour cet événement.")
+        messages.error(
+            request, "Vous avez atteint la limite de 3 relances pour cet événement."
+        )
         return redirect("events:event_validation", slug=event.slug)
 
     # Si c'est une relance (au moins une demande précédente non confirmée)
@@ -161,7 +172,10 @@ def send_video_request(request, slug):
 
     # Générer l'URL de confirmation
     confirmation_url = request.build_absolute_uri(
-        reverse("events:confirm_video_request", kwargs={"token": video_request_log.confirmation_token})
+        reverse(
+            "events:confirm_video_request",
+            kwargs={"token": video_request_log.confirmation_token},
+        )
     )
 
     # Mettre à jour le contexte avec l'URL de confirmation
@@ -188,15 +202,19 @@ def send_video_request(request, slug):
         "details": event_description,
         "location": event_location,
     }
-    context["google_calendar_url"] = f"https://calendar.google.com/calendar/render?{urlencode(google_params)}"
+    context["google_calendar_url"] = (
+        f"https://calendar.google.com/calendar/render?{urlencode(google_params)}"
+    )
 
     # URL Outlook
     outlook_params = {
         "subject": event_title,
         "startdt": event.start_datetime.isoformat(),
-        "enddt": event.end_datetime.isoformat()
-        if event.end_datetime
-        else event.start_datetime.isoformat(),
+        "enddt": (
+            event.end_datetime.isoformat()
+            if event.end_datetime
+            else event.start_datetime.isoformat()
+        ),
         "body": event_description,
         "location": event_location,
     }
@@ -211,7 +229,10 @@ def send_video_request(request, slug):
 
     # URL de refus (pour le bouton "Refuser")
     refuse_url = request.build_absolute_uri(
-        reverse("events:refuse_video_request", kwargs={"token": video_request_log.confirmation_token})
+        reverse(
+            "events:refuse_video_request",
+            kwargs={"token": video_request_log.confirmation_token},
+        )
     )
     context["refuse_url"] = refuse_url
 
@@ -242,7 +263,8 @@ def send_video_request(request, slug):
             )
         else:
             messages.success(
-                request, f"La demande de tournage vidéo a été envoyée à {recipient_email}."
+                request,
+                f"La demande de tournage vidéo a été envoyée à {recipient_email}.",
             )
 
         # Créer une notification pour l'équipe Communication
@@ -252,7 +274,7 @@ def send_video_request(request, slug):
             is_relance=is_relance,
             relance_num=total_requests if is_relance else 0,
         )
-        
+
         # Envoyer une copie de l'email au cameraman configuré
         try:
             cameraman_email = EventSettings.get_video_email()
@@ -283,7 +305,7 @@ def send_video_request(request, slug):
     return redirect("events:event_validation", slug=event.slug)
 
 
-@ratelimit(key='ip', rate='10/m', block=True)
+@ratelimit(key="ip", rate="10/m", block=True)
 def confirm_video_request(request, token):
     """Vue publique pour que le caméraman confirme sa participation."""
     from django.utils import timezone
@@ -313,15 +335,19 @@ def confirm_video_request(request, token):
         "details": event_description,
         "location": event_location,
     }
-    google_calendar_url = f"https://calendar.google.com/calendar/render?{urlencode(google_params)}"
+    google_calendar_url = (
+        f"https://calendar.google.com/calendar/render?{urlencode(google_params)}"
+    )
 
     # URL Outlook
     outlook_params = {
         "subject": event_title,
         "startdt": event.start_datetime.isoformat(),
-        "enddt": event.end_datetime.isoformat()
-        if event.end_datetime
-        else event.start_datetime.isoformat(),
+        "enddt": (
+            event.end_datetime.isoformat()
+            if event.end_datetime
+            else event.start_datetime.isoformat()
+        ),
         "body": event_description,
         "location": event_location,
     }
@@ -362,7 +388,7 @@ def confirm_video_request(request, token):
     )
 
 
-@ratelimit(key='ip', rate='10/m', block=True)
+@ratelimit(key="ip", rate="10/m", block=True)
 def refuse_video_request(request, token):
     """Vue publique pour que le caméraman refuse la participation."""
     from django.utils import timezone
@@ -448,7 +474,9 @@ def generate_ics_file(event):
 
     summary = escape_ics_value(f"Tournage vidéo - {event.title}")
     description = escape_ics_value(f"Tournage vidéo pour l'événement : {event.title}")
-    location = escape_ics_value(f"{event.location}{', ' + event.city if event.city else ''}")
+    location = escape_ics_value(
+        f"{event.location}{', ' + event.city if event.city else ''}"
+    )
 
     ics_content = f"""BEGIN:VCALENDAR
 VERSION:2.0
@@ -473,6 +501,8 @@ def download_ics(request, slug):
     ics_content = generate_ics_file(event)
 
     response = HttpResponse(ics_content, content_type="text/calendar")
-    response["Content-Disposition"] = f'attachment; filename="tournage_{event.slug}.ics"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="tournage_{event.slug}.ics"'
+    )
 
     return response

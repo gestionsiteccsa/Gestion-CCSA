@@ -2,17 +2,9 @@
 
 from django.contrib import admin
 
-from events.models import (
-    Event,
-    EventChangeLog,
-    EventComment,
-    EventDocument,
-    EventImage,
-    EventOccurrence,
-    EventRecurrence,
-    EventValidation,
-    Sector,
-)
+from events.models import (Event, EventChangeLog, EventComment, EventDocument,
+                           EventImage, EventOccurrence, EventRecurrence,
+                           EventValidation, Sector)
 
 
 @admin.register(Sector)
@@ -46,7 +38,13 @@ class EventChangeLogInline(admin.TabularInline):
 
     model = EventChangeLog
     extra = 0
-    readonly_fields = ["changed_by", "field_name", "old_value", "new_value", "changed_at"]
+    readonly_fields = [
+        "changed_by",
+        "field_name",
+        "old_value",
+        "new_value",
+        "changed_at",
+    ]
     can_delete = False
 
 
@@ -61,7 +59,7 @@ class EventDocumentInline(admin.TabularInline):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     """Admin pour les événements.
-    
+
     Optimisation: Utilise list_select_related et prefetch_related
     pour éviter les requêtes N+1 dans la liste.
     """
@@ -77,16 +75,27 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ["sectors", "is_active", "start_datetime", "city"]
     search_fields = ["title", "description", "location", "city"]
     readonly_fields = ["slug", "created_at", "updated_at"]
-    inlines = [EventImageInline, EventDocumentInline, EventCommentInline, EventChangeLogInline]
+    inlines = [
+        EventImageInline,
+        EventDocumentInline,
+        EventCommentInline,
+        EventChangeLogInline,
+    ]
     date_hierarchy = "start_datetime"
     filter_horizontal = ["sectors"]
-    
+
     # Optimisation: Précharger les relations ForeignKey
     list_select_related = ["created_by"]
 
     fieldsets = (
-        ("Informations générales", {"fields": ("title", "slug", "description", "sectors")}),
-        ("Lieu et date", {"fields": ("location", "city", "start_datetime", "end_datetime")}),
+        (
+            "Informations générales",
+            {"fields": ("title", "slug", "description", "sectors")},
+        ),
+        (
+            "Lieu et date",
+            {"fields": ("location", "city", "start_datetime", "end_datetime")},
+        ),
         ("Communication", {"fields": ("comm_before", "comm_during", "comm_after")}),
         ("Options", {"fields": ("needs_filming", "needs_poster")}),
         (
@@ -106,7 +115,7 @@ class EventAdmin(admin.ModelAdmin):
 
     def display_sectors(self, obj):
         """Affiche les secteurs sous forme de liste.
-        
+
         Optimisation: Utilise les secteurs préchargés par prefetch_related
         au lieu de faire une nouvelle requête.
         """
@@ -140,7 +149,14 @@ class EventChangeLogAdmin(admin.ModelAdmin):
     list_display = ["event", "field_name", "changed_by", "changed_at"]
     list_filter = ["changed_at"]
     search_fields = ["event__title", "field_name"]
-    readonly_fields = ["event", "changed_by", "field_name", "old_value", "new_value", "changed_at"]
+    readonly_fields = [
+        "event",
+        "changed_by",
+        "field_name",
+        "old_value",
+        "new_value",
+        "changed_at",
+    ]
 
 
 @admin.register(EventDocument)
@@ -164,7 +180,13 @@ class EventDocumentAdmin(admin.ModelAdmin):
 class EventRecurrenceAdmin(admin.ModelAdmin):
     """Admin pour les récurrences."""
 
-    list_display = ["event", "recurrence_type", "interval", "end_date", "max_occurrences"]
+    list_display = [
+        "event",
+        "recurrence_type",
+        "interval",
+        "end_date",
+        "max_occurrences",
+    ]
     list_filter = ["recurrence_type"]
     search_fields = ["event__title"]
 

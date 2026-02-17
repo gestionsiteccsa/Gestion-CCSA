@@ -7,16 +7,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from events.models import (
-    Event,
-    EventComment,
-    EventDocument,
-    EventImage,
-    EventRecurrence,
-    EventSettings,
-    Sector,
-    VideoNotificationSettings,
-)
+from events.models import (Event, EventComment, EventDocument, EventImage,
+                           EventRecurrence, EventSettings, Sector,
+                           VideoNotificationSettings)
 from events.widgets import ColoredCheckboxSelectMultiple
 
 
@@ -81,7 +74,9 @@ class EventForm(forms.ModelForm):
             "comm_after": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "needs_filming": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "needs_poster": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "notify_on_publish": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "notify_on_publish": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
         }
         labels = {
             "title": "Titre",
@@ -114,7 +109,9 @@ class EventForm(forms.ModelForm):
 
         if start_datetime and end_datetime:
             if end_datetime <= start_datetime:
-                raise ValidationError("La date de fin doit être postérieure à la date de début.")
+                raise ValidationError(
+                    "La date de fin doit être postérieure à la date de début."
+                )
 
         # Vérifier que l'événement n'est pas dans le passé
         if start_datetime and start_datetime < timezone.now():
@@ -160,7 +157,7 @@ class VideoNotificationSettingsForm(forms.ModelForm):
 
 class EventSettingsForm(forms.ModelForm):
     """Formulaire de configuration des paramètres globaux des événements.
-    
+
     Accessible uniquement aux superadmins via l'interface d'administration.
     """
 
@@ -287,7 +284,9 @@ class EventImageForm(forms.ModelForm):
             # Vérifier l'extension
             ext = os.path.splitext(image.name)[1].lower()
             allowed_extensions = getattr(
-                settings, "EVENTS_ALLOWED_EXTENSIONS", [".jpg", ".jpeg", ".png", ".webp"]
+                settings,
+                "EVENTS_ALLOWED_EXTENSIONS",
+                [".jpg", ".jpeg", ".png", ".webp"],
             )
             if ext not in allowed_extensions:
                 raise ValidationError(
@@ -393,7 +392,9 @@ class EventDocumentForm(forms.ModelForm):
             # Vérifier la taille (max 20 Mo)
             max_size = 20 * 1024 * 1024
             if document.size > max_size:
-                raise ValidationError("La taille du fichier ne doit pas dépasser 20 Mo.")
+                raise ValidationError(
+                    "La taille du fichier ne doit pas dépasser 20 Mo."
+                )
 
         return document
 
@@ -477,7 +478,9 @@ class EventRecurrenceForm(forms.ModelForm):
             try:
                 day_list = [int(d.strip()) for d in days.split(",")]
                 if not all(0 <= d <= 6 for d in day_list):
-                    raise ValidationError("Les jours doivent être entre 0 (Lundi) et 6 (Dimanche).")
+                    raise ValidationError(
+                        "Les jours doivent être entre 0 (Lundi) et 6 (Dimanche)."
+                    )
                 return ",".join(str(d) for d in day_list)
             except ValueError:
                 raise ValidationError(
@@ -494,7 +497,9 @@ class EventRecurrenceForm(forms.ModelForm):
         month_of_year = cleaned_data.get("month_of_year")
 
         if recurrence_type == "weekly" and not days_of_week:
-            self.add_error("days_of_week", "Veuillez spécifier au moins un jour de la semaine.")
+            self.add_error(
+                "days_of_week", "Veuillez spécifier au moins un jour de la semaine."
+            )
 
         if recurrence_type == "monthly" and not day_of_month:
             self.add_error("day_of_month", "Veuillez spécifier le jour du mois.")
