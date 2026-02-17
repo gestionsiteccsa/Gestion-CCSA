@@ -96,8 +96,8 @@
             <div class="accordion-content p-4 pt-0 border-t border-slate-100" id="content-essentials">
                 <div class="space-y-4 pt-4">
                     <!-- Title -->
-                    <div class="form-group">
-                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                    <div class="space-y-1">
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                             {{ form.title.label }}
                             <span class="text-red-500">*</span>
                         </label>
@@ -105,12 +105,12 @@
                                name="{{ form.title.name }}"
                                id="{{ form.title.id_for_label }}"
                                value="{{ form.title.value|default:'' }}"
-                               class="form-input {% if form.title.errors %}error{% endif %}"
+                               class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors {% if form.title.errors %}error{% endif %}"
                                placeholder="Ex: Concert de jazz - Big Band du Nord"
                                required
                                minlength="5"
                                data-validate="realtime">
-                        <div class="validation-message" id="error-{{ form.title.name }}"></div>
+                        <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-{{ form.title.name }}"></div>
                         {% if form.title.errors %}
                         <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
                         {% endif %}
@@ -119,8 +119,8 @@
                     <!-- Dates séparées -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Date de début -->
-                        <div class="form-group">
-                            <label class="form-label">
+                        <div class="space-y-1">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">
                                 Date et heure de début
                                 <span class="text-red-500">*</span>
                             </label>
@@ -128,14 +128,14 @@
                                 <input type="date"
                                        name="start_date"
                                        id="start_date"
-                                       class="form-input {% if form.start_datetime.errors %}error{% endif %}"
+                                       class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors {% if form.start_datetime.errors %}error{% endif %}"
                                        required
                                        data-validate="realtime">
                                 <div class="flex items-center gap-2">
                                     <input type="time"
                                            name="start_time"
                                            id="start_time"
-                                           class="form-input flex-1"
+                                           class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors flex-1"
                                            required
                                            data-validate="realtime">
                                     <label class="flex items-center text-sm whitespace-nowrap">
@@ -149,12 +149,12 @@
                                 </div>
                             </div>
                             <input type="hidden" name="{{ form.start_datetime.name }}" id="{{ form.start_datetime.id_for_label }}">
-                            <div class="validation-message" id="error-start-datetime"></div>
+                            <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-start-datetime"></div>
                         </div>
 
                         <!-- Date de fin -->
-                        <div class="form-group">
-                            <label class="form-label">
+                        <div class="space-y-1">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">
                                 Date et heure de fin
                                 <span class="text-slate-400 text-xs ml-1">(optionnel)</span>
                             </label>
@@ -162,14 +162,14 @@
                                 <input type="date"
                                        name="end_date"
                                        id="end_date"
-                                       class="form-input {% if form.end_datetime.errors %}error{% endif %}">
+                                       class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors {% if form.end_datetime.errors %}error{% endif %}">
                                 <input type="time"
                                        name="end_time"
                                        id="end_time"
-                                       class="form-input">
+                                       class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors">
                             </div>
                             <input type="hidden" name="{{ form.end_datetime.name }}" id="{{ form.end_datetime.id_for_label }}">
-                            <div class="validation-message" id="error-end-datetime"></div>
+                            <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-end-datetime"></div>
                             {% if form.end_datetime.errors %}
                             <p class="mt-1 text-sm text-red-600">{{ form.end_datetime.errors.0 }}</p>
                             {% endif %}
@@ -178,8 +178,8 @@
 
                     <!-- Lieu et Ville -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="form-group">
-                            <label for="{{ form.location.id_for_label }}" class="form-label">
+                        <div class="space-y-1">
+                            <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                                 {{ form.location.label }}
                             </label>
                             <div class="relative">
@@ -190,15 +190,15 @@
                                        name="{{ form.location.name }}"
                                        id="{{ form.location.id_for_label }}"
                                        value="{{ form.location.value|default:'' }}"
-                                       class="form-input pl-10 {% if form.location.errors %}error{% endif %}"
+                                       class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors pl-10 {% if form.location.errors %}error{% endif %}"
                                        placeholder="Ex: Salle des fêtes"
                                        data-validate="realtime">
                             </div>
-                            <div class="validation-message" id="error-{{ form.location.name }}"></div>
+                            <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-{{ form.location.name }}"></div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="{{ form.city.id_for_label }}" class="form-label">
+                        <div class="space-y-1">
+                            <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                                 {{ form.city.label }}
                             </label>
                             <div class="relative">
@@ -209,7 +209,7 @@
                                        name="{{ form.city.name }}"
                                        id="{{ form.city.id_for_label }}"
                                        value="{{ form.city.value|default:'' }}"
-                                       class="form-input pl-10 {% if form.city.errors %}error{% endif %}"
+                                       class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors pl-10 {% if form.city.errors %}error{% endif %}"
                                        placeholder="Ex: Le Quesnoy"
                                        list="city-suggestions"
                                        data-validate="realtime">
@@ -223,7 +223,7 @@
                                     <option value="Locquignol">
                                 </datalist>
                             </div>
-                            <div class="validation-message" id="error-{{ form.city.name }}"></div>
+                            <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-{{ form.city.name }}"></div>
                         </div>
                     </div>
                 </div>
@@ -232,7 +232,7 @@
 
         <!-- Section 2: Détails -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="accordion-header" data-accordion="details">
+            <div class="transition-colors" data-accordion="details">
                 <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors">
                     <div class="flex items-center">
                         <div class="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center mr-4">
@@ -257,44 +257,44 @@
             <div class="accordion-content hidden p-4 pt-0 border-t border-slate-100" id="content-details">
                 <div class="space-y-4 pt-4">
                     <!-- Description -->
-                    <div class="form-group">
-                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                    <div class="space-y-1">
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                             {{ form.description.label }}
                             <span class="text-slate-400 text-xs ml-1">(optionnel)</span>
                         </label>
                         <textarea name="{{ form.description.name }}"
                                   id="{{ form.description.id_for_label }}"
                                   rows="5"
-                                  class="form-textarea {% if form.description.errors %}error{% endif %}"
+                                  class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors resize-y {% if form.description.errors %}error{% endif %}"
                                   placeholder="Décrivez votre événement en détail..."
                                   data-validate="realtime">{{ form.description.value|default:'' }}</textarea>
                         <div class="flex justify-between mt-1">
-                            <div class="validation-message" id="error-{{ form.description.name }}"></div>
+                            <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-{{ form.description.name }}"></div>
                             <span class="text-xs text-slate-400" id="description-counter">0 caractères</span>
                         </div>
                     </div>
 
                     <!-- Secteurs améliorés -->
-                    <div class="form-group">
-                        <label class="form-label">
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">
                             Secteurs d'activité
                             <span class="text-red-500">*</span>
                         </label>
                         <div class="{% if form.sectors.errors %}border-2 border-red-500 rounded-lg p-3 bg-red-50{% endif %}">
-                            <div class="sector-selector">
+                            <div class="space-y-2">
                                 <div class="sector-search mb-3">
                                     <input type="text"
                                            id="sector-search"
-                                           class="form-input"
+                                           class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors"
                                            placeholder="Rechercher un secteur..."
                                            autocomplete="off">
                                 </div>
-                                <div class="sector-chips" id="sector-chips">
+                                <div class="flex flex-wrap gap-2" id="sector-chips">
                                     {{ form.sectors }}
                                 </div>
                             </div>
                         </div>
-                        <div class="validation-message" id="error-sectors"></div>
+                        <div class="mt-1 text-xs h-4 transition-all duration-200" id="error-sectors"></div>
                         {% if form.sectors.errors %}
                         <div class="mt-2 flex items-center text-red-600">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +311,7 @@
 
         <!-- Section 3: Communication -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="accordion-header" data-accordion="communication">
+            <div class="transition-colors" data-accordion="communication">
                 <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors">
                     <div class="flex items-center">
                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
@@ -335,16 +335,16 @@
                     <label class="checkbox-card {% if form.comm_before.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.comm_before.name }}" id="{{ form.comm_before.id_for_label }}"
                                {% if form.comm_before.value %}checked{% endif %}
-                               class="checkbox-card-input">
-                        <div class="checkbox-card-content">
+                               class="hidden">
+                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
                             <div class="checkbox-card-icon bg-blue-100 text-blue-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
-                            <div class="checkbox-card-text">
-                                <span class="checkbox-card-title">Avant l'événement</span>
-                                <span class="checkbox-card-desc">Communication préalable (réseaux sociaux, affiches, mail)</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-slate-900">Avant l'événement</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Communication préalable (réseaux sociaux, affiches, mail)</span>
                             </div>
                         </div>
                     </label>
@@ -352,16 +352,16 @@
                     <label class="checkbox-card {% if form.comm_during.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.comm_during.name }}" id="{{ form.comm_during.id_for_label }}"
                                {% if form.comm_during.value %}checked{% endif %}
-                               class="checkbox-card-input">
-                        <div class="checkbox-card-content">
+                               class="hidden">
+                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
                             <div class="checkbox-card-icon bg-green-100 text-green-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="checkbox-card-text">
-                                <span class="checkbox-card-title">Pendant l'événement</span>
-                                <span class="checkbox-card-desc">Couverture en direct (stories, photos, vidéos)</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-slate-900">Pendant l'événement</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Couverture en direct (stories, photos, vidéos)</span>
                             </div>
                         </div>
                     </label>
@@ -369,16 +369,16 @@
                     <label class="checkbox-card {% if form.comm_after.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.comm_after.name }}" id="{{ form.comm_after.id_for_label }}"
                                {% if form.comm_after.value %}checked{% endif %}
-                               class="checkbox-card-input">
-                        <div class="checkbox-card-content">
+                               class="hidden">
+                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
                             <div class="checkbox-card-icon bg-purple-100 text-purple-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <div class="checkbox-card-text">
-                                <span class="checkbox-card-title">Après l'événement</span>
-                                <span class="checkbox-card-desc">Bilan et retour en images (article, album photo)</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-slate-900">Après l'événement</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Bilan et retour en images (article, album photo)</span>
                             </div>
                         </div>
                     </label>
@@ -388,7 +388,7 @@
 
         <!-- Section 4: Options -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="accordion-header" data-accordion="options">
+            <div class="transition-colors" data-accordion="options">
                 <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors">
                     <div class="flex items-center">
                         <div class="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center mr-4">
@@ -412,16 +412,16 @@
                     <label class="checkbox-card {% if form.needs_filming.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.needs_filming.name }}" id="{{ form.needs_filming.id_for_label }}"
                                {% if form.needs_filming.value %}checked{% endif %}
-                               class="checkbox-card-input">
-                        <div class="checkbox-card-content">
+                               class="hidden">
+                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
                             <div class="checkbox-card-icon bg-red-100 text-red-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="checkbox-card-text">
-                                <span class="checkbox-card-title">Tournage vidéo</span>
-                                <span class="checkbox-card-desc">Demande d'intervention pour filmer l'événement</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-slate-900">Tournage vidéo</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Demande d'intervention pour filmer l'événement</span>
                             </div>
                         </div>
                     </label>
@@ -429,16 +429,16 @@
                     <label class="checkbox-card {% if form.needs_poster.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.needs_poster.name }}" id="{{ form.needs_poster.id_for_label }}"
                                {% if form.needs_poster.value %}checked{% endif %}
-                               class="checkbox-card-input">
-                        <div class="checkbox-card-content">
+                               class="hidden">
+                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
                             <div class="checkbox-card-icon bg-orange-100 text-orange-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="checkbox-card-text">
-                                <span class="checkbox-card-title">Création d'affiche</span>
-                                <span class="checkbox-card-desc">Demande de création d'une affiche pour l'événement</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-slate-900">Création d'affiche</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Demande de création d'une affiche pour l'événement</span>
                             </div>
                         </div>
                     </label>
@@ -446,16 +446,16 @@
                     <label class="checkbox-card {% if form.notify_on_publish.value %}active{% endif %}">
                         <input type="checkbox" name="{{ form.notify_on_publish.name }}" id="{{ form.notify_on_publish.id_for_label }}"
                                {% if form.notify_on_publish.value %}checked{% endif %}
-                               class="checkbox-card-input">
-                        <div class="checkbox-card-content">
+                               class="hidden">
+                        <div class="flex items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-200">
                             <div class="checkbox-card-icon bg-green-100 text-green-600">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
-                            <div class="checkbox-card-text">
-                                <span class="checkbox-card-title">Notification email</span>
-                                <span class="checkbox-card-desc">Recevoir un email lors de la confirmation de publication</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-slate-900">Notification email</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Recevoir un email lors de la confirmation de publication</span>
                             </div>
                         </div>
                     </label>
@@ -465,7 +465,7 @@
 
         <!-- Section 5: Images -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="accordion-header" data-accordion="images">
+            <div class="transition-colors" data-accordion="images">
                 <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors">
                     <div class="flex items-center">
                         <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
@@ -570,27 +570,27 @@
         @apply block text-sm font-medium text-slate-700 mb-1.5;
     }
 
-    .form-input {
+    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors {
         @apply w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
                focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
                hover:border-slate-400 transition-colors;
     }
 
-    .form-input.error {
+    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors.error {
         @apply border-red-500 focus:ring-red-500 focus:border-red-500;
     }
 
-    .form-input.valid {
+    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors.valid {
         @apply border-green-500 focus:ring-green-500 focus:border-green-500;
     }
 
-    .form-textarea {
+    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors resize-y {
         @apply w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm
                focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
                hover:border-slate-400 transition-colors resize-y;
     }
 
-    .form-textarea.error {
+    .w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 hover:border-slate-400 transition-colors resize-y.error {
         @apply border-red-500 focus:ring-red-500 focus:border-red-500;
     }
 
