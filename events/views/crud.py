@@ -1,5 +1,7 @@
 """Views pour le CRUD des événements."""
 
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
@@ -24,7 +26,34 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         """Ajoute le titre au contexte."""
         context = super().get_context_data(**kwargs)
         context["title"] = "Créer un événement"
+        context["submit_label"] = "Créer l'événement"
         return context
+
+    def post(self, request, *args, **kwargs):
+        """Gère les champs date/time séparés."""
+        # Reconstruire les datetime à partir des champs séparés
+        post_data = request.POST.copy()
+        
+        start_date = post_data.get('start_date')
+        start_time = post_data.get('start_time')
+        if start_date and start_time:
+            try:
+                dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                post_data['start_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+            except ValueError:
+                pass
+        
+        end_date = post_data.get('end_date')
+        end_time = post_data.get('end_time')
+        if end_date and end_time:
+            try:
+                dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+                post_data['end_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+            except ValueError:
+                pass
+        
+        request.POST = post_data
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         """Sauvegarde l'événement et logue les changements."""
@@ -77,7 +106,35 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Modifier l'événement"
         context["event"] = self.object
+        context["submit_label"] = "Enregistrer les modifications"
+        context["existing_images"] = self.object.images.all()
         return context
+
+    def post(self, request, *args, **kwargs):
+        """Gère les champs date/time séparés."""
+        # Reconstruire les datetime à partir des champs séparés
+        post_data = request.POST.copy()
+        
+        start_date = post_data.get('start_date')
+        start_time = post_data.get('start_time')
+        if start_date and start_time:
+            try:
+                dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                post_data['start_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+            except ValueError:
+                pass
+        
+        end_date = post_data.get('end_date')
+        end_time = post_data.get('end_time')
+        if end_date and end_time:
+            try:
+                dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+                post_data['end_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+            except ValueError:
+                pass
+        
+        request.POST = post_data
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         """Sauvegarde les modifications et logue les changements."""
