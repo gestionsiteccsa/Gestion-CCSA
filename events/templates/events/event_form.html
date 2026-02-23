@@ -839,12 +839,15 @@
     }
 
     // Attach date/time listeners
-    ['start_date', 'start_time', 'end_date', 'end_time'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('change', updateDateTime);
-        }
-    });
+    const dateTimeFields = ['start_date', 'start_time', 'end_date', 'end_time'];
+    if (dateTimeFields && typeof dateTimeFields.forEach === 'function') {
+        dateTimeFields.forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', updateDateTime);
+            }
+        });
+    }
 
     // Image upload handling
     const uploadZone = document.getElementById('image-upload-zone');
