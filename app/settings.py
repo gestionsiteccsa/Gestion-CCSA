@@ -47,12 +47,17 @@ INSTALLED_APPS = [
     "url_shortener",
 ]
 
+# Whitenoise pour servir les fichiers statiques en production
+if not DEBUG:
+    INSTALLED_APPS.insert(0, "whitenoise.runserver_nostatic")
+
 # Django Sites framework
 SITE_ID = 1
 
 MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -133,6 +138,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# Whitenoise configuration (pour servir les fichiers statiques en production)
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = "media/"

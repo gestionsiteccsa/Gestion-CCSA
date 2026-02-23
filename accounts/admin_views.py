@@ -163,9 +163,9 @@ def user_list_view(request):
 
     if search:
         users = users.filter(
-            Q(email__icontains=search) |
-            Q(first_name__icontains=search) |
-            Q(last_name__icontains=search)
+            Q(email__icontains=search)
+            | Q(first_name__icontains=search)
+            | Q(last_name__icontains=search)
         )
 
     paginator = Paginator(users.order_by("-date_joined"), 20)
