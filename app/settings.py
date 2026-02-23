@@ -35,12 +35,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "csp",
     "accounts",
     "home",
     "events",
     "backup",
+    "url_shortener",
 ]
+
+# Django Sites framework
+SITE_ID = 1
 
 MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",

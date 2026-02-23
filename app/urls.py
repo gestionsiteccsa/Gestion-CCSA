@@ -16,6 +16,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("evenements/", include("events.urls")),
     path("backup/", include("backup.urls")),
+    path("liens/", include("url_shortener.urls")),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("", include("home.urls")),
 ]

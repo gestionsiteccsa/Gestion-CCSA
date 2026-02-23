@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - CC Sud-Avesnois{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- En-tête -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Mes liens raccourcis</h1>
+            <p class="mt-2 text-gray-600">Gérez vos URLs raccourcies et suivez leur utilisation.</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <a href="{% url 'url_shortener:create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Raccourcir un lien
+            </a>
+        </div>
+    </div>
+
+    {% if shortened_urls %}
+    <!-- Tableau des liens -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Lien court
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            URL originale
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Créé le
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for url in shortened_urls %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center space-x-2">
+                                <code class="text-sm font-mono bg-primary-50 text-primary-700 px-2 py-1 rounded">
+                                    /r/{{ url.code }}
+                                </code>
+                                <button 
+                                    onclick="copyToClipboard('{{ url.get_short_url }}')" 
+                                    class="text-gray-400 hover:text-primary-600 transition-colors"
+                                    title="Copier le lien"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <a href="{{ url.get_short_url }}" target="_blank" class="text-xs text-gray-500 hover:text-primary-600 mt-1 inline-block truncate max-w-xs">
+                                {{ url.get_short_url }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url.original_url }}" target="_blank" class="text-sm text-gray-600 hover:text-primary-600 transition-colors truncate max-w-md inline-block" title="{{ url.original_url }}">
+                                {{ url.original_url|truncatechars:60 }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-500">
+                                {{ url.created_at|date:"d/m/Y" }}
+                            </span>
+                            <span class="text-xs text-gray-400 block">
+                                {{ url.created_at|time:"H:i" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center justify-end space-x-2">
+                                <a href="{{ url.get_short_url }}" target="_blank" class="text-gray-400 hover:text-primary-600 transition-colors" title="Ouvrir le lien">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </a>
+                                <a href="{% url 'url_shortener:delete' url.code %}" class="text-gray-400 hover:text-red-600 transition-colors" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce lien ?');">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <!-- État vide -->
+    <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="mx-auto h-24 w-24 text-gray-300 mb-4">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun lien raccourci</h3>
+        <p class="text-gray-500 mb-6 max-w-sm mx-auto">
+            Vous n'avez pas encore créé de lien raccourci. Commencez par en créer un !
+        </p>
+        <a href="{% url 'url_shortener:create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Créer mon premier lien
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast notification pour la copie -->
+<div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <div class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>Lien copié dans le presse-papiers !</span>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        showToast();
+    }).catch(function(err) {
+        // Fallback pour les navigateurs anciens
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast();
+    });
+}
+
+function showToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.remove('translate-y-20', 'opacity-0');
+    
+    setTimeout(function() {
+        toast.classList.add('translate-y-20', 'opacity-0');
+    }, 3000);
+}
+</script>
+{% endblock %}
