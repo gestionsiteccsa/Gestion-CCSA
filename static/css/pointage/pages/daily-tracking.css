@@ -1,0 +1,406 @@
+/* static/css/pointage/pages/daily-tracking.css */
+/* Styles pour la page de pointage journalier */
+
+/* Container principal */
+.pointage-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Header */
+.pointage-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--slate-200);
+}
+
+.pointage-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--slate-900);
+}
+
+/* Formulaire de date */
+.date-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-label {
+    font-weight: 500;
+    color: var(--slate-700);
+}
+
+.date-input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--slate-300);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Alertes */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+}
+
+.alert-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* Grille des sections */
+.sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Carte de section */
+.section-card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.section-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    padding: 1rem;
+    border-left: 4px solid;
+    background-color: var(--slate-50);
+}
+
+.section-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--slate-900);
+    margin: 0;
+}
+
+.section-description {
+    font-size: 0.875rem;
+    color: var(--slate-600);
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+
+/* Compteur */
+.counter-container {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.counter-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    margin-bottom: 1rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Boutons du compteur */
+.counter-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.decrement-buttons,
+.increment-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.btn-counter {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-decrement {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-decrement:hover {
+    background-color: #fecaca;
+}
+
+.btn-increment {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.btn-increment:hover {
+    background-color: #bbf7d0;
+}
+
+/* Boutons standards */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--color-primary, #3b82f6);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark, #2563eb);
+}
+
+.btn-secondary {
+    background-color: var(--slate-200);
+    color: var(--slate-700);
+}
+
+.btn-secondary:hover {
+    background-color: var(--slate-300);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--slate-300);
+    color: var(--slate-700);
+}
+
+.btn-outline:hover {
+    background-color: var(--slate-100);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Navigation */
+.pointage-navigation {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding-top: 2rem;
+    border-top: 1px solid var(--slate-200);
+}
+
+/* Liste des sections (gestion) */
+.sections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.section-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section-item.section-inactive {
+    opacity: 0.6;
+}
+
+.section-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.section-color {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    flex-shrink: 0;
+}
+
+.section-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.section-order {
+    font-size: 0.75rem;
+    color: var(--slate-500);
+}
+
+.section-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Formulaire */
+.section-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--slate-700);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--slate-300);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.color-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.color-input-wrapper input[type="color"] {
+    width: 4rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.color-value {
+    font-family: monospace;
+    color: var(--slate-600);
+}
+
+.error-message {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc2626;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Formulaire inline */
+.inline-form {
+    display: inline;
+}
+
+/* État vide */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--slate-600);
+}
+
+.empty-state p {
+    margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pointage-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .date-form {
+        width: 100%;
+    }
+
+    .date-input-group {
+        flex: 1;
+    }
+
+    .date-input {
+        flex: 1;
+    }
+
+    .sections-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .counter-buttons {
+        flex-wrap: wrap;
+    }
+
+    .decrement-buttons,
+    .increment-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .section-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .section-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

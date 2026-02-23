@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion des sections - Pointage{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pointage/pages/daily-tracking.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pointage-container">
+    <header class="pointage-header">
+        <h1 class="pointage-title">Gestion des sections</h1>
+        <a href="{% url 'pointage:section_create' %}" class="btn btn-primary">
+            + Nouvelle section
+        </a>
+    </header>
+
+    <div class="sections-list">
+        {% for section in sections %}
+        <div class="section-item {% if not section.is_active %}section-inactive{% endif %}">
+            <div class="section-info">
+                <div class="section-color" style="background-color: {{ section.color }}"></div>
+                <div class="section-details">
+                    <h3 class="section-name">{{ section.name }}</h3>
+                    {% if section.description %}
+                    <p class="section-description">{{ section.description }}</p>
+                    {% endif %}
+                    <span class="section-order">Ordre : {{ section.order }}</span>
+                </div>
+            </div>
+            
+            <div class="section-actions">
+                <a href="{% url 'pointage:section_update' section.pk %}" class="btn btn-sm btn-outline">
+                    Modifier
+                </a>
+                
+                <form method="post" action="{% url 'pointage:section_toggle' section.pk %}" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm {% if section.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                        {% if section.is_active %}Désactiver{% else %}Activer{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>Aucune section n'a été créée.</p>
+            <a href="{% url 'pointage:section_create' %}" class="btn btn-primary">
+                Créer une section
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="pointage-navigation">
+        <a href="{% url 'pointage:daily_tracking' %}" class="btn btn-outline">
+            ← Retour au pointage
+        </a>
+    </div>
+</div>
+{% endblock %}

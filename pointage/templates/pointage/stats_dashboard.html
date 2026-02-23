@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Statistiques - Pointage{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pointage/pages/stats-dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pointage-container">
+    <header class="pointage-header">
+        <h1 class="pointage-title">Statistiques de pointage</h1>
+    </header>
+
+    <!-- Filtres -->
+    <div class="stats-filters">
+        <div class="period-selector">
+            {% for period in periods %}
+            <button 
+                type="button" 
+                class="btn-period {% if forloop.first %}active{% endif %}"
+                data-period="{{ period.key }}"
+                data-days="{{ period.days }}"
+            >
+                {{ period.label }}
+            </button>
+            {% endfor %}
+        </div>
+        
+        <div class="date-selector">
+            <label for="stats-date">Date de fin :</label>
+            <input type="date" id="stats-date" class="date-input" value="{% now 'Y-m-d' %}">
+        </div>
+    </div>
+
+    <!-- Graphique -->
+    <div class="stats-chart-container">
+        <canvas id="statsChart"></canvas>
+    </div>
+
+    <!-- Résumé -->
+    <div class="stats-summary">
+        <h2>Résumé par section</h2>
+        <div class="summary-grid" id="summary-grid">
+            <!-- Rempli dynamiquement par JS -->
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="pointage-navigation">
+        <a href="{% url 'pointage:daily_tracking' %}" class="btn btn-outline">
+            ← Retour au pointage
+        </a>
+    </div>
+</div>
+
+<!-- Données pour Chart.js -->
+{{ sections|json_script:"sections-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/pointage/pages/stats_dashboard.js' %}"></script>
+{% endblock %}

@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("evenements/", include("events.urls")),
+    path("pointage/", include("pointage.urls")),
     path("backup/", include("backup.urls")),
     path("liens/", include("url_shortener.urls")),
     path("r/<slug:code>/", redirect_short_url, name="short_redirect"),

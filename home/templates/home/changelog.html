@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Changelog - CCSA Connect{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-900">Journal des modifications</h1>
+        <p class="mt-2 text-slate-600">Historique des changements et mises à jour de l'application</p>
+    </div>
+
+    <div class="space-y-8">
+        <!-- Unreleased -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[Unreleased]</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-slate-100 text-slate-600 rounded-full">En développement</span>
+            </div>
+            <div class="space-y-6">
+                <!-- Fonctionnalités -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-purple-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Nouvelles fonctionnalités
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Feature Pointage</strong> : Système complet de pointage pour le rôle "Accueil"
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Pointage journalier des visites et appels avec compteurs 1-5</li>
+                                <li>Gestion des sections personnalisables (Accueil, Appels, etc.)</li>
+                                <li>Pointage rétroactif jusqu'à 30 jours</li>
+                                <li>Dashboard statistiques avec graphiques (Jour/Semaine/Mois)</li>
+                                <li>Historique des modifications avec traçabilité</li>
+                                <li>Permissions basées sur le rôle "Accueil" (insensible à la casse)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tests -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Tests
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Implémentation TDD (Test Driven Development) pour l'app Pointage</li>
+                        <li>Tests unitaires complets pour les modèles (SectionType, DailyTracking, TrackingHistory)</li>
+                        <li>Tests d'intégration pour les vues et permissions</li>
+                        <li>Tests de sécurité pour le mixin AccueilRequiredMixin</li>
+                    </ul>
+                </div>
+
+                <!-- Corrections -->
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">Corrections</h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Correction de 16 tests échoués</li>
+                        <li>Correction du champ <code>author</code> pour les commentaires (était <code>user</code>)</li>
+                        <li>Correction de <code>save_m2m()</code> dans les vues de mise à jour et duplication</li>
+                        <li>Correction du <code>EventChangeLog</code> dans la duplication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Version 1.1.0 -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[1.1.0] - 2026-02-09</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-primary-100 text-primary-700 rounded-full">Dernière version</span>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Sécurité -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-red-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        Sécurité
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><span class="font-semibold text-red-600">[CRITIQUE]</span> Correction de vulnérabilités XSS dans les templates
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li><code>event_detail.html</code> : Échappement des descriptions et commentaires</li>
+                                <li><code>video_request.html</code> : Échappement des variables dans les emails</li>
+                                <li><code>communication_dashboard.html</code> : Protection contre l'injection JavaScript dans Chart.js</li>
+                            </ul>
+                        </li>
+                        <li><span class="font-semibold text-orange-600">[ÉLEVÉ]</span> Ajout de l'échappement ICS selon RFC 5545 pour les fichiers de calendrier</li>
+                        <li><span class="font-semibold text-yellow-600">[MOYEN]</span> Implémentation du rate limiting sur les endpoints de notifications
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li><code>notification_mark_read</code> : 10 requêtes/minute</li>
+                                <li><code>notification_mark_all_read</code> : 5 requêtes/minute</li>
+                            </ul>
+                        </li>
+                        <li><span class="font-semibold text-yellow-600">[MOYEN]</span> Validation robuste des entrées utilisateur dans le dashboard
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Validation des dates personnalisées</li>
+                                <li>Limite de période à 2 ans maximum</li>
+                                <li>Messages d'erreur utilisateur appropriés</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Performance -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Performance
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><span class="font-semibold text-orange-600">[ÉLEVÉ]</span> Optimisation des requêtes N+1 dans le dashboard
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Réduction de 50+ requêtes SQL à 1 requête pour les statistiques par secteur</li>
+                                <li>Utilisation de <code>annotate()</code> et <code>Count()</code> de Django ORM</li>
+                            </ul>
+                        </li>
+                        <li><span class="font-semibold text-yellow-600">[MOYEN]</span> Mise en place du caching pour les villes dans EventListView
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Cache de 1 heure avec clé basée sur le rôle utilisateur</li>
+                                <li>Réduction drastique des requêtes répétées</li>
+                            </ul>
+                        </li>
+                        <li><span class="font-semibold text-yellow-600">[MOYEN]</span> Ajout de <code>transaction.atomic()</code> pour la duplication d'événements
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Garantie d'intégrité des données</li>
+                                <li>Rollback automatique en cas d'erreur</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tests -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Tests
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Configuration complète de pytest avec 80% de couverture minimale requise</li>
+                        <li>Ajout de tests de sécurité XSS</li>
+                        <li>Ajout de tests pour les fonctionnalités de tournage vidéo</li>
+                        <li>Ajout de tests pour le rate limiting</li>
+                    </ul>
+                </div>
+
+                <!-- Documentation -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-purple-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        Documentation
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Création du CHANGELOG.md</li>
+                        <li>Création du SECURITY.md avec les bonnes pratiques</li>
+                        <li>Mise à jour du README.md avec les nouvelles fonctionnalités</li>
+                    </ul>
+                </div>
+
+                <!-- Maintenance -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-slate-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Maintenance
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Audit de sécurité complet avec Bandit (aucune vulnérabilité critique trouvée)</li>
+                        <li>Corrections de bugs mineurs</li>
+                        <li>Amélioration de la gestion des erreurs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Version 1.0.0 -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[1.0.0] - 2026-01-15</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full">Stable</span>
+            </div>
+            <div>
+                <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                    Première version stable
+                </h3>
+                <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                    <li>Gestion complète des événements (CRUD)</li>
+                    <li>Système de validation par l'équipe Communication</li>
+                    <li>Gestion des secteurs d'activité</li>
+                    <li>Système de notifications</li>
+                    <li>Authentification et autorisation par rôles</li>
+                    <li>Upload de documents et images</li>
+                    <li>Dashboard statistiques pour l'équipe Communication</li>
+                    <li>Système de demande de tournage vidéo</li>
+                    <li>Génération de fichiers ICS</li>
+                    <li>Recurrence d'événements</li>
+                    <li>Gestion des commentaires</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Légende -->
+    <div class="mt-12 pt-8 border-t border-slate-200">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Types de changements</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-red-100 text-red-700 rounded font-medium">Sécurité</span>
+                <span class="text-slate-600">Correction de vulnérabilités de sécurité</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium">Performance</span>
+                <span class="text-slate-600">Améliorations de performance</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-green-100 text-green-700 rounded font-medium">Corrections</span>
+                <span class="text-slate-600">Correction de bugs</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded font-medium">Fonctionnalités</span>
+                <span class="text-slate-600">Nouvelles fonctionnalités</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded font-medium">Changements</span>
+                <span class="text-slate-600">Changements comportementaux</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded font-medium">Documentation</span>
+                <span class="text-slate-600">Changements de documentation</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
