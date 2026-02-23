@@ -75,7 +75,7 @@ flake8-bugbear==25.11.29
 flake8-docstrings==1.7.0
 Flask==2.3.3
 flask-cors==6.0.2
-frozenlist==1.3.3
+frozenlist==1.4.1
 google-api-core==2.24.1
 google-api-python-client==2.160.0
 google-auth==2.38.0
@@ -114,7 +114,7 @@ marshmallow==4.2.1
 matplotlib-inline==0.1.6
 mccabe==0.7.0
 mdurl==0.1.2
-multidict==6.0.4
+multidict==6.0.5
 mypy==1.19.1
 mypy-extensions==1.0.0
 nest-asyncio==1.5.6
@@ -182,7 +182,7 @@ pytokens==0.4.0
 pytz==2023.3.post1
 pyunormalize==16.0.0
 PyYAML==6.0.2
-pyzmq==25.1.0
+pyzmq==26.0.3
 redis==7.0.1
 referencing==0.36.2
 regex==2026.1.15
