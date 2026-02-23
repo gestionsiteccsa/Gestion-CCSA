@@ -73,12 +73,8 @@ class ShortenedURL(models.Model):
 
             parsed = urlparse(self.original_url)
 
-            # Récupérer le domaine actuel
-            current_domain = (
-                getattr(settings, "ALLOWED_HOSTS", ["localhost"])[0]
-                if settings.ALLOWED_HOSTS
-                else "localhost"
-            )
+            # Récupérer le domaine actuel via la méthode centralisée
+            current_domain = self._get_current_domain()
 
             # Vérifier si l'URL pointe vers le même domaine
             if parsed.netloc and current_domain in parsed.netloc:
@@ -131,19 +127,34 @@ class ShortenedURL(models.Model):
         """Retourne l'URL de redirection."""
         return reverse("url_shortener:redirect", kwargs={"code": self.code})
 
+    @staticmethod
+    def _get_current_domain():
+        """Retourne le domaine actuel du site.
+
+        Priorité:
+        1. SITE_URL (settings) - pour la production
+        2. ALLOWED_HOSTS[0] - fallback
+        3. localhost - dernier recours
+        """
+        # Priorité 1: SITE_URL si défini (format: https://domain.com)
+        site_url = getattr(settings, "SITE_URL", None)
+        if site_url:
+            from urllib.parse import urlparse
+
+            parsed = urlparse(site_url)
+            if parsed.netloc:
+                return parsed.netloc
+
+        # Priorité 2: ALLOWED_HOSTS
+        if settings.ALLOWED_HOSTS:
+            return settings.ALLOWED_HOSTS[0]
+
+        # Fallback: localhost
+        return "localhost"
+
     def get_short_url(self):
         """Retourne l'URL courte complète."""
-        from django.contrib.sites.models import Site
-
-        try:
-            domain = Site.objects.get_current().domain
-        except:
-            domain = (
-                getattr(settings, "ALLOWED_HOSTS", ["localhost"])[0]
-                if settings.ALLOWED_HOSTS
-                else "localhost"
-            )
-
+        domain = self._get_current_domain()
         protocol = "https" if not settings.DEBUG else "http"
         return f"{protocol}://{domain}/r/{self.code}"
 

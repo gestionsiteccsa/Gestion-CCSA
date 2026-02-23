@@ -280,14 +280,11 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
         active_events = base_queryset.filter(is_active=True).count()
 
         # Événements validés et en attente (pas besoin de select_related pour un count)
-        validated_events = (
-            EventValidation.objects.filter(
-                is_validated=True,
-                event__start_datetime__date__gte=start_date,
-                event__start_datetime__date__lte=end_date,
-            )
-            .count()
-        )
+        validated_events = EventValidation.objects.filter(
+            is_validated=True,
+            event__start_datetime__date__gte=start_date,
+            event__start_datetime__date__lte=end_date,
+        ).count()
 
         pending_validation = base_queryset.filter(
             is_active=True, validation__isnull=True

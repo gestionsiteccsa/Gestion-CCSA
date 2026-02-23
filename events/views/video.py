@@ -312,8 +312,7 @@ def confirm_video_request(request, token):
 
     # Récupérer la demande par son token (avec select_related pour éviter N+1)
     video_request = get_object_or_404(
-        VideoRequestLog.objects.select_related('event'),
-        confirmation_token=token
+        VideoRequestLog.objects.select_related("event"), confirmation_token=token
     )
     event = video_request.event
 
@@ -398,8 +397,7 @@ def refuse_video_request(request, token):
 
     # Récupérer la demande par son token (avec select_related pour éviter N+1)
     video_request = get_object_or_404(
-        VideoRequestLog.objects.select_related('event'),
-        confirmation_token=token
+        VideoRequestLog.objects.select_related("event"), confirmation_token=token
     )
     event = video_request.event
 

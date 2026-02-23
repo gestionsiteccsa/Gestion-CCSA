@@ -112,7 +112,9 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
             context["validation_status"] = "pending"
 
         # Récupérer les demandes vidéo en une seule requête
-        video_requests = list(VideoRequestLog.objects.filter(event=self.object).order_by("-sent_at"))
+        video_requests = list(
+            VideoRequestLog.objects.filter(event=self.object).order_by("-sent_at")
+        )
         context["video_requests"] = video_requests
         context["latest_video_request"] = video_requests[0] if video_requests else None
 

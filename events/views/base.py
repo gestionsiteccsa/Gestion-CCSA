@@ -26,14 +26,16 @@ class EventListView(ListView):
         """Retourne uniquement les événements à venir pour la timeline."""
         today = timezone.now().date()
         thirty_days_later = today + timedelta(days=30)
-        
-        return Event.objects.filter(
-            is_active=True,
-            start_datetime__date__gte=today,
-            start_datetime__date__lte=thirty_days_later,
-        ).prefetch_related(
-            "sectors", "validation", "video_requests"
-        ).order_by("start_datetime")[:10]
+
+        return (
+            Event.objects.filter(
+                is_active=True,
+                start_datetime__date__gte=today,
+                start_datetime__date__lte=thirty_days_later,
+            )
+            .prefetch_related("sectors", "validation", "video_requests")
+            .order_by("start_datetime")[:10]
+        )
 
     def get_context_data(self, **kwargs):
         """Ajoute la date actuelle pour le regroupement par semaine."""
@@ -61,7 +63,9 @@ class EventArchiveView(ListView):
 
         if result is None:
             try:
-                communication_role = Role.objects.get(name="Communication", is_active=True)
+                communication_role = Role.objects.get(
+                    name="Communication", is_active=True
+                )
                 result = UserRole.objects.filter(
                     user=self.request.user, role=communication_role, is_active=True
                 ).exists()
@@ -76,9 +80,11 @@ class EventArchiveView(ListView):
         today = date.today()
 
         # Filtrer uniquement les événements passés (archives)
-        queryset = Event.objects.filter(
-            is_active=True, start_datetime__date__lt=today
-        ).prefetch_related("sectors", "validation").select_related("created_by")
+        queryset = (
+            Event.objects.filter(is_active=True, start_datetime__date__lt=today)
+            .prefetch_related("sectors", "validation")
+            .select_related("created_by")
+        )
 
         # Filtre par secteurs (multiple)
         sector_ids = self.request.GET.getlist("sector")
