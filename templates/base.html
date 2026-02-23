@@ -96,13 +96,36 @@
                     
 
                     
-                    {% if user.is_authenticated %}
+                     {% if user.is_authenticated %}
                     <a href="{% url 'events:event_list' %}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'events' and request.resolver_match.url_name != 'event_validation_list' and request.resolver_match.url_name != 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
                         Événements
                     </a>
-                    <a href="{% url 'url_shortener:list' %}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
-                        Liens
-                    </a>
+                    
+                    <!-- Outils Dropdown -->
+                    <div class="relative" id="tools-nav-menu-container">
+                        <button type="button" id="tools-nav-menu-button" class="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span>Outils</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Outils Dropdown Menu -->
+                        <div id="tools-nav-menu" class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+                            <a href="{% url 'url_shortener:list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    Liens
+                                </span>
+                            </a>
+                        </div>
+                    </div>
                     {% endif %}
                     
                     {% has_communication_role as user_has_comm_role %}
@@ -304,9 +327,21 @@
                 <a href="{% url 'events:event_list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'events' and request.resolver_match.url_name != 'event_validation_list' and request.resolver_match.url_name != 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
                     Événements
                 </a>
-                <a href="{% url 'url_shortener:list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
-                    Liens
-                </a>
+                
+                <!-- Outils Mobile -->
+                <div class="border-t border-slate-100 my-2 pt-2">
+                    <div class="px-3 py-2 text-sm font-medium text-slate-500">
+                        Outils
+                    </div>
+                    <a href="{% url 'url_shortener:list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            Liens
+                        </span>
+                    </a>
+                </div>
                 {% endif %}
                 
                 {% has_communication_role as user_has_comm_role %}
@@ -481,7 +516,8 @@
         // Gestionnaire de menus dropdown
         const menus = [
             { button: 'user-menu-button', menu: 'user-menu' },
-            { button: 'communication-nav-menu-button', menu: 'communication-nav-menu' }
+            { button: 'communication-nav-menu-button', menu: 'communication-nav-menu' },
+            { button: 'tools-nav-menu-button', menu: 'tools-nav-menu' }
         ];
 
         // Fonction pour fermer tous les menus sauf celui spécifié
