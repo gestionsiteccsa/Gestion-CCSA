@@ -52,7 +52,7 @@ class Event(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="Titre")
     slug = models.SlugField(max_length=250, unique=True, verbose_name="Slug")
-    description = models.TextField(verbose_name="Description")
+    description = models.TextField(verbose_name="Description", blank=True)
     location = models.CharField(max_length=200, verbose_name="Lieu")
     city = models.CharField(max_length=100, verbose_name="Ville")
 
