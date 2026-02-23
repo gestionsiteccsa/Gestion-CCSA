@@ -38,7 +38,8 @@ class EventValidationListView(CommunicationRequiredMixin, ListView):
                 is_active=True,
             )
             .filter(Q(validation__isnull=True) | Q(validation__is_validated=False))
-            .prefetch_related("sectors", "created_by", "video_requests")
+            .prefetch_related("sectors", "video_requests")
+            .select_related("created_by")
             .order_by("created_at")
         )
 
@@ -110,18 +111,15 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
             context["validation"] = None
             context["validation_status"] = "pending"
 
-        # Récupérer les demandes vidéo
-        video_requests = VideoRequestLog.objects.filter(event=self.object).order_by(
-            "-sent_at"
-        )
+        # Récupérer les demandes vidéo en une seule requête
+        video_requests = list(VideoRequestLog.objects.filter(event=self.object).order_by("-sent_at"))
         context["video_requests"] = video_requests
-        context["latest_video_request"] = (
-            video_requests.first() if video_requests.exists() else None
-        )
+        context["latest_video_request"] = video_requests[0] if video_requests else None
 
         # Vérifier si on peut envoyer plus de demandes (max 4)
-        context["can_send_more"] = video_requests.count() < 4
-        context["total_requests"] = video_requests.count()
+        total_requests = len(video_requests)
+        context["can_send_more"] = total_requests < 4
+        context["total_requests"] = total_requests
 
         # Récupérer l'email de notification vidéo configuré
         context["video_email"] = EventSettings.get_video_email()

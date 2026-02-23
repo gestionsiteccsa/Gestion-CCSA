@@ -115,7 +115,9 @@ class Event(models.Model):
             models.Index(fields=["is_active"]),
             models.Index(fields=["city"]),
             models.Index(fields=["start_datetime"]),
+            models.Index(fields=["end_datetime"]),
             models.Index(fields=["is_active", "start_datetime"]),
+            models.Index(fields=["is_active", "start_datetime", "end_datetime"]),
             models.Index(fields=["created_by", "is_active"]),
         ]
 
@@ -266,6 +268,10 @@ class EventComment(models.Model):
         verbose_name = "Commentaire"
         verbose_name_plural = "Commentaires"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["event", "-created_at"]),
+            models.Index(fields=["author", "-created_at"]),
+        ]
 
     def __str__(self):
         return f"Commentaire de {self.author} sur {self.event}"
@@ -327,6 +333,11 @@ class EventValidation(models.Model):
         verbose_name = "Validation d'événement"
         verbose_name_plural = "Validations d'événements"
         ordering = ["-validated_at"]
+        indexes = [
+            models.Index(fields=["is_validated"]),
+            models.Index(fields=["event", "is_validated"]),
+            models.Index(fields=["validated_at"]),
+        ]
 
     def __str__(self):
         status = "Validé" if self.is_validated else "En attente"
@@ -749,6 +760,10 @@ class VideoRequestLog(models.Model):
         verbose_name = "Demande de tournage vidéo"
         verbose_name_plural = "Demandes de tournage vidéo"
         ordering = ["-sent_at"]
+        indexes = [
+            models.Index(fields=["event", "-sent_at"]),
+            models.Index(fields=["confirmation_token"]),
+        ]
 
     def __str__(self):
         return f"Demande vidéo pour {self.event.title} - {self.sent_at.strftime('%d/%m/%Y %H:%M')}"

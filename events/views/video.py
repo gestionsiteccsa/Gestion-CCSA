@@ -310,8 +310,11 @@ def confirm_video_request(request, token):
     """Vue publique pour que le caméraman confirme sa participation."""
     from django.utils import timezone
 
-    # Récupérer la demande par son token
-    video_request = get_object_or_404(VideoRequestLog, confirmation_token=token)
+    # Récupérer la demande par son token (avec select_related pour éviter N+1)
+    video_request = get_object_or_404(
+        VideoRequestLog.objects.select_related('event'),
+        confirmation_token=token
+    )
     event = video_request.event
 
     # Générer les URLs pour les agendas
@@ -393,8 +396,11 @@ def refuse_video_request(request, token):
     """Vue publique pour que le caméraman refuse la participation."""
     from django.utils import timezone
 
-    # Récupérer la demande par son token
-    video_request = get_object_or_404(VideoRequestLog, confirmation_token=token)
+    # Récupérer la demande par son token (avec select_related pour éviter N+1)
+    video_request = get_object_or_404(
+        VideoRequestLog.objects.select_related('event'),
+        confirmation_token=token
+    )
     event = video_request.event
 
     # Vérifier si déjà confirmé ou refusé

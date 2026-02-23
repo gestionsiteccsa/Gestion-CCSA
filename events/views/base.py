@@ -227,7 +227,7 @@ class EventDetailView(DetailView):
     def get_queryset(self):
         """Inclut les relations pour optimisation."""
         return Event.objects.filter(is_active=True).prefetch_related(
-            "sectors", "images", "documents", "comments__user"
+            "sectors", "images", "documents", "comments__author"
         )
 
     def get_context_data(self, **kwargs):
