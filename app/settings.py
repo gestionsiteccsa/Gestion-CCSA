@@ -315,6 +315,12 @@ LOGGING = {
             "filename": LOGS_DIR / "security.log",
             "formatter": "verbose",
         },
+        "events_file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": LOGS_DIR / "events.log",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "django": {
@@ -330,6 +336,11 @@ LOGGING = {
         "django.request": {
             "handlers": ["security_file", "console"],
             "level": "ERROR",
+            "propagate": False,
+        },
+        "events": {
+            "handlers": ["events_file", "console"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },

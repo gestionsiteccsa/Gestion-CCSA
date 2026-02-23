@@ -1,5 +1,6 @@
 """Views pour le CRUD des événements."""
 
+import logging
 from datetime import datetime
 
 from django.contrib import messages
@@ -12,6 +13,8 @@ from django.views.generic import CreateView, DeleteView, UpdateView
 from accounts.services import NotificationService
 from events.forms import EventForm
 from events.models import Event, EventChangeLog
+
+logger = logging.getLogger("events")
 
 
 class EventCreateView(LoginRequiredMixin, CreateView):
@@ -31,6 +34,9 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         """Gère les champs date/time séparés."""
+        logger.info(f"POST request received for event creation by user {request.user}")
+        logger.debug(f"POST data: {request.POST.dict()}")
+        
         # Reconstruire les datetime à partir des champs séparés
         post_data = request.POST.copy()
 
@@ -38,29 +44,41 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         start_time = post_data.get("start_time")
         all_day = post_data.get("all_day") == "on"
 
+        logger.debug(f"Parsed dates - start_date: {start_date}, start_time: {start_time}, all_day: {all_day}")
+
         if start_date:
             if all_day:
                 # Mode journée entière : 00:00
                 post_data["start_datetime"] = f"{start_date}T00:00"
+                logger.debug(f"Set start_datetime (all_day): {post_data['start_datetime']}")
             elif start_time:
                 try:
-                    dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                    dt = datetime.strptime(
+                        f"{start_date} {start_time}", "%Y-%m-%d %H:%M"
+                    )
                     post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
-                except ValueError:
+                    logger.debug(f"Set start_datetime: {post_data['start_datetime']}")
+                except ValueError as e:
+                    logger.error(f"Error parsing start datetime: {e}")
                     pass
 
         end_date = post_data.get("end_date")
         end_time = post_data.get("end_time")
 
+        logger.debug(f"Parsed end dates - end_date: {end_date}, end_time: {end_time}")
+
         if end_date:
             if all_day:
                 # Mode journée entière : 23:59
                 post_data["end_datetime"] = f"{end_date}T23:59"
+                logger.debug(f"Set end_datetime (all_day): {post_data['end_datetime']}")
             elif end_time:
                 try:
                     dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
                     post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
-                except ValueError:
+                    logger.debug(f"Set end_datetime: {post_data['end_datetime']}")
+                except ValueError as e:
+                    logger.error(f"Error parsing end datetime: {e}")
                     pass
 
         request.POST = post_data
@@ -68,31 +86,63 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         """Sauvegarde l'événement et logue les changements."""
-        with transaction.atomic():
-            # Définir le créateur
-            form.instance.created_by = self.request.user
+        logger.info(f"Form is valid. Creating event with title: {form.cleaned_data.get('title')}")
+        
+        try:
+            with transaction.atomic():
+                # Définir le créateur
+                form.instance.created_by = self.request.user
+                logger.debug(f"Set created_by to: {self.request.user}")
 
-            # Sauvegarder l'événement sans commit pour pouvoir sauvegarder les M2M après
-            self.object = form.save(commit=False)
-            self.object.save()
+                # Sauvegarder l'événement sans commit pour pouvoir sauvegarder les M2M après
+                self.object = form.save(commit=False)
+                logger.debug(f"Saving event object (commit=False)")
+                self.object.save()
+                logger.info(f"Event saved successfully with ID: {self.object.id}, slug: {self.object.slug}")
 
-            # Sauvegarder les relations many-to-many
-            form.save_m2m()
+                # Sauvegarder les relations many-to-many
+                logger.debug(f"Saving M2M relations (sectors)")
+                form.save_m2m()
 
-            # Créer un log de création
-            EventChangeLog.objects.create(
-                event=self.object,
-                changed_by=self.request.user,
-                field_name="création",
-                old_value="",
-                new_value="Événement créé",
-            )
+                # Créer un log de création
+                EventChangeLog.objects.create(
+                    event=self.object,
+                    changed_by=self.request.user,
+                    field_name="création",
+                    old_value="",
+                    new_value="Événement créé",
+                )
+                logger.debug(f"Created EventChangeLog for event {self.object.id}")
 
-            # Envoyer une notification à l'équipe Communication
-            NotificationService.notify_event_created(self.object, self.request.user)
+                # Envoyer une notification à l'équipe Communication
+                logger.debug(f"Sending notification to communication team")
+                NotificationService.notify_event_created(self.object, self.request.user)
 
-            messages.success(self.request, "L'événement a été créé avec succès.")
-            return redirect(self.get_success_url())
+                messages.success(self.request, "L'événement a été créé avec succès.")
+                logger.info(f"Event creation completed successfully. Redirecting to: {self.get_success_url()}")
+                return redirect(self.get_success_url())
+        except Exception as e:
+            logger.exception(f"Error creating event: {e}")
+            messages.error(self.request, f"Erreur lors de la création de l'événement: {e}")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        """Log form errors when validation fails."""
+        logger.error(f"Form validation failed for event creation")
+        logger.error(f"Form errors: {form.errors}")
+        logger.error(f"Non-field errors: {form.non_field_errors()}")
+        logger.debug(f"Cleaned data: {form.cleaned_data}")
+        
+        # Add specific error messages for common issues
+        if 'start_datetime' in form.errors:
+            messages.error(self.request, "Erreur: La date et heure de début sont invalides.")
+        if 'sectors' in form.errors:
+            messages.error(self.request, "Erreur: Veuillez sélectionner au moins un secteur.")
+        if form.non_field_errors():
+            for error in form.non_field_errors():
+                messages.error(self.request, error)
+        
+        return super().form_invalid(form)
 
     def get_success_url(self):
         """Redirige vers le détail de l'événement créé."""
@@ -136,7 +186,9 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                 post_data["start_datetime"] = f"{start_date}T00:00"
             elif start_time:
                 try:
-                    dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                    dt = datetime.strptime(
+                        f"{start_date} {start_time}", "%Y-%m-%d %H:%M"
+                    )
                     post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
                 except ValueError:
                     pass
