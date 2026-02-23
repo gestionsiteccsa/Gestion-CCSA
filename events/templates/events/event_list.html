@@ -722,242 +722,31 @@
     </section>
     {% endif %}
     
-    <!-- Barre de recherche et filtres -->
-    <section class="mb-8 bg-slate-50 rounded-xl p-6 border border-slate-200 animate-fade-in-up delay-200" aria-label="Filtres et recherche">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-slate-900">Rechercher dans les archives</h2>
+    <!-- Section vide si pas d'événements -->
+    {% if not upcoming_events %}
+    <section class="text-center py-16 animate-fade-in-up">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
         </div>
+        <h3 class="text-lg font-medium text-slate-900 mb-2">Aucun événement à venir</h3>
+        <p class="text-slate-600 mb-4">Il n'y a pas d'événements prévus dans les 30 prochains jours.</p>
         
-        <!-- Barre de recherche -->
-        <form method="get" class="mb-6" role="search" aria-label="Rechercher des événements">
-            <div class="relative">
-                <label for="search-events" class="sr-only">Rechercher des événements</label>
-                <input type="text" 
-                       id="search-events"
-                       name="q" 
-                       value="{{ request.GET.q }}"
-                       placeholder="Rechercher par titre, lieu, ville..." 
-                       class="search-input w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                       aria-describedby="search-help">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700 transition-colors">
-                    Rechercher
-                </button>
-            </div>
-            <p id="search-help" class="sr-only">Tapez pour rechercher parmi tous les événements</p>
-        </form>
-
-        <!-- Filtres -->
-        <div class="space-y-4">
-            <!-- Filtre par secteur -->
-            <div>
-                <h3 class="text-sm font-medium text-slate-700 mb-2">Filtrer par secteur</h3>
-                <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrer par secteur">
-                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.status %}status={{ request.GET.status }}&{% endif %}"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-slate-300 text-slate-700 hover:bg-slate-100 {% if not request.GET.sector %}active{% endif %}"
-                       aria-pressed="{% if not request.GET.sector %}true{% else %}false{% endif %}">
-                        Tous
-                    </a>
-                    {% for sector in sectors %}
-                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}sector={{ sector.id }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border transition-all hover:shadow-sm {% if request.GET.sector == sector.id|stringformat:'s' %}active{% endif %}"
-                       style="background-color: {% if request.GET.sector == sector.id|stringformat:'s' %}{{ sector.color_code }}{% else %}white{% endif %}; 
-                              border-color: {{ sector.color_code }}; 
-                              color: {% if request.GET.sector == sector.id|stringformat:'s' %}white{% else %}{{ sector.color_code }}{% endif %};"
-                       aria-pressed="{% if request.GET.sector == sector.id|stringformat:'s' %}true{% else %}false{% endif %}">
-                        {{ sector.name }}
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Filtre par statut -->
-            <div>
-                <h3 class="text-sm font-medium text-slate-700 mb-2">Filtrer par statut</h3>
-                <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrer par statut">
-                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-slate-300 text-slate-700 hover:bg-slate-100 {% if not request.GET.status %}active{% endif %}"
-                       aria-pressed="{% if not request.GET.status %}true{% else %}false{% endif %}">
-                        Tous les statuts
-                    </a>
-                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}status=validated"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-green-500 text-green-700 hover:bg-green-50 {% if request.GET.status == 'validated' %}active{% endif %}"
-                       {% if request.GET.status == 'validated' %}style="background-color: #22c55e; color: white;"{% endif %}
-                       aria-pressed="{% if request.GET.status == 'validated' %}true{% else %}false{% endif %}">
-                        Validé
-                    </a>
-                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}status=pending"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-yellow-500 text-yellow-700 hover:bg-yellow-50 {% if request.GET.status == 'pending' %}active{% endif %}"
-                       {% if request.GET.status == 'pending' %}style="background-color: #eab308; color: white;"{% endif %}
-                       aria-pressed="{% if request.GET.status == 'pending' %}true{% else %}false{% endif %}">
-                        En attente
-                    </a>
-                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}status=rejected"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-red-500 text-red-700 hover:bg-red-50 {% if request.GET.status == 'rejected' %}active{% endif %}"
-                       {% if request.GET.status == 'rejected' %}style="background-color: #ef4444; color: white;"{% endif %}
-                       aria-pressed="{% if request.GET.status == 'rejected' %}true{% else %}false{% endif %}">
-                        Rejeté
-                    </a>
-                </div>
-            </div>
-
-            <!-- Réinitialiser les filtres -->
-            {% if request.GET.q or request.GET.sector or request.GET.status %}
-            <div class="pt-2 border-t border-slate-200">
-                <a href="{% url 'events:event_list' %}" 
-                   class="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 transition-colors"
-                   aria-label="Réinitialiser tous les filtres">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    Réinitialiser les filtres
-                </a>
-            </div>
-            {% endif %}
-        </div>
-    </section>
-    
-    <!-- Archives -->
-    <section aria-labelledby="archives-title">
-        <div class="mb-6 animate-fade-in-up delay-300">
-            <h2 id="archives-title" class="text-2xl font-bold text-slate-900">Archives</h2>
-            <p class="mt-1 text-slate-600 text-sm">Événements passés</p>
-        </div>
-        
-        {% if events %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for event in events %}
-            <article class="event-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in-up" style="animation-delay: {{ forloop.counter0|add:4 }}00ms;">
-                <div class="p-5">
-                    <!-- Sectors -->
-                    <div class="flex flex-wrap gap-1.5 mb-3">
-                        {% for sector in event.sectors.all %}
-                        <span class="badge text-xs" 
-                              style="background-color: {{ sector.color_code }}20; color: {{ sector.color_code }}; border: 1px solid {{ sector.color_code }}40;">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                            </svg>
-                            {{ sector.name }}
-                        </span>
-                        {% endfor %}
-                    </div>
-
-                    <!-- Title -->
-                    <h3 class="text-lg font-semibold text-slate-900 mb-2 line-clamp-2">{{ event.title }}</h3>
-
-                    <!-- Meta -->
-                    <div class="space-y-1.5 text-sm text-slate-600 mb-4">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            <time datetime="{{ event.start_datetime|date:'Y-m-d\TH:i:s' }}">{{ event.start_datetime|date:"d/m/Y H:i" }}</time>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            {{ event.location }}, {{ event.city }}
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <p class="text-slate-600 text-sm line-clamp-2 mb-4">{{ event.description|truncatewords:20 }}</p>
-
-                    <!-- Actions -->
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-100">
-                        <a href="{{ event.get_absolute_url }}" 
-                           class="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium text-sm focus:outline-none focus:underline">
-                            Voir les détails
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                        
-                        <!-- Bouton Ajouter à Outlook -->
-                        <a href="https://outlook.office.com/calendar/0/deeplink/compose?subject={{ event.title|urlencode }}&startdt={{ event.start_datetime|date:'c' }}{% if event.end_datetime %}&enddt={{ event.end_datetime|date:'c' }}{% endif %}&body={{ event.description|truncatewords:50|urlencode }}&location={{ event.location|default:event.city|urlencode }}" 
-                           class="calendar-btn inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           aria-label="Ajouter {{ event.title }} à Outlook">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            Ajouter à Outlook
-                        </a>
-                    </div>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
-
-        <!-- Pagination -->
-        {% if is_paginated %}
-        <nav class="mt-8 flex justify-center" aria-label="Pagination">
-            <div class="flex items-center gap-2">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if filter_params %}&{{ filter_params }}{% endif %}" 
-                   class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                   aria-label="Page précédente">
-                    <span aria-hidden="true">←</span> Précédent
-                </a>
-                {% endif %}
-
-                {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                <span class="px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg" aria-current="page">{{ num }}</span>
-                {% else %}
-                <a href="?page={{ num }}{% if filter_params %}&{{ filter_params }}{% endif %}" 
-                   class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                   aria-label="Page {{ num }}">{{ num }}</a>
-                {% endif %}
-                {% endfor %}
-
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if filter_params %}&{{ filter_params }}{% endif %}" 
-                   class="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                   aria-label="Page suivante">
-                    Suivant <span aria-hidden="true">→</span>
-                </a>
-                {% endif %}
-            </div>
-        </nav>
-        {% endif %}
-
-        {% else %}
-        <!-- Empty state -->
-        <div class="text-center py-16 animate-fade-in-up">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-            </div>
-            {% if user_has_comm_role %}
-                <h3 class="text-lg font-medium text-slate-900 mb-2">Aucun événement trouvé</h3>
-                <p class="text-slate-600 mb-4">Essayez de modifier vos filtres ou votre recherche.</p>
-            {% else %}
-                <h3 class="text-lg font-medium text-slate-900 mb-2">Aucun événement</h3>
-                <p class="text-slate-600 mb-4">Aucun événement passé à afficher.</p>
-            {% endif %}
-            
-            {% if user.is_authenticated %}
-            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="{% url 'events:event_create' %}" 
-                   class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    Créer un événement
-                </a>
-                <a href="{% url 'events:event_calendar' %}" 
-                   class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-primary-600 bg-white border border-primary-600 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                    Voir le calendrier
-                </a>
-            </div>
-            {% endif %}
+        {% if user.is_authenticated %}
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{% url 'events:event_create' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                Créer un événement
+            </a>
+            <a href="{% url 'events:event_archives' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-primary-600 bg-white border border-primary-600 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                Consulter les archives
+            </a>
         </div>
         {% endif %}
     </section>
+    {% endif %}
 </div>
 
 <script>
@@ -966,7 +755,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('timelineContainer');
     const scrollLeft = document.getElementById('scrollLeft');
     const scrollRight = document.getElementById('scrollRight');
-    const todayIndicator = document.getElementById('todayIndicator');
     const viewCompactBtn = document.getElementById('viewCompact');
     const viewExpandedBtn = document.getElementById('viewExpanded');
     
@@ -999,41 +787,6 @@ document.addEventListener('DOMContentLoaded', function() {
         viewCompactBtn.addEventListener('click', () => setViewMode('compact'));
         viewExpandedBtn.addEventListener('click', () => setViewMode('expanded'));
     }
-    
-    // Positionner l'indicateur "Aujourd'hui"
-    function positionTodayIndicator() {
-        if (!todayIndicator || !container) return;
-        
-        // S'assurer que l'indicateur est visible
-        todayIndicator.style.display = 'block';
-        
-        // Trouver le séparateur de la semaine courante
-        const currentWeekSeparator = container.querySelector('.week-separator-current');
-        
-        if (currentWeekSeparator) {
-            // Positionner au début de la semaine courante
-            const parentFlex = container.querySelector('.flex.gap-6');
-            if (parentFlex) {
-                const separatorRect = currentWeekSeparator.getBoundingClientRect();
-                const parentRect = parentFlex.getBoundingClientRect();
-                const relativeLeft = separatorRect.left - parentRect.left;
-                todayIndicator.style.left = relativeLeft + 'px';
-            }
-        } else {
-            // Si pas de semaine courante, positionner au début avec un décalage
-            todayIndicator.style.left = '20px';
-        }
-    }
-    
-    // Appeler après que le DOM soit complètement rendu
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(positionTodayIndicator, 300);
-        });
-    } else {
-        setTimeout(positionTodayIndicator, 300);
-    }
-    window.addEventListener('resize', positionTodayIndicator);
     
     if (container && scrollLeft && scrollRight) {
         const scrollAmount = 300;

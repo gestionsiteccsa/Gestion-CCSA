@@ -9,6 +9,7 @@ app_name = "events"
 urlpatterns = [
     # Liste et calendrier
     path("", views.EventListView.as_view(), name="event_list"),
+    path("archives/", views.EventArchiveView.as_view(), name="event_archives"),
     path("calendrier/", views.EventCalendarView.as_view(), name="event_calendar"),
     path("mes-evenements/", views.MyEventsView.as_view(), name="my_events"),
     path(

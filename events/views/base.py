@@ -16,10 +16,37 @@ from events.models import Event
 
 
 class EventListView(ListView):
-    """Vue liste des événements avec filtres."""
+    """Vue liste des événements à venir (timeline uniquement)."""
 
     model = Event
     template_name = "events/event_list.html"
+    context_object_name = "upcoming_events"
+
+    def get_queryset(self):
+        """Retourne uniquement les événements à venir pour la timeline."""
+        today = timezone.now().date()
+        thirty_days_later = today + timedelta(days=30)
+        
+        return Event.objects.filter(
+            is_active=True,
+            start_datetime__date__gte=today,
+            start_datetime__date__lte=thirty_days_later,
+        ).prefetch_related(
+            "sectors", "validation", "video_requests"
+        ).order_by("start_datetime")[:10]
+
+    def get_context_data(self, **kwargs):
+        """Ajoute la date actuelle pour le regroupement par semaine."""
+        context = super().get_context_data(**kwargs)
+        context["now"] = timezone.now()
+        return context
+
+
+class EventArchiveView(ListView):
+    """Vue des archives d'événements avec recherche et filtres."""
+
+    model = Event
+    template_name = "events/event_archives.html"
     context_object_name = "events"
     paginate_by = 12
 
@@ -27,11 +54,11 @@ class EventListView(ListView):
         """Vérifie si l'utilisateur a le rôle Communication (avec cache)."""
         if not self.request.user.is_authenticated:
             return False
-        
+
         # Cache pour éviter les requêtes répétées
         cache_key = f"user_comm_role_{self.request.user.id}"
         result = cache.get(cache_key)
-        
+
         if result is None:
             try:
                 communication_role = Role.objects.get(name="Communication", is_active=True)
@@ -41,16 +68,14 @@ class EventListView(ListView):
             except Role.DoesNotExist:
                 result = False
             cache.set(cache_key, result, 300)  # Cache pendant 5 minutes
-        
+
         return result
 
     def get_queryset(self):
-        """Filtre les événements selon les paramètres GET."""
+        """Filtre les événements archivés selon les paramètres GET."""
         today = date.today()
 
         # Filtrer uniquement les événements passés (archives)
-        # Optimisation: prefetch_related pour éviter les requêtes N+1 sur sectors et validation
-        # Optimisation: select_related pour éviter les requêtes N+1 sur created_by
         queryset = Event.objects.filter(
             is_active=True, start_datetime__date__lt=today
         ).prefetch_related("sectors", "validation").select_related("created_by")
@@ -129,23 +154,6 @@ class EventListView(ListView):
         if "page" in filter_params:
             filter_params.pop("page")
         context["filter_params"] = filter_params.urlencode()
-
-        # Événements à venir dans les 30 prochains jours pour la timeline
-        today = timezone.now().date()
-        thirty_days_later = today + timedelta(days=30)
-        upcoming_queryset = Event.objects.filter(
-            is_active=True,
-            start_datetime__date__gte=today,
-            start_datetime__date__lte=thirty_days_later,
-        )
-        # Optimisation: prefetch_related pour éviter les requêtes N+1
-        # Inclut video_requests pour éviter N+1 dans le template (event_list.html ligne 520)
-        context["upcoming_events"] = upcoming_queryset.prefetch_related(
-            "sectors", "validation", "video_requests"
-        ).order_by("start_datetime")[:10]
-
-        # Date actuelle pour le regroupement par semaine dans le template
-        context["now"] = timezone.now()
 
         return context
 

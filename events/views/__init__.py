@@ -4,9 +4,9 @@ Ce package contient toutes les vues Django pour la gestion des événements,
 organisées par domaine fonctionnel.
 """
 
-# Vues de base (liste, détail, calendrier)
-from events.views.base import (EventCalendarView, EventDetailView,
-                               EventListView, MyEventsView)
+# Vues de base (liste, détail, calendrier, archives)
+from events.views.base import (EventArchiveView, EventCalendarView,
+                               EventDetailView, EventListView, MyEventsView)
 # CRUD événements
 from events.views.crud import EventCreateView, EventDeleteView, EventUpdateView
 # Tableau de bord Communication
@@ -29,6 +29,7 @@ from events.views.video import (VideoEmailSettingsView, confirm_video_request,
 __all__ = [
     # Base views
     "EventListView",
+    "EventArchiveView",
     "EventCalendarView",
     "EventDetailView",
     "MyEventsView",
