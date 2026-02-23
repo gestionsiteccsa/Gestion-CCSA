@@ -817,7 +817,7 @@
         }
     }
 
-    function toggleAllDay() {
+    window.toggleAllDay = function() {
         const allDay = document.getElementById('all_day').checked;
         const startTimeInput = document.getElementById('start_time');
         const endTimeInput = document.getElementById('end_time');
@@ -948,13 +948,13 @@
     }
 
     // Save as draft button
-    function saveAsDraft() {
+    window.saveAsDraft = function() {
         saveToLocalStorage();
         alert('Brouillon sauvegardé ! Vous pourrez retrouver vos données en revenant sur cette page.');
     }
 
     // Set recurring event
-    function setRecurring() {
+    window.setRecurring = function() {
         // Open the options accordion
         const optionsHeader = document.querySelector('[data-accordion="options"]');
         optionsHeader.click();
