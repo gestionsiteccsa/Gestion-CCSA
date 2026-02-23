@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>{% block title %}Espace Administration - CC Sud-Avesnois{% endblock %}</title>
+    <title>{% block title %}CCSA Connect{% endblock %}</title>
     {% load static %}
     {% load event_tags %}
     
@@ -82,7 +82,7 @@
                     <div class="flex-shrink-0">
                         <a href="{% url 'home' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
                             <img src="{% static 'logo/Logo_couleur.png' %}" alt="CC Sud-Avesnois" class="h-10 w-auto">
-                            <span class="hidden sm:block text-lg font-semibold text-slate-700">Gestion</span>
+                            <span class="hidden sm:block text-lg font-semibold text-slate-700">CCSA Connect</span>
                         </a>
                     </div>
                     
@@ -122,6 +122,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                                     </svg>
                                     Liens
+                                </span>
+                            </a>
+                            <a href="https://qr.ccsudavesnois.fr" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3zm-3-6h3v3h-3v-3z"></path>
+                                    </svg>
+                                    QR Codes
                                 </span>
                             </a>
                         </div>
@@ -281,6 +289,9 @@
                                         Logs système
                                     </span>
                                 </a>
+                                {% endif %}
+                                
+                                <div class="border-t border-slate-200 my-1"></div>
                                 
                                 <form method="post" action="{% url 'accounts:logout' %}" class="block">
                                     {% csrf_token %}
@@ -299,7 +310,6 @@
                                 S'inscrire
                             </a>
                         </div>
-                    {% endif %}
                     {% endif %}
                 </nav>
                 
@@ -339,6 +349,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                             </svg>
                             Liens
+                        </span>
+                    </a>
+                    <a href="https://qr.ccsudavesnois.fr" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3zm-3-6h3v3h-3v-3z"/>
+                            </svg>
+                            QR Codes
                         </span>
                     </a>
                 </div>
@@ -490,9 +508,6 @@
                     <span class="text-sm text-slate-500">© {% now "Y" %} Communauté de Communes Sud-Avesnois</span>
                 </div>
                 <div class="flex items-center space-x-6 text-sm text-slate-500">
-                    <a href="#" class="hover:text-primary-600 transition-colors">Mentions légales</a>
-                    <a href="#" class="hover:text-primary-600 transition-colors">Politique de confidentialité</a>
-                    <a href="#" class="hover:text-primary-600 transition-colors">Contact</a>
                 </div>
             </div>
         </div>

@@ -65,7 +65,7 @@ def role_create_view(request):
                 if is_default:
                     Role.objects.filter(is_default=True).update(is_default=False)
 
-                role = Role.objects.create(
+                Role.objects.create(
                     name=name,
                     description=description,
                     color=color,
@@ -163,9 +163,9 @@ def user_list_view(request):
 
     if search:
         users = users.filter(
-            Q(email__icontains=search)
-            | Q(first_name__icontains=search)
-            | Q(last_name__icontains=search)
+            Q(email__icontains=search) |
+            Q(first_name__icontains=search) |
+            Q(last_name__icontains=search)
         )
 
     paginator = Paginator(users.order_by("-date_joined"), 20)

@@ -17,7 +17,7 @@ from django.urls import reverse_lazy
 
 from .forms import (PasswordChangeForm, UserLoginForm, UserProfileForm,
                     UserRegistrationForm, UserUpdateForm)
-from .models import LoginHistory, UserSession
+from .models import LoginHistory, User, UserSession
 
 
 def get_client_ip(request):
@@ -38,7 +38,12 @@ def register_view(request):
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            # Si c'est le premier utilisateur, le promouvoir superadmin
+            if User.objects.count() == 0:
+                user.is_superuser = True
+                user.is_staff = True
+            user.save()
             messages.success(
                 request,
                 "Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
