@@ -24,16 +24,25 @@ class EventListView(ListView):
     paginate_by = 12
 
     def _user_has_communication_role(self):
-        """Vérifie si l'utilisateur a le rôle Communication."""
+        """Vérifie si l'utilisateur a le rôle Communication (avec cache)."""
         if not self.request.user.is_authenticated:
             return False
-        try:
-            communication_role = Role.objects.get(name="Communication", is_active=True)
-            return UserRole.objects.filter(
-                user=self.request.user, role=communication_role, is_active=True
-            ).exists()
-        except Role.DoesNotExist:
-            return False
+        
+        # Cache pour éviter les requêtes répétées
+        cache_key = f"user_comm_role_{self.request.user.id}"
+        result = cache.get(cache_key)
+        
+        if result is None:
+            try:
+                communication_role = Role.objects.get(name="Communication", is_active=True)
+                result = UserRole.objects.filter(
+                    user=self.request.user, role=communication_role, is_active=True
+                ).exists()
+            except Role.DoesNotExist:
+                result = False
+            cache.set(cache_key, result, 300)  # Cache pendant 5 minutes
+        
+        return result
 
     def get_queryset(self):
         """Filtre les événements selon les paramètres GET."""
@@ -41,9 +50,10 @@ class EventListView(ListView):
 
         # Filtrer uniquement les événements passés (archives)
         # Optimisation: prefetch_related pour éviter les requêtes N+1 sur sectors et validation
+        # Optimisation: select_related pour éviter les requêtes N+1 sur created_by
         queryset = Event.objects.filter(
             is_active=True, start_datetime__date__lt=today
-        ).prefetch_related("sectors", "validation")
+        ).prefetch_related("sectors", "validation").select_related("created_by")
 
         # Filtre par secteurs (multiple)
         sector_ids = self.request.GET.getlist("sector")
@@ -129,9 +139,13 @@ class EventListView(ListView):
             start_datetime__date__lte=thirty_days_later,
         )
         # Optimisation: prefetch_related pour éviter les requêtes N+1
+        # Inclut video_requests pour éviter N+1 dans le template (event_list.html ligne 520)
         context["upcoming_events"] = upcoming_queryset.prefetch_related(
-            "sectors", "validation"
+            "sectors", "validation", "video_requests"
         ).order_by("start_datetime")[:10]
+
+        # Date actuelle pour le regroupement par semaine dans le template
+        context["now"] = timezone.now()
 
         return context
 
@@ -249,8 +263,7 @@ class MyEventsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         """Retourne uniquement les événements créés par l'utilisateur."""
         queryset = Event.objects.filter(
-            created_by=self.request.user,
-            is_active=True
+            created_by=self.request.user, is_active=True
         ).prefetch_related("sectors", "validation")
 
         # Filtre par statut de validation
@@ -278,17 +291,13 @@ class MyEventsView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         # Statistiques
-        user_events = Event.objects.filter(
-            created_by=self.request.user, is_active=True
-        )
+        user_events = Event.objects.filter(created_by=self.request.user, is_active=True)
 
         context["total_events"] = user_events.count()
         context["validated_count"] = user_events.filter(
             validation__is_validated=True
         ).count()
-        context["pending_count"] = user_events.filter(
-            validation__isnull=True
-        ).count()
+        context["pending_count"] = user_events.filter(validation__isnull=True).count()
         context["rejected_count"] = user_events.filter(
             validation__is_validated=False
         ).count()

@@ -33,25 +33,25 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         """Gère les champs date/time séparés."""
         # Reconstruire les datetime à partir des champs séparés
         post_data = request.POST.copy()
-        
-        start_date = post_data.get('start_date')
-        start_time = post_data.get('start_time')
+
+        start_date = post_data.get("start_date")
+        start_time = post_data.get("start_time")
         if start_date and start_time:
             try:
                 dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
-                post_data['start_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+                post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
             except ValueError:
                 pass
-        
-        end_date = post_data.get('end_date')
-        end_time = post_data.get('end_time')
+
+        end_date = post_data.get("end_date")
+        end_time = post_data.get("end_time")
         if end_date and end_time:
             try:
                 dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
-                post_data['end_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+                post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
             except ValueError:
                 pass
-        
+
         request.POST = post_data
         return super().post(request, *args, **kwargs)
 
@@ -114,25 +114,25 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """Gère les champs date/time séparés."""
         # Reconstruire les datetime à partir des champs séparés
         post_data = request.POST.copy()
-        
-        start_date = post_data.get('start_date')
-        start_time = post_data.get('start_time')
+
+        start_date = post_data.get("start_date")
+        start_time = post_data.get("start_time")
         if start_date and start_time:
             try:
                 dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
-                post_data['start_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+                post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
             except ValueError:
                 pass
-        
-        end_date = post_data.get('end_date')
-        end_time = post_data.get('end_time')
+
+        end_date = post_data.get("end_date")
+        end_time = post_data.get("end_time")
         if end_date and end_time:
             try:
                 dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
-                post_data['end_datetime'] = dt.strftime("%Y-%m-%dT%H:%M")
+                post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
             except ValueError:
                 pass
-        
+
         request.POST = post_data
         return super().post(request, *args, **kwargs)
 

@@ -100,7 +100,7 @@ class EventForm(forms.ModelForm):
         # Le queryset est déjà défini dans la déclaration du champ
         # mais on le met à jour ici pour être sûr d'avoir les données fraîches
         self.fields["sectors"].queryset = Sector.objects.filter(is_active=True)
-        
+
         # Rendre les champs datetime cachés dans le template
         self.fields["start_datetime"].widget = forms.HiddenInput()
         self.fields["end_datetime"].widget = forms.HiddenInput()

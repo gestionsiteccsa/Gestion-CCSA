@@ -252,6 +252,132 @@
     .scroll-hint {
         animation: pulse 2s infinite;
     }
+
+    /* Regroupement par semaine */
+    .week-separator {
+        position: relative;
+        padding: 20px 0 10px;
+        margin-bottom: 10px;
+        border-left: 3px solid #e2e8f0;
+        padding-left: 15px;
+    }
+
+    .week-label {
+        position: absolute;
+        top: 0;
+        left: 15px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        z-index: 5;
+    }
+
+    .week-separator-current {
+        border-left-color: #22c55e;
+    }
+
+    .week-separator-current .week-label {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Indicateur Aujourd'hui - SUPPRIMÉ
+    .today-indicator {
+        display: none;
+    }
+    */
+        position: absolute;
+        top: -32px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ef4444;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .today-label::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: #ef4444 transparent transparent transparent;
+    }
+
+    /* Mode compact */
+    .timeline-container.compact-mode .event-card {
+        min-height: auto;
+    }
+
+    .timeline-container.compact-mode .event-card .p-4 {
+        padding: 8px;
+    }
+
+    .timeline-container.compact-mode .event-card h3 {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .timeline-container.compact-mode .event-card .badge {
+        padding: 2px 6px;
+        font-size: 9px;
+    }
+
+    .timeline-container.compact-mode .event-card .badge-icon {
+        width: 10px;
+        height: 10px;
+    }
+
+    .timeline-container.compact-mode .city-location {
+        display: none;
+    }
+
+    /* Toggle mode bouton */
+    .view-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .view-toggle-btn:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .view-toggle-btn.active {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    .view-toggle-btn svg {
+        width: 16px;
+        height: 16px;
+    }
 </style>
 
 <!-- Skip link pour accessibilité -->
@@ -282,15 +408,43 @@
     {% if upcoming_events %}
     <section class="mb-8 animate-fade-in-up delay-200" aria-labelledby="upcoming-title">
         <div class="flex items-center justify-between mb-4">
-            <h2 id="upcoming-title" class="text-xl font-bold text-slate-900">À venir dans les 30 prochains jours</h2>
-            <a href="{% url 'events:event_calendar' %}" 
-               class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium focus:outline-none focus:underline"
-               aria-label="Voir le calendrier complet">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                Voir le calendrier
-            </a>
+            <div>
+                <h2 id="upcoming-title" class="text-xl font-bold text-slate-900">À venir dans les 30 prochains jours</h2>
+                <p class="text-sm text-slate-500 mt-1">{{ upcoming_events|length }} événement{{ upcoming_events|length|pluralize }} trouvé{{ upcoming_events|length|pluralize }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Toggle Vue Compacte/Détaillée -->
+                <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                    <button type="button" 
+                            id="viewCompact"
+                            class="view-toggle-btn active"
+                            aria-pressed="true"
+                            aria-label="Mode compact">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        Compact
+                    </button>
+                    <button type="button" 
+                            id="viewExpanded"
+                            class="view-toggle-btn"
+                            aria-pressed="false"
+                            aria-label="Mode détaillé">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        Détaillé
+                    </button>
+                </div>
+                <a href="{% url 'events:event_calendar' %}" 
+                   class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium focus:outline-none focus:underline"
+                   aria-label="Voir le calendrier complet">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Voir le calendrier
+                </a>
+            </div>
         </div>
         
         <!-- Timeline horizontale avec scroll -->
@@ -319,10 +473,26 @@
             </button>
             
             <!-- Conteneur scrollable -->
-            <div class="overflow-x-auto pb-4 timeline-scroll-container" id="timelineContainer" tabindex="0" role="region" aria-label="Timeline des événements à venir - Utilisez les flèches pour naviguer">
-                <div class="flex gap-6 min-w-max px-2">
-                    {% for event in upcoming_events %}
-                    {% with first_sector=event.sectors.first %}
+            <div class="overflow-x-auto pb-4 timeline-scroll-container timeline-container compact-mode" id="timelineContainer" tabindex="0" role="region" aria-label="Timeline des événements à venir - Utilisez les flèches pour naviguer">
+                <div class="flex gap-6 min-w-max px-2 relative">
+                    
+                    {% regroup upcoming_events by start_datetime|date:"W" as events_by_week %}
+                    
+                    {% for week_group in events_by_week %}
+                        <div class="week-separator {% if week_group.grouper == now|date:'W' %}week-separator-current{% endif %}">
+                            <div class="week-label">
+                                {% if week_group.grouper == now|date:"W" %}
+                                    Cette semaine
+                                {% elif week_group.grouper == now|date:"W"|add:1 %}
+                                    Semaine prochaine
+                                {% else %}
+                                    Semaine {{ week_group.grouper }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+{% for event in week_group.list %}
+{% with first_sector=event.sectors.all.0 %}
                     <article class="relative flex-shrink-0 w-64 group animate-fade-in-left delay-{{ forloop.counter|add:2|divisibleby:5 }}00" style="animation-delay: {{ forloop.counter0 }}00ms;">
                         <a href="{{ event.get_absolute_url }}" 
                            class="block"
@@ -415,7 +585,7 @@
                                     </h3>
                                     
                                     <!-- Ville -->
-                                    <div class="flex items-center justify-between text-xs text-slate-500">
+                                    <div class="flex items-center justify-between text-xs text-slate-500 city-location">
                                         <div class="flex items-center">
                                             <svg class="w-3 h-3 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -455,7 +625,8 @@
                             </div>
                         </a>
                     </article>
-                    {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
                     {% endfor %}
                 </div>
             </div>
@@ -795,6 +966,74 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('timelineContainer');
     const scrollLeft = document.getElementById('scrollLeft');
     const scrollRight = document.getElementById('scrollRight');
+    const todayIndicator = document.getElementById('todayIndicator');
+    const viewCompactBtn = document.getElementById('viewCompact');
+    const viewExpandedBtn = document.getElementById('viewExpanded');
+    
+    // Gestion du mode compact/détaillé
+    function setViewMode(mode) {
+        if (!container) return;
+        
+        if (mode === 'compact') {
+            container.classList.add('compact-mode');
+            viewCompactBtn.classList.add('active');
+            viewCompactBtn.setAttribute('aria-pressed', 'true');
+            viewExpandedBtn.classList.remove('active');
+            viewExpandedBtn.setAttribute('aria-pressed', 'false');
+        } else {
+            container.classList.remove('compact-mode');
+            viewCompactBtn.classList.remove('active');
+            viewCompactBtn.setAttribute('aria-pressed', 'false');
+            viewExpandedBtn.classList.add('active');
+            viewExpandedBtn.setAttribute('aria-pressed', 'true');
+        }
+        
+        localStorage.setItem('timelineViewMode', mode);
+    }
+    
+    // Restaurer le mode depuis localStorage
+    const savedMode = localStorage.getItem('timelineViewMode') || 'compact';
+    setViewMode(savedMode);
+    
+    if (viewCompactBtn && viewExpandedBtn) {
+        viewCompactBtn.addEventListener('click', () => setViewMode('compact'));
+        viewExpandedBtn.addEventListener('click', () => setViewMode('expanded'));
+    }
+    
+    // Positionner l'indicateur "Aujourd'hui"
+    function positionTodayIndicator() {
+        if (!todayIndicator || !container) return;
+        
+        // S'assurer que l'indicateur est visible
+        todayIndicator.style.display = 'block';
+        
+        // Trouver le séparateur de la semaine courante
+        const currentWeekSeparator = container.querySelector('.week-separator-current');
+        
+        if (currentWeekSeparator) {
+            // Positionner au début de la semaine courante
+            const parentFlex = container.querySelector('.flex.gap-6');
+            if (parentFlex) {
+                const separatorRect = currentWeekSeparator.getBoundingClientRect();
+                const parentRect = parentFlex.getBoundingClientRect();
+                const relativeLeft = separatorRect.left - parentRect.left;
+                todayIndicator.style.left = relativeLeft + 'px';
+            }
+        } else {
+            // Si pas de semaine courante, positionner au début avec un décalage
+            todayIndicator.style.left = '20px';
+        }
+    }
+    
+    // Appeler après que le DOM soit complètement rendu
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(positionTodayIndicator, 300);
+        });
+    } else {
+        setTimeout(positionTodayIndicator, 300);
+    }
+    window.addEventListener('resize', positionTodayIndicator);
     
     if (container && scrollLeft && scrollRight) {
         const scrollAmount = 300;

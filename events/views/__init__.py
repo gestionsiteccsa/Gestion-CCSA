@@ -5,8 +5,8 @@ organisées par domaine fonctionnel.
 """
 
 # Vues de base (liste, détail, calendrier)
-from events.views.base import (EventCalendarView, EventDetailView, EventListView,
-                               MyEventsView)
+from events.views.base import (EventCalendarView, EventDetailView,
+                               EventListView, MyEventsView)
 # CRUD événements
 from events.views.crud import EventCreateView, EventDeleteView, EventUpdateView
 # Tableau de bord Communication
