@@ -825,13 +825,13 @@
         if (allDay) {
             startTimeInput.value = '00:00';
             endTimeInput.value = '23:59';
-            startTimeInput.disabled = true;
-            endTimeInput.disabled = true;
+            startTimeInput.readOnly = true;
+            endTimeInput.readOnly = true;
             startTimeInput.classList.add('bg-slate-100');
             endTimeInput.classList.add('bg-slate-100');
         } else {
-            startTimeInput.disabled = false;
-            endTimeInput.disabled = false;
+            startTimeInput.readOnly = false;
+            endTimeInput.readOnly = false;
             startTimeInput.classList.remove('bg-slate-100');
             endTimeInput.classList.remove('bg-slate-100');
         }

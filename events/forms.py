@@ -117,9 +117,9 @@ class EventForm(forms.ModelForm):
                     "La date de fin doit être postérieure à la date de début."
                 )
 
-        # Vérifier que l'événement n'est pas dans le passé
-        if start_datetime and start_datetime < timezone.now():
-            raise ValidationError("La date de début ne peut pas être dans le passé.")
+        # Note: La validation "événement dans le passé" est retirée car elle cause
+        # des problèmes lors de la soumission (l'heure peut changer entre le
+        # chargement du formulaire et la soumission)
 
         return cleaned_data
 

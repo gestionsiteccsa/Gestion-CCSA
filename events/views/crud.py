@@ -36,21 +36,32 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
         start_date = post_data.get("start_date")
         start_time = post_data.get("start_time")
-        if start_date and start_time:
-            try:
-                dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
-                post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass
+        all_day = post_data.get("all_day") == "on"
+
+        if start_date:
+            if all_day:
+                # Mode journée entière : 00:00
+                post_data["start_datetime"] = f"{start_date}T00:00"
+            elif start_time:
+                try:
+                    dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                    post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
+                except ValueError:
+                    pass
 
         end_date = post_data.get("end_date")
         end_time = post_data.get("end_time")
-        if end_date and end_time:
-            try:
-                dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
-                post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass
+
+        if end_date:
+            if all_day:
+                # Mode journée entière : 23:59
+                post_data["end_datetime"] = f"{end_date}T23:59"
+            elif end_time:
+                try:
+                    dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+                    post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
+                except ValueError:
+                    pass
 
         request.POST = post_data
         return super().post(request, *args, **kwargs)
@@ -117,21 +128,32 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
         start_date = post_data.get("start_date")
         start_time = post_data.get("start_time")
-        if start_date and start_time:
-            try:
-                dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
-                post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass
+        all_day = post_data.get("all_day") == "on"
+
+        if start_date:
+            if all_day:
+                # Mode journée entière : 00:00
+                post_data["start_datetime"] = f"{start_date}T00:00"
+            elif start_time:
+                try:
+                    dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                    post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
+                except ValueError:
+                    pass
 
         end_date = post_data.get("end_date")
         end_time = post_data.get("end_time")
-        if end_date and end_time:
-            try:
-                dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
-                post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass
+
+        if end_date:
+            if all_day:
+                # Mode journée entière : 23:59
+                post_data["end_datetime"] = f"{end_date}T23:59"
+            elif end_time:
+                try:
+                    dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+                    post_data["end_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
+                except ValueError:
+                    pass
 
         request.POST = post_data
         return super().post(request, *args, **kwargs)
