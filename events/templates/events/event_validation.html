@@ -380,47 +380,208 @@
                 </div>
                 
                 <!-- Validation Form -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 relative" id="validation-form-container">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-slate-900 flex items-center">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            Validation
+                        </h3>
+                        
+                        <!-- Badge de statut -->
+                        {% if validation_status == 'validated' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Validé
+                        </span>
+                        {% elif validation_status == 'rejected' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Refusé
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            En attente
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Informations de validation si déjà traité -->
+                    {% if validation %}
+                    <div class="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600">
+                                {% if validation.is_validated %}
+                                    Validé par
+                                {% else %}
+                                    Refusé par
+                                {% endif %}
+                                <span class="font-medium text-slate-900">{{ validation.validated_by.get_full_name|default:validation.validated_by.email }}</span>
+                            </span>
+                            <span class="text-slate-500">{{ validation.validated_at|date:"d/m/Y à H:i" }}</span>
+                        </div>
+                        {% if validation.notes %}
+                        <div class="mt-2 pt-2 border-t border-slate-200">
+                            <p class="text-sm text-slate-600">
+                                <span class="font-medium">Notes :</span> {{ validation.notes }}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Overlay de chargement -->
+                    <div id="loading-overlay" class="absolute inset-0 bg-white/90 rounded-xl flex flex-col items-center justify-center z-10 hidden">
+                        <svg class="w-12 h-12 animate-spin text-primary-600 mb-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-lg font-semibold text-slate-900" id="loading-text">Traitement en cours...</p>
+                        <p class="text-sm text-slate-500 mt-2">Envoi de l'email au créateur</p>
+                    </div>
+                    
+                    <!-- Message de succès -->
+                    <div id="success-message" class="absolute inset-0 bg-white/95 rounded-xl flex flex-col items-center justify-center z-20 hidden">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                         </div>
-                        Validation
-                    </h3>
+                        <p class="text-xl font-bold text-slate-900" id="success-title">Événement validé !</p>
+                        <p class="text-sm text-slate-500 mt-2 text-center px-6" id="success-description">
+                            L'email de confirmation a été envoyé au créateur.
+                        </p>
+                    </div>
                     
-                    <form method="post" class="space-y-4">
+                    <form method="post" class="space-y-4" id="validation-form">
                         {% csrf_token %}
                         
                         <div>
-                            <label for="notes" class="block text-sm font-medium text-slate-700 mb-1">
-                                Notes de validation (optionnel)
+                            <label for="comment" class="block text-sm font-medium text-slate-700 mb-1">
+                                {% if validation %}Modifier les notes{% else %}Notes de validation (optionnel){% endif %}
                             </label>
-                            <textarea name="notes" id="notes" rows="3"
+                            <textarea name="comment" id="comment" rows="3"
                                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-y"
-                                      placeholder="Ajouter des notes sur la validation..."></textarea>
+                                      placeholder="{% if validation %}Modifier les notes sur la validation...{% else %}Ajouter des notes sur la validation...{% endif %}"
+                            >{% if validation %}{{ validation.notes|default:"" }}{% endif %}</textarea>
                         </div>
                         
                         <div class="space-y-3 pt-4 border-t border-slate-200">
-                            <button type="submit" name="action" value="validate"
-                                    class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                Valider et publier
+                            <button type="submit" name="action" value="validate" id="btn-validate"
+                                    class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white transition-all {% if validation_status == 'validated' %}bg-green-400 cursor-not-allowed{% else %}bg-green-600 hover:bg-green-700{% endif %} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                    {% if validation_status == 'validated' %}disabled{% endif %}>
+                                <span class="btn-content flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    {% if validation_status == 'validated' %}Déjà validé{% else %}Valider et publier{% endif %}
+                                </span>
+                                <span class="btn-loading hidden">
+                                    <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Validation...
+                                </span>
                             </button>
                             
-                            <button type="submit" name="action" value="reject"
-                                    class="w-full inline-flex items-center justify-center px-4 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                    onclick="return confirm('Êtes-vous sûr de vouloir rejeter cet événement ?')">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                Rejeter l'événement
+                            <button type="submit" name="action" value="reject" id="btn-reject"
+                                    class="w-full inline-flex items-center justify-center px-4 py-2 border text-sm font-medium rounded-lg transition-all {% if validation_status == 'rejected' %}bg-red-100 text-red-400 border-red-200 cursor-not-allowed{% else %}border-red-300 text-red-700 bg-white hover:bg-red-50{% endif %} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                    {% if validation_status == 'rejected' %}disabled{% else %}onclick="return confirmReject(event)"{% endif %}>
+                                <span class="btn-content flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    {% if validation_status == 'rejected' %}Déjà refusé{% else %}Rejeter l'événement{% endif %}
+                                </span>
+                                <span class="btn-loading hidden">
+                                    <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Rejet...
+                                </span>
                             </button>
                         </div>
                     </form>
+                    
+                    <script>
+                        // Variable pour stocker quel bouton a été cliqué
+                        let clickedButton = null;
+                        
+                        // Capturer le clic sur les boutons de soumission
+                        document.querySelectorAll('#validation-form button[type="submit"]').forEach(btn => {
+                            btn.addEventListener('click', function(e) {
+                                clickedButton = this;
+                            });
+                        });
+                        
+                        function confirmReject(event) {
+                            if (!confirm('Êtes-vous sûr de vouloir rejeter cet événement ?')) {
+                                event.preventDefault();
+                                return false;
+                            }
+                            return true;
+                        }
+                        
+                        document.getElementById('validation-form').addEventListener('submit', function(e) {
+                            // Ne pas empêcher la soumission - laisser le formulaire se soumettre normalement
+                            // Juste montrer le feedback visuel
+                            
+                            const submitBtn = clickedButton || document.activeElement;
+                            if (!submitBtn || submitBtn.type !== 'submit') {
+                                // Si aucun bouton trouvé, essayer de déterminer par la cible de l'événement
+                                return;
+                            }
+                            
+                            const action = submitBtn.value;
+                            const overlay = document.getElementById('loading-overlay');
+                            const loadingText = document.getElementById('loading-text');
+                            
+                            // Afficher le spinner sur le bouton
+                            const btnContent = submitBtn.querySelector('.btn-content');
+                            const btnLoading = submitBtn.querySelector('.btn-loading');
+                            
+                            if (btnContent && btnLoading) {
+                                btnContent.classList.add('hidden');
+                                btnLoading.classList.remove('hidden');
+                            }
+                            submitBtn.disabled = true;
+                            
+                            // Afficher l'overlay
+                            if (overlay) {
+                                overlay.classList.remove('hidden');
+                                
+                                if (action === 'reject') {
+                                    loadingText.textContent = "Rejet en cours...";
+                                } else {
+                                    loadingText.textContent = "Validation en cours...";
+                                }
+                            }
+                            
+                            // Ajouter un champ caché pour l'action si pas déjà présent
+                            let actionInput = this.querySelector('input[name="action"]');
+                            if (!actionInput) {
+                                actionInput = document.createElement('input');
+                                actionInput.type = 'hidden';
+                                actionInput.name = 'action';
+                                this.appendChild(actionInput);
+                            }
+                            actionInput.value = action;
+                            
+                            // Le formulaire va se soumettre normalement
+                        });
+                    </script>
                 </div>
                 
                 <!-- Quick Actions -->

@@ -1,6 +1,7 @@
 """Views pour le workflow de validation des événements."""
 
 import logging
+import urllib.parse
 
 from django.conf import settings
 from django.contrib import messages
@@ -125,6 +126,24 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
 
         # Récupérer l'email de notification vidéo configuré
         context["video_email"] = EventSettings.get_video_email()
+
+        # Construire les URLs de partage sur les réseaux sociaux
+        site_url = getattr(settings, "SITE_URL", "")
+        event_url = f"{site_url}{self.object.get_absolute_url()}"
+        encoded_event_url = urllib.parse.quote(event_url, safe="")
+
+        # URL de création d'événement Facebook
+        context["facebook_url"] = "https://www.facebook.com/events/create/"
+
+        # URL de partage Facebook
+        context[
+            "facebook_share_url"
+        ] = f"https://www.facebook.com/sharer/sharer.php?u={encoded_event_url}"
+
+        # URL de partage LinkedIn
+        context[
+            "linkedin_share_url"
+        ] = f"https://www.linkedin.com/sharing/share-offsite/?url={encoded_event_url}"
 
         return context
 

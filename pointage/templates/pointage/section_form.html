@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Modifier{% else %}Créer{% endif %} une section - Pointage{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pointage/pages/daily-tracking.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pointage-container">
+    <header class="pointage-header">
+        <h1 class="pointage-title">
+            {% if object %}
+            Modifier la section "{{ object.name }}"
+            {% else %}
+            Créer une nouvelle section
+            {% endif %}
+        </h1>
+    </header>
+
+    <form method="post" class="section-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.name.id_for_label }}">Nom *</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <span class="error-message">{{ form.name.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <span class="error-message">{{ form.description.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.color.id_for_label }}">Couleur</label>
+            <div class="color-input-wrapper">
+                {{ form.color }}
+                <span class="color-value" id="color-value">{{ form.color.value|default:"#64748b" }}</span>
+            </div>
+            {% if form.color.errors %}
+            <span class="error-message">{{ form.color.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.order.id_for_label }}">Ordre d'affichage</label>
+            {{ form.order }}
+            {% if form.order.errors %}
+            <span class="error-message">{{ form.order.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {% if object %}Enregistrer les modifications{% else %}Créer la section{% endif %}
+            </button>
+            <a href="{% url 'pointage:section_list' %}" class="btn btn-secondary">
+                Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Mise à jour de l'affichage de la couleur
+    document.getElementById('{{ form.color.id_for_label }}').addEventListener('input', function(e) {
+        document.getElementById('color-value').textContent = e.target.value;
+    });
+</script>
+{% endblock %}

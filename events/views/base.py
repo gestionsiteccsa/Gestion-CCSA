@@ -1,11 +1,13 @@
 """Views pour la gestion de base des événements."""
 
 from datetime import date, timedelta
+from urllib.parse import urlencode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.db.models import Q
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
 
@@ -161,6 +163,26 @@ class EventArchiveView(ListView):
             filter_params.pop("page")
         context["filter_params"] = filter_params.urlencode()
 
+        # Générer les URLs Outlook pour chaque événement
+        outlook_urls = {}
+        for event in context["events"]:
+            # Si pas de date de fin, ajouter 1 heure à la date de début
+            if event.end_datetime:
+                end_dt = event.end_datetime
+            else:
+                end_dt = event.start_datetime + timedelta(hours=1)
+            
+            outlook_params = {
+                "subject": event.title,
+                "startdt": event.start_datetime.isoformat(),
+                "enddt": end_dt.isoformat(),
+                "body": event.description or "",
+                "location": event.location or event.city or "",
+            }
+            outlook_urls[event.id] = f"https://outlook.office.com/calendar/0/deeplink/compose?{urlencode(outlook_params)}"
+
+        context["outlook_urls"] = outlook_urls
+
         return context
 
 
@@ -245,12 +267,26 @@ class EventDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         """Gère l'ajout d'un commentaire."""
         self.object = self.get_object()
+
+        # Vérifier que l'utilisateur est authentifié
+        if not request.user.is_authenticated:
+            from django.contrib import messages
+
+            messages.error(
+                request, "Vous devez être connecté pour ajouter un commentaire."
+            )
+            return redirect(
+                "{}?next={}".format(
+                    reverse("accounts:login"), self.object.get_absolute_url()
+                )
+            )
+
         form = EventCommentForm(request.POST)
 
         if form.is_valid():
             comment = form.save(commit=False)
             comment.event = self.object
-            comment.user = request.user
+            comment.author = request.user
             comment.save()
 
             # Envoyer une notification

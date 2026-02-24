@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pointage_extras %}
+
+{% block title %}Pointage - {{ selected_date|date:"d/m/Y" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pointage/pages/daily-tracking.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pointage-container" data-csrf-token="{{ csrf_token }}">
+    <!-- Header avec date -->
+    <header class="pointage-header">
+        <h1 class="pointage-title">Pointage du {{ selected_date|date:"d/m/Y" }}</h1>
+        
+        <form method="get" action="{% url 'pointage:daily_tracking_date' date='0000-00-00' %}" class="date-form" id="date-form">
+            <div class="date-input-group">
+                <label for="date-input" class="date-label">Date :</label>
+                <input 
+                    type="date" 
+                    id="date-input" 
+                    name="date" 
+                    class="date-input"
+                    value="{{ selected_date|date:'Y-m-d' }}"
+                    min="{{ min_date|date:'Y-m-d' }}"
+                    max="{{ max_date|date:'Y-m-d' }}"
+                >
+                <button type="submit" class="btn btn-primary">Changer</button>
+            </div>
+        </form>
+        
+        <a href="{% url 'pointage:daily_tracking' %}" class="btn btn-secondary">
+            Aujourd'hui
+        </a>
+    </header>
+
+    <!-- Message si date rétroactive -->
+    {% if selected_date != max_date %}
+    <div class="alert alert-info">
+        <svg class="alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Vous êtes en mode rétroactif. Vous pouvez corriger les pointages jusqu'à 30 jours avant.</span>
+    </div>
+    {% endif %}
+
+    <!-- Grille des sections -->
+    <div class="sections-grid">
+        {% for section in sections %}
+        {% with tracking=tracking_data|get_item:section.id %}
+        <div class="section-card" data-section-id="{{ section.id }}">
+            <div class="section-header" style="border-left-color: {{ section.color }}">
+                <h2 class="section-name">{{ section.name }}</h2>
+                {% if section.description %}
+                <p class="section-description">{{ section.description }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="counter-container">
+                <div class="counter-value" id="counter-{{ section.id }}" data-tracking-id="{{ tracking.tracking.id }}">
+                    {{ tracking.count }}
+                </div>
+                
+                <div class="counter-buttons">
+                    <div class="decrement-buttons">
+                        {% for i in "54321" %}
+                        <button 
+                            type="button" 
+                            class="btn-counter btn-decrement"
+                            data-delta="-{{ i }}"
+                            data-tracking-id="{{ tracking.tracking.id }}"
+                        >
+                            -{{ i }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="increment-buttons">
+                        {% for i in "12345" %}
+                        <button 
+                            type="button" 
+                            class="btn-counter btn-increment"
+                            data-delta="{{ i }}"
+                            data-tracking-id="{{ tracking.tracking.id }}"
+                        >
+                            +{{ i }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+        {% empty %}
+        <div class="empty-state">
+            <p>Aucune section n'a été configurée.</p>
+            <a href="{% url 'pointage:section_create' %}" class="btn btn-primary">
+                Créer une section
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="pointage-navigation">
+        <a href="{% url 'pointage:section_list' %}" class="btn btn-outline">
+            Gérer les sections
+        </a>
+        <a href="{% url 'pointage:stats_dashboard' %}" class="btn btn-outline">
+            Voir les statistiques
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pointage/pages/daily_tracking.js' %}"></script>
+{% endblock %}
