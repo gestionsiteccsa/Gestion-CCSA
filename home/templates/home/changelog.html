@@ -11,11 +11,11 @@
     </div>
 
     <div class="space-y-8">
-        <!-- Unreleased -->
+        <!-- Version 1.2.0 - Production -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-slate-900">[Unreleased]</h2>
-                <span class="px-3 py-1 text-sm font-medium bg-slate-100 text-slate-600 rounded-full">En développement</span>
+                <h2 class="text-xl font-semibold text-slate-900">[1.2.0] - 2026-02-24</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full">En production</span>
             </div>
             <div class="space-y-6">
                 <!-- Fonctionnalités -->
@@ -27,14 +27,15 @@
                         Nouvelles fonctionnalités
                     </h3>
                     <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
-                        <li><strong>Feature Pointage</strong> : Système complet de pointage pour le rôle "Accueil"
+                        <li><strong>Nouvelle Application Pointage</strong> : Système complet de pointage pour le rôle "Accueil"
                             <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
                                 <li>Pointage journalier des visites et appels avec compteurs 1-5</li>
                                 <li>Gestion des sections personnalisables (Accueil, Appels, etc.)</li>
                                 <li>Pointage rétroactif jusqu'à 30 jours</li>
                                 <li>Dashboard statistiques avec graphiques (Jour/Semaine/Mois)</li>
-                                <li>Historique des modifications avec traçabilité</li>
+                                <li>Historique des modifications avec traçabilité complète</li>
                                 <li>Permissions basées sur le rôle "Accueil" (insensible à la casse)</li>
+                                <li>Architecture modulaire avec modèles SectionType, DailyTracking, TrackingHistory</li>
                             </ul>
                         </li>
                     </ul>
@@ -53,6 +54,7 @@
                         <li>Tests unitaires complets pour les modèles (SectionType, DailyTracking, TrackingHistory)</li>
                         <li>Tests d'intégration pour les vues et permissions</li>
                         <li>Tests de sécurité pour le mixin AccueilRequiredMixin</li>
+                        <li>Couverture de test complète sur l'application Pointage</li>
                     </ul>
                 </div>
 
@@ -77,9 +79,10 @@
                                 <li>Titre cliquable vers la page de validation détaillée</li>
                                 <li>Colonne "Statut" affichant Validé/Refusé/En attente avec badges colorés</li>
                                 <li>Renommage du bouton "Valider" en "Examiner" pour plus de clarté</li>
-                                <li>Formulaire adaptatif selon le statut de validation</li>
-                                <li>Affichage des informations de validation (qui, quand, notes)</li>
-                                <li>Boutons Validé/Rejet désactivés si déjà dans cet état</li>
+                                <li>Formulaire adaptatif selon le statut de validation avec affichage des informations</li>
+                                <li>Affichage de l'utilisateur et de la date de validation/rejet</li>
+                                <li>Notes de validation éditables avec pré-remplissage</li>
+                                <li>Boutons contextuels désactivés selon l'état actuel</li>
                             </ul>
                         </li>
                         <li><strong>Boutons de Partage</strong> : Correction et amélioration
@@ -87,6 +90,7 @@
                                 <li>Correction des URLs Facebook et LinkedIn dans la page de validation</li>
                                 <li>Lien de création d'événement Facebook fonctionnel</li>
                                 <li>Correction du bouton Outlook dans les archives avec plage horaire de 1h par défaut</li>
+                                <li>Génération dynamique des URLs de partage côté serveur</li>
                             </ul>
                         </li>
                     </ul>
@@ -96,10 +100,10 @@
                 <div>
                     <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">Corrections</h3>
                     <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
-                        <li>Correction de 16 tests échoués</li>
+                        <li>Correction de 16 tests échoués suite aux modifications</li>
                         <li>Correction du champ <code>author</code> pour les commentaires (était <code>user</code>)</li>
                         <li>Correction de <code>save_m2m()</code> dans les vues de mise à jour et duplication</li>
-                        <li>Correction du <code>EventChangeLog</code> dans la duplication</li>
+                        <li>Correction du <code>EventChangeLog</code> dans la duplication d'événements</li>
                         <li>Suppression des doublons dans le dossier workflows/ (fichiers .md à la racine)</li>
                     </ul>
                 </div>
@@ -110,7 +114,7 @@
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold text-slate-900">[1.1.0] - 2026-02-09</h2>
-                <span class="px-3 py-1 text-sm font-medium bg-primary-100 text-primary-700 rounded-full">Dernière version</span>
+                <span class="px-3 py-1 text-sm font-medium bg-primary-100 text-primary-700 rounded-full">Stable</span>
             </div>
             
             <div class="space-y-6">
