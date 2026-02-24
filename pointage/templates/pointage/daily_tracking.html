@@ -5,86 +5,194 @@
 {% block title %}Pointage - {{ selected_date|date:"d/m/Y" }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pointage/pages/daily-tracking.css' %}">
+<style>
+    /* Animations */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse-scale {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @keyframes countUpdate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); color: #3b82f6; }
+        100% { transform: scale(1); }
+    }
+    
+    .animate-slide-up {
+        animation: slideInUp 0.5s ease-out forwards;
+    }
+    
+    .animate-count {
+        animation: countUpdate 0.3s ease-out;
+    }
+    
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    
+    /* Effet de hover sur les boutons */
+    .btn-counter {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn-counter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-counter:active {
+        transform: translateY(0);
+    }
+    
+    /* Card hover effect */
+    .section-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .section-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Compteur avec font tabulaire */
+    .counter-value {
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: "tnum";
+    }
+    
+    /* Focus visible */
+    .btn-counter:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="pointage-container" data-csrf-token="{{ csrf_token }}">
-    <!-- Header avec date -->
-    <header class="pointage-header">
-        <h1 class="pointage-title">Pointage du {{ selected_date|date:"d/m/Y" }}</h1>
-        
-        <form method="get" action="{% url 'pointage:daily_tracking_date' date='0000-00-00' %}" class="date-form" id="date-form">
-            <div class="date-input-group">
-                <label for="date-input" class="date-label">Date :</label>
-                <input 
-                    type="date" 
-                    id="date-input" 
-                    name="date" 
-                    class="date-input"
-                    value="{{ selected_date|date:'Y-m-d' }}"
-                    min="{{ min_date|date:'Y-m-d' }}"
-                    max="{{ max_date|date:'Y-m-d' }}"
-                >
-                <button type="submit" class="btn btn-primary">Changer</button>
-            </div>
-        </form>
-        
-        <a href="{% url 'pointage:daily_tracking' %}" class="btn btn-secondary">
-            Aujourd'hui
-        </a>
-    </header>
-
-    <!-- Message si date rétroactive -->
-    {% if selected_date != max_date %}
-    <div class="alert alert-info">
-        <svg class="alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>Vous êtes en mode rétroactif. Vous pouvez corriger les pointages jusqu'à 30 jours avant.</span>
-    </div>
-    {% endif %}
-
-    <!-- Grille des sections -->
-    <div class="sections-grid">
-        {% for section in sections %}
-        {% with tracking=tracking_data|get_item:section.id %}
-        <div class="section-card" data-section-id="{{ section.id }}">
-            <div class="section-header" style="border-left-color: {{ section.color }}">
-                <h2 class="section-name">{{ section.name }}</h2>
-                {% if section.description %}
-                <p class="section-description">{{ section.description }}</p>
-                {% endif %}
+<div class="pointage-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-csrf-token="{{ csrf_token }}">
+    <!-- Header -->
+    <header class="mb-8 animate-slide-up">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Pointage journalier</h1>
+                <p class="mt-1 text-slate-600 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span id="current-date">{{ selected_date|date:"l d F Y"|capfirst }}</span>
+                </p>
             </div>
             
-            <div class="counter-container">
-                <div class="counter-value" id="counter-{{ section.id }}" data-tracking-id="{{ tracking.tracking.id }}">
-                    {{ tracking.count }}
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{% url 'pointage:section_list' %}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Gérer les sections
+                </a>
+                
+                <a href="{% url 'pointage:stats_dashboard' %}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Voir les statistiques
+                </a>
+                
+                <a href="{% url 'pointage:retroactive_tracking' %}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 rounded-lg text-sm font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Saisie rétroactive
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Grille des sections -->
+    {% if sections %}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        {% for section in sections %}
+        {% with tracking=tracking_data|get_item:section.id %}
+        <div class="section-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-slide-up" 
+             style="animation-delay: {{ forloop.counter0|add:1 }}00ms;"
+             data-section-id="{{ section.id }}">
+            
+            <!-- Header de la section avec couleur -->
+            <div class="relative px-6 py-4 border-b border-slate-100" style="background: linear-gradient(135deg, {{ section.color }}15 0%, {{ section.color }}08 100%);">
+                <div class="absolute left-0 top-0 bottom-0 w-1" style="background-color: {{ section.color }}"></div>
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ section.color }}20;">
+                            <svg class="w-5 h-5" style="color: {{ section.color }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-900">{{ section.name }}</h2>
+                            {% if section.description %}
+                            <p class="text-sm text-slate-500">{{ section.description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Compteur -->
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="counter-value text-6xl font-bold text-slate-900 mb-2" 
+                         id="counter-{{ section.id }}" 
+                         data-tracking-id="{{ tracking.tracking.id }}">
+                        {{ tracking.count }}
+                    </div>
+                    <p class="text-sm text-slate-400">personnes comptabilisées</p>
                 </div>
                 
-                <div class="counter-buttons">
-                    <div class="decrement-buttons">
-                        {% for i in "54321" %}
+                <!-- Boutons +/- -->
+                <div class="space-y-3">
+                    <!-- Boutons d'incrémentation -->
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider mr-2">+</span>
+                        {% for i in "12345" %}
                         <button 
                             type="button" 
-                            class="btn-counter btn-decrement"
-                            data-delta="-{{ i }}"
+                            class="btn-counter w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-semibold text-sm flex items-center justify-center"
+                            data-delta="{{ i }}"
                             data-tracking-id="{{ tracking.tracking.id }}"
+                            title="+{{ i }}"
                         >
-                            -{{ i }}
+                            {{ i }}
                         </button>
                         {% endfor %}
                     </div>
                     
-                    <div class="increment-buttons">
-                        {% for i in "12345" %}
+                    <!-- Boutons de décrémentation -->
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider mr-2">-</span>
+                        {% for i in "54321" %}
                         <button 
                             type="button" 
-                            class="btn-counter btn-increment"
-                            data-delta="{{ i }}"
+                            class="btn-counter w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 font-semibold text-sm flex items-center justify-center"
+                            data-delta="-{{ i }}"
                             data-tracking-id="{{ tracking.tracking.id }}"
+                            title="-{{ i }}"
                         >
-                            +{{ i }}
+                            {{ i }}
                         </button>
                         {% endfor %}
                     </div>
@@ -92,25 +200,28 @@
             </div>
         </div>
         {% endwith %}
-        {% empty %}
-        <div class="empty-state">
-            <p>Aucune section n'a été configurée.</p>
-            <a href="{% url 'pointage:section_create' %}" class="btn btn-primary">
-                Créer une section
-            </a>
-        </div>
         {% endfor %}
     </div>
-
-    <!-- Navigation -->
-    <div class="pointage-navigation">
-        <a href="{% url 'pointage:section_list' %}" class="btn btn-outline">
-            Gérer les sections
-        </a>
-        <a href="{% url 'pointage:stats_dashboard' %}" class="btn btn-outline">
-            Voir les statistiques
+    
+    {% else %}
+    <!-- Empty state -->
+    <div class="text-center py-16 animate-slide-up delay-100">
+        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">Aucune section configurée</h3>
+        <p class="text-slate-600 mb-6 max-w-md mx-auto">Commencez par créer des sections pour organiser votre pointage (ex: Accueil, Ateliers, Conférences...)</p>
+        <a href="{% url 'pointage:section_create' %}" 
+           class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-lg shadow-primary-600/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Créer une section
         </a>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 

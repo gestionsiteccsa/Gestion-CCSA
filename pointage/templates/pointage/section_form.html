@@ -4,76 +4,272 @@
 {% block title %}{% if object %}Modifier{% else %}Créer{% endif %} une section - Pointage{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pointage/pages/daily-tracking.css' %}">
+<style>
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+    
+    /* Form focus states */
+    .form-input {
+        transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Color picker preview */
+    .color-preview {
+        transition: all 0.2s ease;
+    }
+    
+    .color-preview:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Input color custom styling */
+    input[type="color"] {
+        -webkit-appearance: none;
+        border: none;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+    
+    input[type="color"]::-webkit-color-swatch {
+        border: none;
+        border-radius: 0.5rem;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="pointage-container">
-    <header class="pointage-header">
-        <h1 class="pointage-title">
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6 animate-fade-in-up">
+        <a href="{% url 'pointage:section_list' %}" class="hover:text-slate-700 transition-colors">Sections</a>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-slate-900 font-medium">{% if object %}Modifier{% else %}Nouvelle{% endif %}</span>
+    </nav>
+    
+    <!-- Header -->
+    <header class="mb-8 animate-fade-in-up">
+        <h1 class="text-3xl font-bold text-slate-900">
             {% if object %}
-            Modifier la section "{{ object.name }}"
+            Modifier la section
             {% else %}
-            Créer une nouvelle section
+            Créer une section
             {% endif %}
         </h1>
+        
+        <p class="mt-2 text-slate-600">
+            {% if object %}
+            Modifiez les informations de "{{ object.name }}"
+            {% else %}
+            Créez une nouvelle section pour organiser votre pointage
+            {% endif %}
+        </p>
     </header>
 
-    <form method="post" class="section-form">
+    <!-- Form -->
+    <form method="post" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in-up delay-100">
         {% csrf_token %}
         
-        <div class="form-group">
-            <label for="{{ form.name.id_for_label }}">Nom *</label>
-            {{ form.name }}
-            {% if form.name.errors %}
-            <span class="error-message">{{ form.name.errors.0 }}</span>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.description.id_for_label }}">Description</label>
-            {{ form.description }}
-            {% if form.description.errors %}
-            <span class="error-message">{{ form.description.errors.0 }}</span>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.color.id_for_label }}">Couleur</label>
-            <div class="color-input-wrapper">
-                {{ form.color }}
-                <span class="color-value" id="color-value">{{ form.color.value|default:"#64748b" }}</span>
+        <div class="p-6 space-y-6">
+            
+            <!-- Nom -->
+            <div>
+                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-2">
+                    Nom de la section *
+                </label>
+                
+                <input type="text" 
+                       name="{{ form.name.html_name }}"
+                       id="{{ form.name.id_for_label }}"
+                       value="{{ form.name.value|default:'' }}"
+                       placeholder="Ex: Accueil, Ateliers, Conférences..."
+                       class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+                       required>
+                
+                {% if form.name.errors %}
+                <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ form.name.errors.0 }}
+                </p>
+                {% endif %}
             </div>
-            {% if form.color.errors %}
-            <span class="error-message">{{ form.color.errors.0 }}</span>
-            {% endif %}
-        </div>
 
-        <div class="form-group">
-            <label for="{{ form.order.id_for_label }}">Ordre d'affichage</label>
-            {{ form.order }}
-            {% if form.order.errors %}
-            <span class="error-message">{{ form.order.errors.0 }}</span>
-            {% endif %}
-        </div>
+            <!-- Description -->
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-2">
+                    Description
+                </label>
+                
+                <textarea name="{{ form.description.html_name }}"
+                          id="{{ form.description.id_for_label }}"
+                          rows="3"
+                          placeholder="Description optionnelle de cette section..."
+                          class="form-input w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none">{{ form.description.value|default:'' }}</textarea>
+                
+                {% if form.description.errors %}
+                <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ form.description.errors.0 }}
+                </p>
+                {% endif %}
+                
+                <p class="mt-2 text-xs text-slate-500">Cette description apparaîtra sous le nom de la section dans le formulaire de pointage.</p>
+            </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                {% if object %}Enregistrer les modifications{% else %}Créer la section{% endif %}
-            </button>
-            <a href="{% url 'pointage:section_list' %}" class="btn btn-secondary">
+            <!-- Couleur -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Couleur
+                </label>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Color preview -->
+                    <div class="color-preview relative w-20 h-20 rounded-xl overflow-hidden shadow-inner border-2 border-slate-200"
+                         id="color-preview"
+                         style="background-color: {{ form.color.value|default:'#64748b' }};">
+                        <input type="color" 
+                               name="{{ form.color.html_name }}"
+                               id="{{ form.color.id_for_label }}"
+                               value="{{ form.color.value|default:'#64748b' }}"
+                               class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                               title="Choisir une couleur">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <svg class="w-6 h-6 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <input type="text" 
+                                   id="color-hex"
+                                   value="{{ form.color.value|default:'#64748b' }}"
+                                   class="form-input w-32 px-3 py-2 text-sm font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                   readonly>
+                            
+                            <span class="text-sm text-slate-500">Cliquez sur le carré pour changer</span>
+                        </div>
+                        
+                        {% if form.color.errors %}
+                        <p class="text-sm text-red-600 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {{ form.color.errors.0 }}
+                        </p>
+                        {% endif %}
+                    </div>                </div>
+            </div>
+
+            <!-- Ordre -->
+            <div>
+                <label for="{{ form.order.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-2">
+                    Ordre d'affichage
+                </label>
+                
+                <div class="flex items-center gap-3">
+                    <input type="number" 
+                           name="{{ form.order.html_name }}"
+                           id="{{ form.order.id_for_label }}"
+                           value="{{ form.order.value|default:'0' }}"
+                           min="0"
+                           class="form-input w-24 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-center">
+                    
+                    <div class="flex gap-2">
+                        <button type="button" onclick="adjustOrder(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                        </button>
+                        
+                        <button type="button" onclick="adjustOrder(1)" class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                {% if form.order.errors %}
+                <p class="mt-2 text-sm text-red-600 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ form.order.errors.0 }}
+                </p>
+                {% endif %}
+                
+                <p class="mt-2 text-xs text-slate-500">Les sections sont affichées par ordre croissant. Une valeur plus faible apparaît en premier.</p>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <a href="{% url 'pointage:section_list' %}" 
+               class="w-full sm:w-auto px-4 py-2.5 text-slate-700 hover:text-slate-900 hover:bg-slate-200 rounded-lg font-medium transition-colors text-center">
                 Annuler
             </a>
+            
+            <button type="submit" 
+                    class="w-full sm:w-auto px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                {% if object %}Enregistrer les modifications{% else %}Créer la section{% endif %}
+            </button>
         </div>
     </form>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-    // Mise à jour de l'affichage de la couleur
-    document.getElementById('{{ form.color.id_for_label }}').addEventListener('input', function(e) {
-        document.getElementById('color-value').textContent = e.target.value;
+    // Mise à jour de la preview de couleur
+    const colorInput = document.getElementById('{{ form.color.id_for_label }}');
+    const colorPreview = document.getElementById('color-preview');
+    const colorHex = document.getElementById('color-hex');
+    const orderInput = document.getElementById('{{ form.order.id_for_label }}');
+    
+    colorInput.addEventListener('input', function(e) {
+        const color = e.target.value;
+        colorPreview.style.backgroundColor = color;
+        colorHex.value = color;
     });
+    
+    // Ajustement de l'ordre
+    function adjustOrder(delta) {
+        const currentValue = parseInt(orderInput.value) || 0;
+        const newValue = Math.max(0, currentValue + delta);
+        orderInput.value = newValue;
+    }
 </script>
 {% endblock %}

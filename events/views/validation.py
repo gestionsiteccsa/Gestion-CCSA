@@ -136,14 +136,14 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
         context["facebook_url"] = "https://www.facebook.com/events/create/"
 
         # URL de partage Facebook
-        context[
-            "facebook_share_url"
-        ] = f"https://www.facebook.com/sharer/sharer.php?u={encoded_event_url}"
+        context["facebook_share_url"] = (
+            f"https://www.facebook.com/sharer/sharer.php?u={encoded_event_url}"
+        )
 
         # URL de partage LinkedIn
-        context[
-            "linkedin_share_url"
-        ] = f"https://www.linkedin.com/sharing/share-offsite/?url={encoded_event_url}"
+        context["linkedin_share_url"] = (
+            f"https://www.linkedin.com/sharing/share-offsite/?url={encoded_event_url}"
+        )
 
         return context
 

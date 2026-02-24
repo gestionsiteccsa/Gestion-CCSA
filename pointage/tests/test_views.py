@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from accounts.models import Role, User
+from accounts.models import Role, User, UserRole
 from pointage.models import DailyTracking, SectionType
 
 
@@ -31,7 +31,9 @@ class AccueilRequiredMixinTests(TestCase):
             name="Accueil",
             description="Rôle accueil",
         )
-        self.user_with_accueil.roles.add(self.role_accueil)
+        UserRole.objects.create(
+            user=self.user_with_accueil, role=self.role_accueil, is_active=True
+        )
 
     def test_access_denied_without_role(self):
         """Teste que l'accès est refusé sans le rôle."""
@@ -81,7 +83,7 @@ class DailyTrackingViewTests(TestCase):
             password="testpass123",
         )
         self.role = Role.objects.create(name="Accueil")
-        self.user.roles.add(self.role)
+        UserRole.objects.create(user=self.user, role=self.role, is_active=True)
         self.section = SectionType.objects.create(name="Accueil", order=1)
 
         self.client.login(email="accueil@example.com", password="testpass123")
@@ -216,7 +218,7 @@ class SectionManagementViewTests(TestCase):
             password="testpass123",
         )
         self.role = Role.objects.create(name="Accueil")
-        self.user.roles.add(self.role)
+        UserRole.objects.create(user=self.user, role=self.role, is_active=True)
 
         self.client.login(email="accueil@example.com", password="testpass123")
 
@@ -287,7 +289,7 @@ class StatsViewTests(TestCase):
             password="testpass123",
         )
         self.role = Role.objects.create(name="Accueil")
-        self.user.roles.add(self.role)
+        UserRole.objects.create(user=self.user, role=self.role, is_active=True)
         self.section = SectionType.objects.create(name="Accueil", order=1)
 
         self.client.login(email="accueil@example.com", password="testpass123")

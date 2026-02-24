@@ -4,58 +4,227 @@
 {% block title %}Gestion des sections - Pointage{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pointage/pages/daily-tracking.css' %}">
+<style>
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+    
+    .animate-slide-in-right {
+        animation: slideInRight 0.4s ease-out forwards;
+    }
+    
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    
+    /* Card effects */
+    .section-item {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .section-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-item.section-inactive {
+        opacity: 0.6;
+        filter: grayscale(0.5);
+    }
+    
+    /* Color circle */
+    .color-circle {
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Status badge animation */
+    .status-badge {
+        transition: all 0.2s ease;
+    }
+    
+    .status-badge:hover {
+        transform: scale(1.05);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="pointage-container">
-    <header class="pointage-header">
-        <h1 class="pointage-title">Gestion des sections</h1>
-        <a href="{% url 'pointage:section_create' %}" class="btn btn-primary">
-            + Nouvelle section
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 animate-fade-in-up">
+        <div>
+            <div class="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span>Pointage</span>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                <span class="text-slate-900 font-medium">Sections</span>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-900">Gestion des sections</h1>
+            <p class="mt-1 text-slate-600">{{ sections|length }} section{{ sections|length|pluralize }} configurée{{ sections|length|pluralize }}</p>
+        </div>
+        
+        <a href="{% url 'pointage:section_create' %}" 
+           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-primary-600/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nouvelle section
         </a>
     </header>
 
-    <div class="sections-list">
-        {% for section in sections %}
-        <div class="section-item {% if not section.is_active %}section-inactive{% endif %}">
-            <div class="section-info">
-                <div class="section-color" style="background-color: {{ section.color }}"></div>
-                <div class="section-details">
-                    <h3 class="section-name">{{ section.name }}</h3>
-                    {% if section.description %}
-                    <p class="section-description">{{ section.description }}</p>
-                    {% endif %}
-                    <span class="section-order">Ordre : {{ section.order }}</span>
+    {% if sections %}
+    <!-- Liste des sections -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in-up delay-100">
+        <div class="divide-y divide-slate-100">
+            {% for section in sections %}
+            <div class="section-item flex items-center justify-between p-5 {% if not section.is_active %}section-inactive{% endif %} animate-slide-in-right" 
+                 style="animation-delay: {{ forloop.counter0 }}00ms;">
+                
+                <div class="flex items-center gap-4">
+                    <!-- Couleur -->
+                    <div class="color-circle w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
+                         style="background-color: {{ section.color }}20;">
+                        <div class="w-6 h-6 rounded-full" style="background-color: {{ section.color }}"></div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-lg font-semibold text-slate-900">{{ section.name }}</h3>
+                            
+                            <!-- Badge statut -->
+                            {% if section.is_active %}
+                            <span class="status-badge inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="status-badge inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Inactive
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if section.description %}
+                        <p class="text-sm text-slate-500 mt-0.5">{{ section.description }}</p>
+                        {% endif %}
+                        
+                        <div class="flex items-center gap-3 mt-1">
+                            <span class="text-xs text-slate-400 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                </svg>
+                                Ordre : {{ section.order }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex items-center gap-2">
+                    <a href="{% url 'pointage:section_update' section.pk %}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Modifier
+                    </a>
+                    
+                    <form method="post" action="{% url 'pointage:section_toggle' section.pk %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors {% if section.is_active %}text-red-600 hover:text-red-700 hover:bg-red-50{% else %}text-green-600 hover:text-green-700 hover:bg-green-50{% endif %}">
+                            {% if section.is_active %}
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Désactiver
+                            {% else %}
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Activer
+                            {% endif %}
+                        </button>
+                    </form>
                 </div>
             </div>
-            
-            <div class="section-actions">
-                <a href="{% url 'pointage:section_update' section.pk %}" class="btn btn-sm btn-outline">
-                    Modifier
-                </a>
-                
-                <form method="post" action="{% url 'pointage:section_toggle' section.pk %}" class="inline-form">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm {% if section.is_active %}btn-danger{% else %}btn-success{% endif %}">
-                        {% if section.is_active %}Désactiver{% else %}Activer{% endif %}
-                    </button>
-                </form>
-            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="empty-state">
-            <p>Aucune section n'a été créée.</p>
-            <a href="{% url 'pointage:section_create' %}" class="btn btn-primary">
-                Créer une section
-            </a>
-        </div>
-        {% endfor %}
     </div>
-
-    <div class="pointage-navigation">
-        <a href="{% url 'pointage:daily_tracking' %}" class="btn btn-outline">
-            ← Retour au pointage
+    
+    <!-- Info box -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3 animate-fade-in-up delay-200">
+        <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div class="text-sm text-blue-800">
+            <p class="font-medium">À propos des sections</p>
+            <p class="mt-1">Les sections inactives n'apparaissent pas dans le formulaire de pointage quotidien. Vous pouvez les réactiver à tout moment.</p>
+        </div>
+    </div>
+    
+    {% else %}
+    
+    <!-- Empty state -->
+    <div class="text-center py-16 animate-fade-in-up delay-100">
+        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">Aucune section créée</h3>
+        <p class="text-slate-600 mb-6 max-w-md mx-auto">Créez votre première section pour commencer à faire le pointage des visiteurs.</p>
+        <a href="{% url 'pointage:section_create' %}" 
+           class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-lg shadow-primary-600/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Créer une section
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- Navigation -->
+    <div class="flex justify-center mt-8 animate-fade-in-up delay-300">
+        <a href="{% url 'pointage:daily_tracking' %}" 
+           class="inline-flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Retour au pointage
         </a>
     </div>
 </div>

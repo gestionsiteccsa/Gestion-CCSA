@@ -2,7 +2,9 @@
 
 from django.urls import path
 
-from pointage.views.daily_tracking import DailyTrackingView, UpdateTrackingView
+from pointage.views.daily_tracking import (DailyTrackingView,
+                                           RetroactiveTrackingView,
+                                           UpdateTrackingView)
 from pointage.views.section_management import (SectionCreateView,
                                                SectionListView,
                                                SectionToggleView,
@@ -18,6 +20,11 @@ urlpatterns = [
         "date/<str:date>/",
         DailyTrackingView.as_view(),
         name="daily_tracking_date",
+    ),
+    path(
+        "retroactive/",
+        RetroactiveTrackingView.as_view(),
+        name="retroactive_tracking",
     ),
     path(
         "update/<int:pk>/",

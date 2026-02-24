@@ -171,7 +171,7 @@ class EventArchiveView(ListView):
                 end_dt = event.end_datetime
             else:
                 end_dt = event.start_datetime + timedelta(hours=1)
-            
+
             outlook_params = {
                 "subject": event.title,
                 "startdt": event.start_datetime.isoformat(),
@@ -179,7 +179,9 @@ class EventArchiveView(ListView):
                 "body": event.description or "",
                 "location": event.location or event.city or "",
             }
-            outlook_urls[event.id] = f"https://outlook.office.com/calendar/0/deeplink/compose?{urlencode(outlook_params)}"
+            outlook_urls[event.id] = (
+                f"https://outlook.office.com/calendar/0/deeplink/compose?{urlencode(outlook_params)}"
+            )
 
         context["outlook_urls"] = outlook_urls
 

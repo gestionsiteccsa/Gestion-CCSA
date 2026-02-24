@@ -31,13 +31,11 @@ class TestXSSProtection:
 
         response = client.get(event.get_absolute_url())
         assert response.status_code == 200
-        # Vérifier que le script n'est pas présent tel quel
-        assert "<script>alert('XSS')</script>" not in response.content.decode()
-        # Vérifier qu'il est échappé
-        assert (
-            "&lt;script&gt;" in response.content.decode()
-            or "<script>" not in response.content.decode()
-        )
+        # Vérifier que le script malveillant n'est pas présent tel quel dans le contenu de l'événement
+        content = response.content.decode()
+        # Le script XSS ne doit pas apparaître tel quel dans le corps de la page
+        # (mais peut y avoir d'autres scripts légitimes comme Tailwind)
+        assert "<script>alert('XSS')</script>" not in content
 
     def test_comment_escaped_in_template(self, client):
         """Test que les commentaires sont échappés."""
@@ -71,24 +69,26 @@ class TestRateLimiting:
 
     def test_notification_mark_read_rate_limit(self, client):
         """Test que le rate limiting fonctionne pour mark_read."""
+        import uuid
+
         user = User.objects.create_user(
             email="test@cc-sudavesnois.fr",
             password="testpass123",
         )
         client.force_login(user)
 
-        # Faire 11 requêtes (limite à 10)
+        # Faire 11 requêtes (limite à 10) avec un UUID valide
         for i in range(11):
             response = client.post(
                 reverse(
                     "accounts:notification_mark_read",
-                    kwargs={"notification_id": "test"},
+                    kwargs={"notification_id": str(uuid.uuid4())},
                 ),
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest",
             )
 
-        # La 11ème devrait être rejetée
-        assert response.status_code == 429 or response.status_code == 404
+        # La 11ème devrait être rejetée (429) ou notification non trouvée (404)
+        assert response.status_code in [429, 404]
 
     def test_notification_mark_all_rate_limit(self, client):
         """Test que le rate limiting fonctionne pour mark_all."""
@@ -124,6 +124,7 @@ class TestEventDuplication:
             title="Original Event",
             description="Description",
             location="Test Location",
+            city="Test City",
             start_datetime=timezone.now() + timedelta(days=1),
             created_by=user,
         )
@@ -131,16 +132,23 @@ class TestEventDuplication:
 
         client.force_login(user)
 
+        # Récupérer la page de duplication pour obtenir les valeurs initiales
+        response = client.get(
+            reverse("events:event_duplicate", kwargs={"slug": event.slug})
+        )
+        assert response.status_code == 200
+
+        # Utiliser le format de date attendu par le formulaire (datetime-local)
         response = client.post(
             reverse("events:event_duplicate", kwargs={"slug": event.slug}),
             {
                 "title": "Duplicated Event",
                 "description": "New Description",
                 "location": "New Location",
-                "start_datetime_0": "2026-02-10",
-                "start_datetime_1": "10:00",
-                "copy_images": "",
-                "copy_documents": "",
+                "city": "New City",
+                "start_datetime": "2026-02-10T10:00",
+                "end_datetime": "2026-02-10T12:00",
+                "sectors": [sector.pk],
             },
         )
 

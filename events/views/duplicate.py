@@ -86,8 +86,9 @@ class EventDuplicateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             form.instance.created_by = self.request.user
             form.instance.status = "pending"  # Le nouvel événement doit être validé
 
-            # Sauvegarder
-            response = super().form_valid(form)
+            # Sauvegarder sans commit pour pouvoir sauvegarder les M2M après
+            self.object = form.save(commit=False)
+            self.object.save()
 
             # Sauvegarder les relations many-to-many
             form.save_m2m()
@@ -113,12 +114,10 @@ class EventDuplicateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             # Créer un log
             EventChangeLog.objects.create(
                 event=self.object,
-                user=self.request.user,
-                action="duplicate",
-                changes={
-                    "source_event_id": str(self.source_event.id),
-                    "source_event_title": self.source_event.title,
-                },
+                changed_by=self.request.user,
+                field_name="duplication",
+                old_value="",
+                new_value=f"Dupliqué depuis: {self.source_event.title}",
             )
 
             messages.success(
@@ -126,7 +125,7 @@ class EventDuplicateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                 f"L'événement '{self.object.title}' a été créé par duplication. "
                 "Il doit maintenant être validé.",
             )
-            return response
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         """Redirige vers le détail du nouvel événement."""

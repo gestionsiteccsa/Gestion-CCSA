@@ -15,3 +15,15 @@ def get_item(dictionary, key):
     if dictionary is None:
         return None
     return dictionary.get(key)
+
+
+@register.filter
+def split(value, delimiter=","):
+    """Divise une chaîne en liste selon un délimiteur.
+
+    Usage dans le template:
+        {{ "a,b,c"|split:"," }}
+    """
+    if value is None:
+        return []
+    return value.split(delimiter)

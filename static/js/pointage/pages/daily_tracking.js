@@ -87,8 +87,15 @@
             e.preventDefault();
 
             const selectedDate = dateInput.value;
-            const action = dateForm.action.replace("0000-00-00", selectedDate);
-
+            // Récupérer l'URL de base et remplacer la date dedans
+            let action = dateForm.action;
+            
+            // Si l'URL contient une date au format YYYY-MM-DD, la remplacer
+            const dateRegex = /\d{4}-\d{2}-\d{2}/;
+            if (dateRegex.test(action)) {
+                action = action.replace(dateRegex, selectedDate);
+            }
+            
             window.location.href = action;
         });
     }

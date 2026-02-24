@@ -172,6 +172,10 @@ class Event(models.Model):
         """Retourne l'URL de téléchargement iCal de l'événement."""
         return reverse("events:download_ics", kwargs={"slug": self.slug})
 
+    def get_validation_url(self):
+        """Retourne l'URL de validation de l'événement."""
+        return reverse("events:event_validation", kwargs={"slug": self.slug})
+
     @property
     def is_upcoming(self):
         """Retourne True si l'événement est à venir."""

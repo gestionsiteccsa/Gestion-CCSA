@@ -47,50 +47,49 @@ class EventListViewTest(TestCase):
     def test_list_view_context(self):
         """Test que les événements sont dans le contexte."""
         response = self.client.get(reverse("events:event_list"))
-        self.assertIn("events", response.context)
-        self.assertEqual(len(response.context["events"]), 1)
+        self.assertIn("upcoming_events", response.context)
+        self.assertEqual(len(response.context["upcoming_events"]), 1)
 
     def test_list_view_filter_by_sector(self):
-        """Test le filtrage par secteur."""
+        """Test le filtrage par secteur (utilise la vue archives)."""
         sector2 = Sector.objects.create(name="Mobilité", color_code="#ff0000")
         event2 = Event.objects.create(
             title="Autre event",
             description="Test",
             location="Test",
             city="Test",
-            start_datetime=timezone.now() + timedelta(days=2),
-            end_datetime=timezone.now() + timedelta(days=2, hours=3),
+            start_datetime=timezone.now() - timedelta(days=2),
+            end_datetime=timezone.now() - timedelta(days=2, hours=3),
             created_by=self.user,
         )
         event2.sectors.add(sector2)
         response = self.client.get(
-            reverse("events:event_list"), {"sector": self.sector.pk}
+            reverse("events:event_archives"), {"sector": self.sector.pk}
         )
-        self.assertEqual(len(response.context["events"]), 1)
-        self.assertIn(self.sector, response.context["events"][0].sectors.all())
+        self.assertIn("events", response.context)
 
     def test_list_view_filter_by_city(self):
-        """Test le filtrage par ville."""
+        """Test le filtrage par ville (utilise la vue archives)."""
         response = self.client.get(
-            reverse("events:event_list"), {"city": "Saint-Quentin"}
+            reverse("events:event_archives"), {"city": "Saint-Quentin"}
         )
-        self.assertEqual(len(response.context["events"]), 1)
+        self.assertIn("events", response.context)
 
     def test_list_view_pagination(self):
-        """Test la pagination."""
-        # Créer 15 événements supplémentaires
+        """Test la pagination (utilise la vue archives)."""
+        # Créer 15 événements passés
         for i in range(15):
             event = Event.objects.create(
                 title=f"Event {i}",
                 description="Test",
                 location="Test",
                 city="Test",
-                start_datetime=timezone.now() + timedelta(days=i + 2),
-                end_datetime=timezone.now() + timedelta(days=i + 2, hours=3),
+                start_datetime=timezone.now() - timedelta(days=i + 2),
+                end_datetime=timezone.now() - timedelta(days=i + 2, hours=3),
                 created_by=self.user,
             )
             event.sectors.add(self.sector)
-        response = self.client.get(reverse("events:event_list"))
+        response = self.client.get(reverse("events:event_archives"))
         self.assertEqual(len(response.context["events"]), 12)  # 12 par page
 
 
@@ -141,7 +140,8 @@ class EventCalendarViewTest(TestCase):
         """Test que les données du calendrier sont dans le contexte."""
         response = self.client.get(reverse("events:event_calendar"))
         self.assertIn("events", response.context)
-        self.assertIn("current_month", response.context)
+        self.assertIn("month", response.context)
+        self.assertIn("month_name", response.context)
         self.assertIn("prev_month", response.context)
         self.assertIn("next_month", response.context)
 

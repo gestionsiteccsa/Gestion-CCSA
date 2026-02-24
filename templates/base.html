@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{% block title %}CCSA Connect{% endblock %}</title>
     {% load static %}
-    {% load event_tags %}
+                     {% load event_tags %}
     
     <!-- Tailwind CSS v4.1 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -134,9 +134,55 @@
                             </a>
                         </div>
                     </div>
-                    {% endif %}
-                    
-                    {% has_communication_role as user_has_comm_role %}
+                     {% endif %}
+                     
+                     {% has_accueil_role as user_has_accueil_role %}
+                     {% if user_has_accueil_role %}
+                     <!-- Pointage Dropdown -->
+                     <div class="relative" id="pointage-nav-menu-container">
+                         <button type="button" id="pointage-nav-menu-button" class="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'pointage' %}text-primary-600 bg-primary-50{% endif %}">
+                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                             </svg>
+                             <span>Pointage</span>
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                             </svg>
+                         </button>
+                         
+                         <!-- Pointage Dropdown Menu -->
+                         <div id="pointage-nav-menu" class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+                             <a href="{% url 'pointage:daily_tracking' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                 <span class="flex items-center">
+                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                     </svg>
+                                     Saisir le pointage
+                                 </span>
+                             </a>
+                             <a href="{% url 'pointage:stats_dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                 <span class="flex items-center">
+                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                     </svg>
+                                     Statistiques
+                                 </span>
+                             </a>
+                             <div class="border-t border-slate-200 my-1"></div>
+                             <a href="{% url 'pointage:section_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                 <span class="flex items-center">
+                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                     </svg>
+                                     Gérer les sections
+                                 </span>
+                             </a>
+                         </div>
+                     </div>
+                     {% endif %}
+                     
+                     {% has_communication_role as user_has_comm_role %}
                     {% get_pending_validation_count as pending_count %}
                     {% if user_has_comm_role %}
                     <!-- Communication Dropdown -->
@@ -351,18 +397,52 @@
                             Liens
                         </span>
                     </a>
-                    <a href="https://qr.ccsudavesnois.fr" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3zm-3-6h3v3h-3v-3z"/>
-                            </svg>
-                            QR Codes
-                        </span>
-                    </a>
-                </div>
-                {% endif %}
-                
-                {% has_communication_role as user_has_comm_role %}
+                     <a href="https://qr.ccsudavesnois.fr" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'url_shortener' %}text-primary-600 bg-primary-50{% endif %}">
+                         <span class="flex items-center">
+                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm13-2h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3zm-3-6h3v3h-3v-3z"/>
+                             </svg>
+                             QR Codes
+                         </span>
+                     </a>
+                 </div>
+                 
+                 {% has_accueil_role as user_has_accueil_role %}
+                 {% if user_has_accueil_role %}
+                 <!-- Pointage Mobile -->
+                 <div class="border-t border-slate-100 my-2 pt-2">
+                     <div class="px-3 py-2 text-sm font-medium text-slate-500">
+                         Pointage
+                     </div>
+                     <a href="{% url 'pointage:daily_tracking' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'pointage' and request.resolver_match.url_name == 'daily_tracking' %}text-primary-600 bg-primary-50{% endif %}">
+                         <span class="flex items-center">
+                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                             </svg>
+                             Saisir le pointage
+                         </span>
+                     </a>
+                     <a href="{% url 'pointage:stats_dashboard' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'stats_dashboard' %}text-primary-600 bg-primary-50{% endif %}">
+                         <span class="flex items-center">
+                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                             </svg>
+                             Statistiques
+                         </span>
+                     </a>
+                     <a href="{% url 'pointage:section_list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'section_list' %}text-primary-600 bg-primary-50{% endif %}">
+                         <span class="flex items-center">
+                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                             </svg>
+                             Gérer les sections
+                         </span>
+                     </a>
+                 </div>
+                 {% endif %}
+                 
+                 {% has_communication_role as user_has_comm_role %}
                 {% get_pending_validation_count as pending_count %}
                 {% if user_has_comm_role %}
                     <div class="border-t border-slate-100 my-2 pt-2">
@@ -389,6 +469,7 @@
                         </span>
                     </a>
                 </div>
+                {% endif %}
                 {% endif %}
                 
                 {% if user.is_authenticated %}
@@ -508,6 +589,12 @@
                     <span class="text-sm text-slate-500">© {% now "Y" %} Communauté de Communes Sud-Avesnois</span>
                 </div>
                 <div class="flex items-center space-x-6 text-sm text-slate-500">
+                    <a href="{% url 'changelog' %}" class="hover:text-primary-600 transition-colors flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        Journal des modifications
+                    </a>
                 </div>
             </div>
         </div>
@@ -532,7 +619,8 @@
         const menus = [
             { button: 'user-menu-button', menu: 'user-menu' },
             { button: 'communication-nav-menu-button', menu: 'communication-nav-menu' },
-            { button: 'tools-nav-menu-button', menu: 'tools-nav-menu' }
+            { button: 'tools-nav-menu-button', menu: 'tools-nav-menu' },
+            { button: 'pointage-nav-menu-button', menu: 'pointage-nav-menu' }
         ];
 
         // Fonction pour fermer tous les menus sauf celui spécifié

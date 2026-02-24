@@ -36,7 +36,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         """Gère les champs date/time séparés."""
         logger.info(f"POST request received for event creation by user {request.user}")
         logger.debug(f"POST data: {request.POST.dict()}")
-        
+
         # Reconstruire les datetime à partir des champs séparés
         post_data = request.POST.copy()
 
@@ -44,13 +44,17 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         start_time = post_data.get("start_time")
         all_day = post_data.get("all_day") == "on"
 
-        logger.debug(f"Parsed dates - start_date: {start_date}, start_time: {start_time}, all_day: {all_day}")
+        logger.debug(
+            f"Parsed dates - start_date: {start_date}, start_time: {start_time}, all_day: {all_day}"
+        )
 
         if start_date:
             if all_day:
                 # Mode journée entière : 00:00
                 post_data["start_datetime"] = f"{start_date}T00:00"
-                logger.debug(f"Set start_datetime (all_day): {post_data['start_datetime']}")
+                logger.debug(
+                    f"Set start_datetime (all_day): {post_data['start_datetime']}"
+                )
             elif start_time:
                 try:
                     dt = datetime.strptime(
@@ -86,8 +90,10 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         """Sauvegarde l'événement et logue les changements."""
-        logger.info(f"Form is valid. Creating event with title: {form.cleaned_data.get('title')}")
-        
+        logger.info(
+            f"Form is valid. Creating event with title: {form.cleaned_data.get('title')}"
+        )
+
         try:
             with transaction.atomic():
                 # Définir le créateur
@@ -98,7 +104,9 @@ class EventCreateView(LoginRequiredMixin, CreateView):
                 self.object = form.save(commit=False)
                 logger.debug(f"Saving event object (commit=False)")
                 self.object.save()
-                logger.info(f"Event saved successfully with ID: {self.object.id}, slug: {self.object.slug}")
+                logger.info(
+                    f"Event saved successfully with ID: {self.object.id}, slug: {self.object.slug}"
+                )
 
                 # Sauvegarder les relations many-to-many
                 logger.debug(f"Saving M2M relations (sectors)")
@@ -119,11 +127,15 @@ class EventCreateView(LoginRequiredMixin, CreateView):
                 NotificationService.notify_event_created(self.object, self.request.user)
 
                 messages.success(self.request, "L'événement a été créé avec succès.")
-                logger.info(f"Event creation completed successfully. Redirecting to: {self.get_success_url()}")
+                logger.info(
+                    f"Event creation completed successfully. Redirecting to: {self.get_success_url()}"
+                )
                 return redirect(self.get_success_url())
         except Exception as e:
             logger.exception(f"Error creating event: {e}")
-            messages.error(self.request, f"Erreur lors de la création de l'événement: {e}")
+            messages.error(
+                self.request, f"Erreur lors de la création de l'événement: {e}"
+            )
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -132,16 +144,20 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         logger.error(f"Form errors: {form.errors}")
         logger.error(f"Non-field errors: {form.non_field_errors()}")
         logger.debug(f"Cleaned data: {form.cleaned_data}")
-        
+
         # Add specific error messages for common issues
-        if 'start_datetime' in form.errors:
-            messages.error(self.request, "Erreur: La date et heure de début sont invalides.")
-        if 'sectors' in form.errors:
-            messages.error(self.request, "Erreur: Veuillez sélectionner au moins un secteur.")
+        if "start_datetime" in form.errors:
+            messages.error(
+                self.request, "Erreur: La date et heure de début sont invalides."
+            )
+        if "sectors" in form.errors:
+            messages.error(
+                self.request, "Erreur: Veuillez sélectionner au moins un secteur."
+            )
         if form.non_field_errors():
             for error in form.non_field_errors():
                 messages.error(self.request, error)
-        
+
         return super().form_invalid(form)
 
     def get_success_url(self):
@@ -226,8 +242,9 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                 ]
             }
 
-            # Sauvegarder
-            response = super().form_valid(form)
+            # Sauvegarder sans commit pour pouvoir sauvegarder les M2M après
+            self.object = form.save(commit=False)
+            self.object.save()
 
             # Sauvegarder les relations many-to-many
             form.save_m2m()
@@ -254,7 +271,7 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                 NotificationService.notify_event_updated(self.object, self.request.user)
 
             messages.success(self.request, "L'événement a été modifié avec succès.")
-            return response
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         """Redirige vers le détail de l'événement modifié."""
