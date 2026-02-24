@@ -56,6 +56,42 @@
                     </ul>
                 </div>
 
+                <!-- Améliorations Interface -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                        Améliorations Interface
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Workflow AGENTS.md</strong> : Création d'un guide complet pour les agents AI
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Matrice de décision rapide pour l'utilisation des workflows</li>
+                                <li>Checklists de validation par type de fichier</li>
+                                <li>Organisation des workflows en catégories (Python, Django, Frontend, DevOps, etc.)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Page Validation des Événements</strong> : Améliorations UX majeures
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Titre cliquable vers la page de validation détaillée</li>
+                                <li>Colonne "Statut" affichant Validé/Refusé/En attente avec badges colorés</li>
+                                <li>Renommage du bouton "Valider" en "Examiner" pour plus de clarté</li>
+                                <li>Formulaire adaptatif selon le statut de validation</li>
+                                <li>Affichage des informations de validation (qui, quand, notes)</li>
+                                <li>Boutons Validé/Rejet désactivés si déjà dans cet état</li>
+                            </ul>
+                        </li>
+                        <li><strong>Boutons de Partage</strong> : Correction et amélioration
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Correction des URLs Facebook et LinkedIn dans la page de validation</li>
+                                <li>Lien de création d'événement Facebook fonctionnel</li>
+                                <li>Correction du bouton Outlook dans les archives avec plage horaire de 1h par défaut</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
                 <!-- Corrections -->
                 <div>
                     <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2">Corrections</h3>
@@ -64,6 +100,7 @@
                         <li>Correction du champ <code>author</code> pour les commentaires (était <code>user</code>)</li>
                         <li>Correction de <code>save_m2m()</code> dans les vues de mise à jour et duplication</li>
                         <li>Correction du <code>EventChangeLog</code> dans la duplication</li>
+                        <li>Suppression des doublons dans le dossier workflows/ (fichiers .md à la racine)</li>
                     </ul>
                 </div>
             </div>

@@ -39,6 +39,24 @@ def has_communication_role(context):
     return result
 
 
+@register.simple_tag(takes_context=True)
+def has_accueil_role(context):
+    """Vérifie si l'utilisateur a le rôle 'Accueil' (insensible à la casse).
+
+    Usage dans le template:
+        {% has_accueil_role as user_has_accueil_role %}
+        {% if user_has_accueil_role %}
+            ...
+        {% endif %}
+    """
+    user = context.get("user")
+    if not user or not user.is_authenticated:
+        return False
+
+    # Vérification insensible à la casse avec __iexact
+    return user.user_roles.filter(role__name__iexact="accueil", is_active=True).exists()
+
+
 @register.simple_tag
 def get_pending_validation_count():
     """Retourne le nombre d'événements en attente de validation.
@@ -82,3 +100,12 @@ def sub(value, arg):
         return float(value) - float(arg)
     except ValueError:
         return 0
+
+
+@register.filter
+def get_item(dictionary, key):
+    """Récupère une valeur dans un dictionnaire par sa clé."""
+    try:
+        return dictionary.get(key, "")
+    except (AttributeError, TypeError):
+        return ""

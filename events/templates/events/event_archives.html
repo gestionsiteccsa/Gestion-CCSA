@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load event_tags %}
 
 {% block title %}Archives des événements - {{ block.super }}{% endblock %}
 
@@ -296,7 +297,7 @@
                         </a>
                         
                         <!-- Bouton Ajouter à Outlook -->
-                        <a href="https://outlook.office.com/calendar/0/deeplink/compose?subject={{ event.title|urlencode }}&startdt={{ event.start_datetime|date:'c' }}{% if event.end_datetime %}&enddt={{ event.end_datetime|date:'c' }}{% endif %}&body={{ event.description|truncatewords:50|urlencode }}&location={{ event.location|default:event.city|urlencode }}" 
+                        <a href="{{ outlook_urls|get_item:event.id }}"
                            class="calendar-btn inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                            target="_blank"
                            rel="noopener noreferrer"
