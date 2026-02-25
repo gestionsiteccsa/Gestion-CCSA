@@ -87,7 +87,9 @@ class BackupHistory(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="pending", verbose_name="Statut"
     )
-    file_path = models.CharField(max_length=500, blank=True, verbose_name="Chemin du fichier")
+    file_path = models.CharField(
+        max_length=500, blank=True, verbose_name="Chemin du fichier"
+    )
     file_size = models.BigIntegerField(
         null=True, blank=True, verbose_name="Taille du fichier (octets)"
     )

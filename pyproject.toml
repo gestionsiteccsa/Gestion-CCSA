@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Gestion-ccsa"
+version = "1.0.0"
+description = "Application de gestion CCSA"
+requires-python = ">=3.10"
+dependencies = [
+    "Django>=5.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | migrations
+  | __pycache__
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+skip = ["migrations", ".venv", "venv", "env", "__pycache__"]
+known_django = "django"
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "DJANGO", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503", "D100", "D104", "D401"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+    "env",
+    "migrations",
+]
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    "test",
+    "migrations",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "env",
+    ".git",
+]
+skips = [
+    "B101",  # assert_used - acceptable dans les tests
+    "B311",  # random - utilisé pour des cas non cryptographiques
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "app.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "migrations",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "env",
+]

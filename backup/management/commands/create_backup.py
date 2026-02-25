@@ -63,16 +63,22 @@ class Command(BaseCommand):
             if backup_type in ["database", "full"]:
                 db_file = self._backup_database(output_dir, timestamp)
                 backup_files.append(db_file)
-                self.stdout.write(self.style.SUCCESS(f"Base de données sauvegardée: {db_file}"))
+                self.stdout.write(
+                    self.style.SUCCESS(f"Base de données sauvegardée: {db_file}")
+                )
 
             if backup_type in ["media", "full"]:
                 media_file = self._backup_media(output_dir, timestamp)
                 backup_files.append(media_file)
-                self.stdout.write(self.style.SUCCESS(f"Dossier média sauvegardé: {media_file}"))
+                self.stdout.write(
+                    self.style.SUCCESS(f"Dossier média sauvegardé: {media_file}")
+                )
 
             # Si full, créer une archive contenant les deux
             if backup_type == "full" and len(backup_files) == 2:
-                final_file = self._create_full_archive(output_dir, timestamp, backup_files)
+                final_file = self._create_full_archive(
+                    output_dir, timestamp, backup_files
+                )
                 # Supprimer les fichiers intermédiaires
                 for f in backup_files:
                     os.remove(f)
@@ -89,7 +95,9 @@ class Command(BaseCommand):
             # Nettoyer les vieilles sauvegardes
             self._cleanup_old_backups(output_dir)
 
-            self.stdout.write(self.style.SUCCESS(f"Sauvegarde terminée avec succès: {final_file}"))
+            self.stdout.write(
+                self.style.SUCCESS(f"Sauvegarde terminée avec succès: {final_file}")
+            )
 
         except Exception as e:
             history.status = "failed"

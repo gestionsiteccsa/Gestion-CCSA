@@ -15,7 +15,10 @@ User = get_user_model()
 def user(db):
     """Fixture pour créer un utilisateur de test."""
     return User.objects.create_user(
-        email="test@example.com", first_name="Test", last_name="User", password="testpass123"
+        email="test@example.com",
+        first_name="Test",
+        last_name="User",
+        password="testpass123",
     )
 
 
@@ -23,12 +26,18 @@ def user(db):
 def support_user(db):
     """Fixture pour créer un utilisateur support de test."""
     user = User.objects.create_user(
-        email="support@example.com", first_name="Support", last_name="User", password="testpass123"
+        email="support@example.com",
+        first_name="Support",
+        last_name="User",
+        password="testpass123",
     )
     # Créer le rôle Support
     support_role, _ = Role.objects.get_or_create(
         name="Support",
-        defaults={"description": "Rôle pour la gestion des tickets de support", "color": "#3B82F6"},
+        defaults={
+            "description": "Rôle pour la gestion des tickets de support",
+            "color": "#3B82F6",
+        },
     )
     # Assigner le rôle à l'utilisateur
     UserRole.objects.create(user=user, role=support_role)
@@ -107,7 +116,10 @@ class TestFeedbackListView:
     def test_list_view_only_shows_own_tickets(self, client, user):
         """Test que seuls les tickets de l'utilisateur sont affichés."""
         other_user = User.objects.create_user(
-            email="other@example.com", first_name="Other", last_name="User", password="testpass123"
+            email="other@example.com",
+            first_name="Other",
+            last_name="User",
+            password="testpass123",
         )
         own_ticket = FeedbackTicket.objects.create(
             title="Mon ticket", description="Desc", created_by=user
@@ -190,7 +202,9 @@ class TestFeedbackCreateView:
         assert len(mail.outbox) == 1
         assert "Nouveau ticket" in mail.outbox[0].subject
 
-    def test_create_view_creates_notification_for_support(self, client, user, support_user):
+    def test_create_view_creates_notification_for_support(
+        self, client, user, support_user
+    ):
         """Test la création d'une notification pour le support."""
         client.force_login(user)
         url = reverse("feedback:ticket_create")
@@ -254,14 +268,19 @@ class TestFeedbackDetailView:
     def test_detail_view_403_if_not_owner_or_support(self, client, user, ticket):
         """Test le refus d'accès si pas propriétaire ni support."""
         other_user = User.objects.create_user(
-            email="other@example.com", first_name="Other", last_name="User", password="testpass123"
+            email="other@example.com",
+            first_name="Other",
+            last_name="User",
+            password="testpass123",
         )
         client.force_login(other_user)
         url = reverse("feedback:ticket_detail", kwargs={"pk": ticket.pk})
         response = client.get(url)
         assert response.status_code == 403
 
-    def test_detail_view_support_can_access_all_tickets(self, client, support_user, ticket):
+    def test_detail_view_support_can_access_all_tickets(
+        self, client, support_user, ticket
+    ):
         """Test que le support peut accéder à tous les tickets."""
         client.force_login(support_user)
         url = reverse("feedback:ticket_detail", kwargs={"pk": ticket.pk})

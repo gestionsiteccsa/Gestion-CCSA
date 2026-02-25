@@ -4,9 +4,7 @@ from .models import Notification
 
 
 def notifications(request):
-    """
-    Ajoute les notifications au contexte de tous les templates.
-    """
+    """Ajoute les notifications au contexte de tous les templates."""
     if not request.user.is_authenticated:
         return {
             "unread_notifications_count": 0,

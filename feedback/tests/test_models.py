@@ -14,7 +14,10 @@ User = get_user_model()
 def user(db):
     """Fixture pour créer un utilisateur de test."""
     return User.objects.create_user(
-        email="test@example.com", first_name="Test", last_name="User", password="testpass123"
+        email="test@example.com",
+        first_name="Test",
+        last_name="User",
+        password="testpass123",
     )
 
 
@@ -22,7 +25,10 @@ def user(db):
 def support_user(db):
     """Fixture pour créer un utilisateur support de test."""
     return User.objects.create_user(
-        email="support@example.com", first_name="Support", last_name="User", password="testpass123"
+        email="support@example.com",
+        first_name="Support",
+        last_name="User",
+        password="testpass123",
     )
 
 
@@ -69,12 +75,16 @@ class TestFeedbackTicket:
 
     def test_ticket_default_status_is_new(self, user):
         """Test que le statut par défaut est 'nouveau'."""
-        ticket = FeedbackTicket.objects.create(title="Ticket", description="Desc", created_by=user)
+        ticket = FeedbackTicket.objects.create(
+            title="Ticket", description="Desc", created_by=user
+        )
         assert ticket.status == "new"
 
     def test_ticket_default_priority_is_medium(self, user):
         """Test que la priorité par défaut est 'moyenne'."""
-        ticket = FeedbackTicket.objects.create(title="Ticket", description="Desc", created_by=user)
+        ticket = FeedbackTicket.objects.create(
+            title="Ticket", description="Desc", created_by=user
+        )
         assert ticket.priority == "medium"
 
     def test_ticket_status_choices(self):
@@ -102,9 +112,14 @@ class TestFeedbackTicket:
 
     def test_ticket_with_screenshot(self, user):
         """Test la création d'un ticket avec capture d'écran."""
-        image = SimpleUploadedFile("test_screenshot.png", b"file_content", content_type="image/png")
+        image = SimpleUploadedFile(
+            "test_screenshot.png", b"file_content", content_type="image/png"
+        )
         ticket = FeedbackTicket.objects.create(
-            title="Ticket avec image", description="Desc", created_by=user, screenshot=image
+            title="Ticket avec image",
+            description="Desc",
+            created_by=user,
+            screenshot=image,
         )
         assert ticket.screenshot is not None
         assert "test_screenshot" in ticket.screenshot.name
@@ -124,7 +139,10 @@ class TestFeedbackTicket:
     def test_ticket_assigned_to_support_user(self, user, support_user):
         """Test l'assignation d'un ticket à un utilisateur support."""
         ticket = FeedbackTicket.objects.create(
-            title="Ticket assigné", description="Desc", created_by=user, assigned_to=support_user
+            title="Ticket assigné",
+            description="Desc",
+            created_by=user,
+            assigned_to=support_user,
         )
         assert ticket.assigned_to == support_user
 
@@ -160,13 +178,19 @@ class TestFeedbackComment:
 
     def test_comment_is_staff_response_default_false(self, ticket, user):
         """Test que is_staff_response est False par défaut."""
-        comment = FeedbackComment.objects.create(ticket=ticket, author=user, content="Test")
+        comment = FeedbackComment.objects.create(
+            ticket=ticket, author=user, content="Test"
+        )
         assert comment.is_staff_response is False
 
     def test_comment_ordering_by_created_at_asc(self, ticket, user):
         """Test que les commentaires sont triés par date croissante."""
-        comment1 = FeedbackComment.objects.create(ticket=ticket, author=user, content="Premier")
-        comment2 = FeedbackComment.objects.create(ticket=ticket, author=user, content="Deuxième")
+        comment1 = FeedbackComment.objects.create(
+            ticket=ticket, author=user, content="Premier"
+        )
+        comment2 = FeedbackComment.objects.create(
+            ticket=ticket, author=user, content="Deuxième"
+        )
         comments = list(FeedbackComment.objects.all())
         assert comments[0] == comment1
         assert comments[1] == comment2

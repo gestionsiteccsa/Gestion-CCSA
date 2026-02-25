@@ -37,11 +37,18 @@ class FeedbackTicket(models.Model):
     )
 
     priority = models.CharField(
-        max_length=20, choices=PRIORITY_CHOICES, default="medium", verbose_name="Priorité"
+        max_length=20,
+        choices=PRIORITY_CHOICES,
+        default="medium",
+        verbose_name="Priorité",
     )
 
     status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="new", verbose_name="Statut", db_index=True
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="new",
+        verbose_name="Statut",
+        db_index=True,
     )
 
     created_by = models.ForeignKey(
@@ -69,7 +76,9 @@ class FeedbackTicket(models.Model):
         help_text="Formats acceptés : JPG, PNG (max 2MB)",
     )
 
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Créé le", db_index=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Créé le", db_index=True
+    )
 
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Mis à jour le")
 
@@ -102,7 +111,10 @@ class FeedbackComment(models.Model):
     """Représente un commentaire sur un ticket."""
 
     ticket = models.ForeignKey(
-        FeedbackTicket, on_delete=models.CASCADE, related_name="comments", verbose_name="Ticket"
+        FeedbackTicket,
+        on_delete=models.CASCADE,
+        related_name="comments",
+        verbose_name="Ticket",
     )
 
     author = models.ForeignKey(
@@ -114,7 +126,9 @@ class FeedbackComment(models.Model):
 
     content = models.TextField(verbose_name="Contenu")
 
-    is_staff_response = models.BooleanField(default=False, verbose_name="Réponse du support")
+    is_staff_response = models.BooleanField(
+        default=False, verbose_name="Réponse du support"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Créé le")
 

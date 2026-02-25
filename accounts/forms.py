@@ -27,7 +27,9 @@ class UserRegistrationForm(forms.ModelForm):
     accept_terms = forms.BooleanField(
         label="J'accepte les conditions d'utilisation",
         required=True,
-        error_messages={"required": "Vous devez accepter les conditions pour continuer."},
+        error_messages={
+            "required": "Vous devez accepter les conditions pour continuer."
+        },
     )
 
     class Meta:
@@ -51,9 +53,12 @@ class UserRegistrationForm(forms.ModelForm):
         # Vérifier si la restriction de domaine est activée
         if getattr(settings, "ACCOUNTS_RESTRICT_EMAIL_DOMAIN", False):
             allowed_domain = getattr(settings, "ACCOUNTS_ALLOWED_EMAIL_DOMAIN", "")
-            if allowed_domain and not email.lower().endswith(f"@{allowed_domain.lower()}"):
+            if allowed_domain and not email.lower().endswith(
+                f"@{allowed_domain.lower()}"
+            ):
                 raise ValidationError(
-                    f"Les inscriptions sont limitées aux adresses email @{allowed_domain}."
+                    "Les inscriptions sont limitées aux adresses email "
+                    f"@{allowed_domain}."
                 )
 
         # Vérifier l'unicité (insensible à la casse)
@@ -121,7 +126,11 @@ class UserUpdateForm(forms.ModelForm):
         """Vérifie que le nouvel email n'est pas déjà utilisé."""
         email = self.cleaned_data.get("email")
 
-        if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+        if (
+            User.objects.filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
             raise ValidationError("Cette adresse email est déjà utilisée.")
 
         return email.lower()
@@ -151,7 +160,9 @@ class UserProfileForm(forms.ModelForm):
 class PasswordChangeForm(BasePasswordChangeForm):
     """Formulaire de changement de mot de passe."""
 
-    old_password = forms.CharField(label="Ancien mot de passe", widget=forms.PasswordInput)
+    old_password = forms.CharField(
+        label="Ancien mot de passe", widget=forms.PasswordInput
+    )
 
     new_password1 = forms.CharField(
         label="Nouveau mot de passe",

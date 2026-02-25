@@ -2,17 +2,13 @@
 
 from django.urls import path
 
-from pointage.views.daily_tracking import (
-    DailyTrackingView,
-    RetroactiveTrackingView,
-    UpdateTrackingView,
-)
-from pointage.views.section_management import (
-    SectionCreateView,
-    SectionListView,
-    SectionToggleView,
-    SectionUpdateView,
-)
+from pointage.views.daily_tracking import (DailyTrackingView,
+                                           RetroactiveTrackingView,
+                                           UpdateTrackingView)
+from pointage.views.section_management import (SectionCreateView,
+                                               SectionListView,
+                                               SectionToggleView,
+                                               SectionUpdateView)
 from pointage.views.stats import StatsDashboardView, StatsDataView
 
 app_name = "pointage"

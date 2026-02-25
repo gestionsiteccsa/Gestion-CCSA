@@ -28,7 +28,7 @@ def is_superadmin(user):
 @login_required
 @user_passes_test(is_superadmin)
 def role_list_view(request):
-    """Liste des rôles avec statistiques."""
+    """Liste les rôles avec leurs statistiques."""
     roles = Role.objects.annotate(
         users_count=Count("assigned_users", filter=Q(assigned_users__is_active=True))
     ).order_by("name")
@@ -77,7 +77,9 @@ def role_create_view(request):
 
         except Exception as e:
             logger.error(f"Erreur création rôle: {e}")
-            messages.error(request, "Une erreur est survenue lors de la création du rôle.")
+            messages.error(
+                request, "Une erreur est survenue lors de la création du rôle."
+            )
 
     context = {
         "color_choices": Role.COLOR_CHOICES,
@@ -154,7 +156,7 @@ def role_delete_view(request, role_id):
 @login_required
 @user_passes_test(is_superadmin)
 def user_list_view(request):
-    """Liste des utilisateurs avec leurs rôles."""
+    """Liste les utilisateurs avec leurs rôles."""
     search = request.GET.get("search", "")
 
     users = User.objects.select_related().prefetch_related("user_roles__role")
@@ -181,7 +183,7 @@ def user_list_view(request):
 @login_required
 @user_passes_test(is_superadmin)
 def user_assign_roles_view(request, user_id):
-    """Assignation des rôles à un utilisateur (drag & drop)."""
+    """Assigne les rôles à un utilisateur (drag & drop)."""
     user = get_object_or_404(User, id=user_id)
 
     if request.method == "POST":
@@ -210,7 +212,9 @@ def user_assign_roles_view(request, user_id):
 
     # GET: Afficher la page
     all_roles = Role.objects.filter(is_active=True).order_by("name")
-    user_roles = UserRole.objects.filter(user=user, is_active=True).select_related("role")
+    user_roles = UserRole.objects.filter(user=user, is_active=True).select_related(
+        "role"
+    )
 
     context = {
         "target_user": user,

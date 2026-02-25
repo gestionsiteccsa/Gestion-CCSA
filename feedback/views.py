@@ -7,7 +7,8 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from feedback.forms import FeedbackCommentForm, FeedbackSettingsForm, FeedbackTicketForm
+from feedback.forms import (FeedbackCommentForm, FeedbackSettingsForm,
+                            FeedbackTicketForm)
 from feedback.models import FeedbackSettings, FeedbackTicket
 
 
@@ -16,7 +17,9 @@ class IsSupportMixin(UserPassesTestMixin):
 
     def test_func(self):
         """Vérifie que l'utilisateur a le rôle Support."""
-        return self.request.user.user_roles.filter(role__name="Support", is_active=True).exists()
+        return self.request.user.user_roles.filter(
+            role__name="Support", is_active=True
+        ).exists()
 
 
 class IsOwnerOrSupportMixin(UserPassesTestMixin):
@@ -306,5 +309,7 @@ class FeedbackSettingsView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         """Sauvegarde les paramètres."""
-        messages.success(self.request, "Les paramètres du système de feedback ont été mis à jour.")
+        messages.success(
+            self.request, "Les paramètres du système de feedback ont été mis à jour."
+        )
         return super().form_valid(form)

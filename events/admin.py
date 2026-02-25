@@ -2,17 +2,9 @@
 
 from django.contrib import admin
 
-from events.models import (
-    Event,
-    EventChangeLog,
-    EventComment,
-    EventDocument,
-    EventImage,
-    EventOccurrence,
-    EventRecurrence,
-    EventValidation,
-    Sector,
-)
+from events.models import (Event, EventChangeLog, EventComment, EventDocument,
+                           EventImage, EventOccurrence, EventRecurrence,
+                           EventValidation, Sector)
 
 
 @admin.register(Sector)

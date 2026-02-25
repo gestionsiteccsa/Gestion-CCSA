@@ -52,10 +52,14 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             if all_day:
                 # Mode journée entière : 00:00
                 post_data["start_datetime"] = f"{start_date}T00:00"
-                logger.debug(f"Set start_datetime (all_day): {post_data['start_datetime']}")
+                logger.debug(
+                    f"Set start_datetime (all_day): {post_data['start_datetime']}"
+                )
             elif start_time:
                 try:
-                    dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                    dt = datetime.strptime(
+                        f"{start_date} {start_time}", "%Y-%m-%d %H:%M"
+                    )
                     post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
                     logger.debug(f"Set start_datetime: {post_data['start_datetime']}")
                 except ValueError as e:
@@ -86,7 +90,9 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         """Sauvegarde l'événement et logue les changements."""
-        logger.info(f"Form is valid. Creating event with title: {form.cleaned_data.get('title')}")
+        logger.info(
+            f"Form is valid. Creating event with title: {form.cleaned_data.get('title')}"
+        )
 
         try:
             with transaction.atomic():
@@ -127,7 +133,9 @@ class EventCreateView(LoginRequiredMixin, CreateView):
                 return redirect(self.get_success_url())
         except Exception as e:
             logger.exception(f"Error creating event: {e}")
-            messages.error(self.request, f"Erreur lors de la création de l'événement: {e}")
+            messages.error(
+                self.request, f"Erreur lors de la création de l'événement: {e}"
+            )
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -139,9 +147,13 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
         # Add specific error messages for common issues
         if "start_datetime" in form.errors:
-            messages.error(self.request, "Erreur: La date et heure de début sont invalides.")
+            messages.error(
+                self.request, "Erreur: La date et heure de début sont invalides."
+            )
         if "sectors" in form.errors:
-            messages.error(self.request, "Erreur: Veuillez sélectionner au moins un secteur.")
+            messages.error(
+                self.request, "Erreur: Veuillez sélectionner au moins un secteur."
+            )
         if form.non_field_errors():
             for error in form.non_field_errors():
                 messages.error(self.request, error)
@@ -190,7 +202,9 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                 post_data["start_datetime"] = f"{start_date}T00:00"
             elif start_time:
                 try:
-                    dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+                    dt = datetime.strptime(
+                        f"{start_date} {start_time}", "%Y-%m-%d %H:%M"
+                    )
                     post_data["start_datetime"] = dt.strftime("%Y-%m-%dT%H:%M")
                 except ValueError:
                     pass

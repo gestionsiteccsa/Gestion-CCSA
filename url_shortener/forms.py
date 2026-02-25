@@ -51,7 +51,9 @@ class ShortenedURLForm(forms.ModelForm):
         code = code.strip()
 
         # Vérifier les caractères autorisés
-        allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_")
+        allowed_chars = set(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
+        )
         if not all(c in allowed_chars for c in code):
             raise ValidationError(
                 "Le code ne peut contenir que des lettres, chiffres, tirets (-) et underscores (_)."

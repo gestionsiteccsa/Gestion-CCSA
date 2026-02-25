@@ -46,7 +46,9 @@ urlpatterns = [
     path("admin/roles/", role_list_view, name="admin_role_list"),
     path("admin/roles/create/", role_create_view, name="admin_role_create"),
     path("admin/roles/<int:role_id>/edit/", role_edit_view, name="admin_role_edit"),
-    path("admin/roles/<int:role_id>/delete/", role_delete_view, name="admin_role_delete"),
+    path(
+        "admin/roles/<int:role_id>/delete/", role_delete_view, name="admin_role_delete"
+    ),
     path("admin/users/", user_list_view, name="admin_user_list"),
     path(
         "admin/users/<uuid:user_id>/roles/",

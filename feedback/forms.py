@@ -58,7 +58,9 @@ class FeedbackTicketForm(forms.ModelForm):
         if screenshot:
             # Limite à 2MB
             if screenshot.size > 2 * 1024 * 1024:
-                raise forms.ValidationError("La taille de l'image ne doit pas dépasser 2MB.")
+                raise forms.ValidationError(
+                    "La taille de l'image ne doit pas dépasser 2MB."
+                )
         return screenshot
 
     def save(self, commit=True):
@@ -106,7 +108,9 @@ class FeedbackCommentForm(forms.ModelForm):
         if self.user:
             comment.author = self.user
             # Vérifier si l'utilisateur a le rôle Support
-            if self.user.user_roles.filter(role__name="Support", is_active=True).exists():
+            if self.user.user_roles.filter(
+                role__name="Support", is_active=True
+            ).exists():
                 comment.is_staff_response = True
         if commit:
             comment.save()
@@ -133,8 +137,12 @@ class FeedbackSettingsForm(forms.ModelForm):
                     "size": "5",
                 }
             ),
-            "notify_on_new_ticket": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "notify_on_status_change": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "notify_on_new_ticket": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
+            "notify_on_status_change": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
             "from_email": forms.EmailInput(
                 attrs={
                     "class": "form-control",

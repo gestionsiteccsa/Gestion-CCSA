@@ -42,7 +42,9 @@ def reorder_images(request, slug):
             )
 
         # Vérifier que tous les IDs existent et appartiennent à l'événement
-        existing_ids = set(EventImage.objects.filter(event=event).values_list("id", flat=True))
+        existing_ids = set(
+            EventImage.objects.filter(event=event).values_list("id", flat=True)
+        )
         requested_ids = set(image_order)
 
         if not requested_ids.issubset(existing_ids):
@@ -62,7 +64,9 @@ def reorder_images(request, slug):
 
     except json.JSONDecodeError:
         logger.warning("Tentative de reorder_images avec JSON invalide")
-        return JsonResponse({"success": False, "error": "Format JSON invalide"}, status=400)
+        return JsonResponse(
+            {"success": False, "error": "Format JSON invalide"}, status=400
+        )
     except ValidationError as e:
         logger.warning(f"Erreur de validation dans reorder_images: {e}")
         return JsonResponse({"success": False, "error": str(e)}, status=400)
@@ -83,15 +87,21 @@ def delete_image(request, image_id):
 
         # Vérifier que l'utilisateur est le créateur
         if event.created_by != request.user:
-            return JsonResponse({"success": False, "error": "Permission refusée"}, status=403)
+            return JsonResponse(
+                {"success": False, "error": "Permission refusée"}, status=403
+            )
 
         image.delete()
         return JsonResponse({"success": True})
 
     except EventImage.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Image non trouvée"}, status=404)
+        return JsonResponse(
+            {"success": False, "error": "Image non trouvée"}, status=404
+        )
     except Exception as e:
-        logger.error(f"Erreur lors de la suppression d'image {image_id}: {e}", exc_info=True)
+        logger.error(
+            f"Erreur lors de la suppression d'image {image_id}: {e}", exc_info=True
+        )
         return JsonResponse(
             {
                 "success": False,
@@ -112,7 +122,9 @@ def delete_document(request, document_id):
         if event.created_by != request.user:
             from django.contrib import messages
 
-            messages.error(request, "Vous n'avez pas la permission de supprimer ce document.")
+            messages.error(
+                request, "Vous n'avez pas la permission de supprimer ce document."
+            )
             return redirect(event.get_absolute_url())
 
         document.delete()

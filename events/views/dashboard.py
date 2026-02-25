@@ -33,7 +33,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             # Validation de plage (1900-2100)
             if not (1900 <= selected_year <= 2100):
                 selected_year = today.year
-                messages.warning(self.request, "Année invalide. Utilisation de l'année en cours.")
+                messages.warning(
+                    self.request, "Année invalide. Utilisation de l'année en cours."
+                )
         except (ValueError, TypeError):
             selected_year = today.year
 
@@ -159,7 +161,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             # Comparer avec l'année précédente en YTD
             prev_year = selected_year - 1
             prev_ytd_end = ytd_end.replace(year=prev_year)
-            prev_ytd_stats = self._calculate_period_stats(date(prev_year, 1, 1), prev_ytd_end)
+            prev_ytd_stats = self._calculate_period_stats(
+                date(prev_year, 1, 1), prev_ytd_end
+            )
             comparison_data.append(
                 {
                     "year": prev_year,
@@ -189,7 +193,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
 
         if comparison_data:
             primary_comparison = comparison_data[0]  # Première année de comparaison
-            evolution = self._calculate_evolution(ref_stats, primary_comparison["stats"])
+            evolution = self._calculate_evolution(
+                ref_stats, primary_comparison["stats"]
+            )
         else:
             evolution = None
 
@@ -280,16 +286,22 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             event__start_datetime__date__lte=end_date,
         ).count()
 
-        pending_validation = base_queryset.filter(is_active=True, validation__isnull=True).count()
+        pending_validation = base_queryset.filter(
+            is_active=True, validation__isnull=True
+        ).count()
 
         total_with_validation = base_queryset.filter(validation__isnull=False).count()
         validation_rate = (
-            (validated_events / total_with_validation * 100) if total_with_validation > 0 else 0
+            (validated_events / total_with_validation * 100)
+            if total_with_validation > 0
+            else 0
         )
 
         # Répartition par secteur (optimisé - une seule requête)
         sectors_with_counts = (
-            Sector.objects.filter(is_active=True, events__in=base_queryset.filter(is_active=True))
+            Sector.objects.filter(
+                is_active=True, events__in=base_queryset.filter(is_active=True)
+            )
             .annotate(event_count=Count("events", distinct=True))
             .filter(event_count__gt=0)
             .order_by("-event_count")
@@ -338,7 +350,9 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             "recent_events": base_queryset.select_related("created_by")
             .prefetch_related("sectors")
             .order_by("-created_at")[:10],
-            "pending_events": base_queryset.filter(is_active=True, validation__isnull=True)
+            "pending_events": base_queryset.filter(
+                is_active=True, validation__isnull=True
+            )
             .select_related("created_by")
             .prefetch_related("sectors")
             .order_by("-created_at")[:10],
@@ -395,9 +409,13 @@ class CommunicationDashboardView(CommunicationRequiredMixin, TemplateView):
             else:
                 return f"{start_date.strftime('%b')} - {end_date.strftime('%b %Y')}"
         else:
-            return f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}"
+            return (
+                f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}"
+            )
 
-    def _prepare_comparison_chart_data(self, selected_year, comparison_data, ref_start, ref_end):
+    def _prepare_comparison_chart_data(
+        self, selected_year, comparison_data, ref_start, ref_end
+    ):
         """Prépare les données pour les graphiques comparatifs.
 
         Optimisation: Utilise une seule requête avec TruncMonth et annotation

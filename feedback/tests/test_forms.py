@@ -4,7 +4,8 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from feedback.forms import FeedbackCommentForm, FeedbackSettingsForm, FeedbackTicketForm
+from feedback.forms import (FeedbackCommentForm, FeedbackSettingsForm,
+                            FeedbackTicketForm)
 from feedback.models import FeedbackSettings, FeedbackTicket
 
 User = get_user_model()
@@ -14,7 +15,10 @@ User = get_user_model()
 def user(db):
     """Fixture pour créer un utilisateur de test."""
     return User.objects.create_user(
-        email="test@example.com", first_name="Test", last_name="User", password="testpass123"
+        email="test@example.com",
+        first_name="Test",
+        last_name="User",
+        password="testpass123",
     )
 
 

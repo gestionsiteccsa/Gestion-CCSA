@@ -32,7 +32,9 @@ class EventFormTest(TestCase):
             "description": "Concert en plein air",
             "location": "Salle polyvalente",
             "city": "Saint-Quentin",
-            "start_datetime": (timezone.now() + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M"),
+            "start_datetime": (timezone.now() + timedelta(days=1)).strftime(
+                "%Y-%m-%dT%H:%M"
+            ),
             "end_datetime": (timezone.now() + timedelta(days=1, hours=3)).strftime(
                 "%Y-%m-%dT%H:%M"
             ),
@@ -97,7 +99,9 @@ class EventFormTest(TestCase):
             form.fields["end_datetime"].widget.__class__.__name__,
             "HiddenInput",
         )
-        self.assertIn(form.fields["description"].widget.__class__.__name__, ["Textarea"])
+        self.assertIn(
+            form.fields["description"].widget.__class__.__name__, ["Textarea"]
+        )
 
     def test_form_save(self):
         """Test la sauvegarde du formulaire."""

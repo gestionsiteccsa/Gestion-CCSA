@@ -17,7 +17,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     Le premier utilisateur créé devient automatiquement superutilisateur.
     """
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, verbose_name="ID")
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, verbose_name="ID"
+    )
 
     email = models.EmailField(
         "adresse email",
@@ -42,7 +44,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         "numéro de téléphone", validators=[phone_regex], max_length=17, blank=True
     )
 
-    avatar = models.ImageField("avatar", upload_to="avatars/%Y/%m/", blank=True, null=True)
+    avatar = models.ImageField(
+        "avatar", upload_to="avatars/%Y/%m/", blank=True, null=True
+    )
 
     is_active = models.BooleanField(
         "actif",
@@ -56,7 +60,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text="Détermine si l'utilisateur peut accéder à l'admin.",
     )
 
-    is_verified = models.BooleanField("vérifié", default=False, help_text="Email vérifié.")
+    is_verified = models.BooleanField(
+        "vérifié", default=False, help_text="Email vérifié."
+    )
 
     date_joined = models.DateTimeField("date d'inscription", default=timezone.now)
 
@@ -214,7 +220,8 @@ class UserSession(models.Model):
 
     def __str__(self):
         """Retourne la représentation string de la session."""
-        return f"Session de {self.user.email} ({'active' if self.is_active else 'inactive'})"
+        status = "active" if self.is_active else "inactive"
+        return f"Session de {self.user.email} ({status})"
 
     def deactivate(self):
         """Désactive la session."""
@@ -238,7 +245,9 @@ class PagePermission(models.Model):
     url_name = models.CharField("nom de l'URL", max_length=200, db_index=True)
     url_pattern = models.CharField("pattern d'URL", max_length=500)
     description = models.TextField("description", blank=True)
-    codename = models.CharField("code unique", max_length=300, unique=True, db_index=True)
+    codename = models.CharField(
+        "code unique", max_length=300, unique=True, db_index=True
+    )
     http_method = models.CharField(
         "méthode HTTP", max_length=10, choices=HTTP_METHODS, default="GET"
     )
@@ -248,6 +257,8 @@ class PagePermission(models.Model):
     updated_at = models.DateTimeField("mis à jour le", auto_now=True)
 
     class Meta:
+        """Meta options pour le modèle PagePermission."""
+
         verbose_name = "permission de page"
         verbose_name_plural = "permissions de pages"
         ordering = ["app_name", "view_name", "http_method"]
@@ -258,11 +269,16 @@ class PagePermission(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.app_name} - {self.view_name} ({self.get_http_method_display()})"
+        """Retourne la représentation string de la permission."""
+        method = self.get_http_method_display()
+        return f"{self.app_name} - {self.view_name} ({method})"
 
     def save(self, *args, **kwargs):
+        """Sauvegarde la permission avec génération du codename."""
         if not self.codename:
-            self.codename = f"{self.app_name}_{self.url_name}_{self.http_method.lower()}"
+            self.codename = (
+                f"{self.app_name}_{self.url_name}_{self.http_method.lower()}"
+            )
         super().save(*args, **kwargs)
 
 
@@ -286,7 +302,9 @@ class Role(models.Model):
 
     name = models.CharField("nom", max_length=100, unique=True)
     description = models.TextField("description", blank=True)
-    color = models.CharField("couleur", max_length=7, choices=COLOR_CHOICES, default="#3B82F6")
+    color = models.CharField(
+        "couleur", max_length=7, choices=COLOR_CHOICES, default="#3B82F6"
+    )
     is_default = models.BooleanField(
         "rôle par défaut",
         default=False,
@@ -297,21 +315,27 @@ class Role(models.Model):
     updated_at = models.DateTimeField("mis à jour le", auto_now=True)
 
     class Meta:
+        """Meta options pour le modèle Role."""
+
         verbose_name = "rôle"
         verbose_name_plural = "rôles"
         ordering = ["name"]
 
     def __str__(self):
+        """Retourne le nom du rôle."""
         return self.name
 
     def get_permissions_count(self):
+        """Retourne le nombre de permissions actives du rôle."""
         return self.page_permissions.filter(can_access=True).count()
 
 
 class RolePagePermission(models.Model):
     """Association entre un rôle et une permission de page."""
 
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="page_permissions")
+    role = models.ForeignKey(
+        Role, on_delete=models.CASCADE, related_name="page_permissions"
+    )
     page_permission = models.ForeignKey(
         PagePermission, on_delete=models.CASCADE, related_name="role_permissions"
     )
@@ -323,12 +347,15 @@ class RolePagePermission(models.Model):
     updated_at = models.DateTimeField("mis à jour le", auto_now=True)
 
     class Meta:
+        """Meta options pour le modèle RolePagePermission."""
+
         verbose_name = "permission de rôle"
         verbose_name_plural = "permissions de rôles"
         unique_together = ["role", "page_permission"]
         ordering = ["page_permission__app_name", "page_permission__view_name"]
 
     def __str__(self):
+        """Retourne la représentation de la permission de rôle."""
         return f"{self.role.name} - {self.page_permission}"
 
 
@@ -336,7 +363,9 @@ class UserRole(models.Model):
     """Association entre un utilisateur et un rôle."""
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_roles")
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="assigned_users")
+    role = models.ForeignKey(
+        Role, on_delete=models.CASCADE, related_name="assigned_users"
+    )
     assigned_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -348,12 +377,15 @@ class UserRole(models.Model):
     is_active = models.BooleanField("actif", default=True)
 
     class Meta:
+        """Meta options pour le modèle UserRole."""
+
         verbose_name = "rôle utilisateur"
         verbose_name_plural = "rôles utilisateurs"
         unique_together = ["user", "role"]
         ordering = ["-assigned_at"]
 
     def __str__(self):
+        """Retourne la représentation du rôle utilisateur."""
         return f"{self.user.email} - {self.role.name}"
 
 
@@ -391,6 +423,8 @@ class PermissionHistory(models.Model):
     ip_address = models.GenericIPAddressField("adresse IP", null=True, blank=True)
 
     class Meta:
+        """Meta options pour le modèle PermissionHistory."""
+
         verbose_name = "historique de permission"
         verbose_name_plural = "historiques de permissions"
         ordering = ["-performed_at"]
@@ -400,7 +434,9 @@ class PermissionHistory(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.get_action_display()} - {self.user.email} - {self.performed_at}"
+        """Retourne la représentation de l'historique."""
+        action = self.get_action_display()
+        return f"{action} - {self.user.email} - {self.performed_at}"
 
 
 class Notification(models.Model):
@@ -429,7 +465,9 @@ class Notification(models.Model):
         verbose_name="utilisateur",
     )
 
-    notification_type = models.CharField("type", max_length=50, choices=NOTIFICATION_TYPES)
+    notification_type = models.CharField(
+        "type", max_length=50, choices=NOTIFICATION_TYPES
+    )
 
     title = models.CharField("titre", max_length=200)
 
@@ -460,6 +498,8 @@ class Notification(models.Model):
     created_at = models.DateTimeField("créée le", auto_now_add=True)
 
     class Meta:
+        """Meta options pour le modèle Notification."""
+
         verbose_name = "notification"
         verbose_name_plural = "notifications"
         ordering = ["-created_at"]
@@ -470,19 +510,24 @@ class Notification(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.title} - {self.user.email} - {self.created_at.strftime('%d/%m/%Y %H:%M')}"
+        """Retourne la représentation de la notification."""
+        date_str = self.created_at.strftime("%d/%m/%Y %H:%M")
+        return f"{self.title} - {self.user.email} - {date_str}"
 
     def mark_as_read(self):
+        """Marque la notification comme lue."""
         if not self.is_read:
             self.is_read = True
             self.save(update_fields=["is_read"])
 
     @classmethod
     def get_unread_count(cls, user):
+        """Retourne le nombre de notifications non lues."""
         return cls.objects.filter(user=user, is_read=False).count()
 
     @classmethod
     def get_recent_for_user(cls, user, limit=5):
+        """Retourne les notifications récentes d'un utilisateur."""
         return cls.objects.filter(user=user).order_by("-created_at")[:limit]
 
 
@@ -528,19 +573,25 @@ class UserNotificationPreference(models.Model):
     updated_at = models.DateTimeField("modifiée le", auto_now=True)
 
     class Meta:
+        """Meta options pour le modèle UserNotificationPreference."""
+
         verbose_name = "préférence de notification"
         verbose_name_plural = "préférences de notifications"
         unique_together = ["user", "notification_type"]
         ordering = ["notification_type"]
 
     def __str__(self):
-        return f"{self.user.email} - {self.get_notification_type_display()}"
+        """Retourne la représentation de la préférence."""
+        notif_type = self.get_notification_type_display()
+        return f"{self.user.email} - {notif_type}"
 
     @classmethod
     def get_user_preferences(cls, user):
         """Récupère ou crée les préférences pour un utilisateur."""
         # Vérifier si l'utilisateur a le rôle Communication
-        is_comm = user.user_roles.filter(role__name="Communication", is_active=True).exists()
+        is_comm = user.user_roles.filter(
+            role__name="Communication", is_active=True
+        ).exists()
 
         if is_comm:
             # Communication : toutes les notifications, configurables
@@ -570,7 +621,9 @@ class UserNotificationPreference(models.Model):
             return False
 
         # Vérifier si le type est dans les types disponibles pour l'utilisateur
-        is_comm = user.user_roles.filter(role__name="Communication", is_active=True).exists()
+        is_comm = user.user_roles.filter(
+            role__name="Communication", is_active=True
+        ).exists()
 
         if not is_comm and notification_type not in cls.BASIC_USER_TYPES:
             return False

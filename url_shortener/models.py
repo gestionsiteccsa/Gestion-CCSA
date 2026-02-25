@@ -79,7 +79,9 @@ class ShortenedURL(models.Model):
             # Vérifier si l'URL pointe vers le même domaine
             if parsed.netloc and current_domain in parsed.netloc:
                 raise ValidationError(
-                    {"original_url": "Vous ne pouvez pas raccourcir une URL interne à l'intranet."}
+                    {
+                        "original_url": "Vous ne pouvez pas raccourcir une URL interne à l'intranet."
+                    }
                 )
 
         # Vérifier le code personnalisé
@@ -97,7 +99,9 @@ class ShortenedURL(models.Model):
 
             # Vérifier la longueur minimale
             if len(self.code) < 3:
-                raise ValidationError({"code": "Le code doit faire au moins 3 caractères."})
+                raise ValidationError(
+                    {"code": "Le code doit faire au moins 3 caractères."}
+                )
 
     def save(self, *args, **kwargs):
         """Sauvegarde avec génération automatique du code si nécessaire."""

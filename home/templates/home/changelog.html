@@ -11,6 +11,90 @@
     </div>
 
     <div class="space-y-8">
+        <!-- Version 1.3.1 - Production -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[1.3.1] - 2026-02-25</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full">En production</span>
+            </div>
+            <div class="space-y-6">
+                <!-- Qualité du code -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Qualité du code
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Configuration Pre-commit</strong> : Mise en place complète des hooks de qualité
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Création du fichier <code>pyproject.toml</code> avec configuration Black, isort, Flake8 et Bandit</li>
+                                <li>Optimisation du fichier <code>.pre-commit-config.yaml</code> pour éviter les timeouts</li>
+                                <li>Configuration des hooks essentiels : trailing-whitespace, end-of-file-fixer, check-yaml, check-json</li>
+                                <li>Intégration de Black pour le formatage automatique du code Python</li>
+                                <li>Configuration d'isort pour l'organisation des imports</li>
+                                <li>Mise en place de Flake8 pour le linting avec plugins docstrings et bugbear</li>
+                                <li>Configuration de Bandit pour l'analyse de sécurité statique</li>
+                            </ul>
+                        </li>
+                        <li><strong>Correction du style dans accounts/</strong> : Formatage et documentation
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Formatage complet avec Black (line-length: 88) des fichiers models.py, views.py, forms.py, urls.py, services.py</li>
+                                <li>Organisation des imports avec isort selon le profil Black</li>
+                                <li>Ajout des docstrings manquantes dans les classes Meta et méthodes</li>
+                                <li>Correction des lignes trop longues (>88 caractères)</li>
+                                <li>Suppression des imports inutilisés dans services.py</li>
+                                <li>Correction des docstrings pour respecter le style impératif (D401)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Sécurité -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-red-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        Sécurité
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Analyse statique avec Bandit</strong> : Vérification automatique des vulnérabilités
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Configuration dans pyproject.toml avec exclusions appropriées (tests, migrations)</li>
+                                <li>Skip des checks B101 (assert) et B311 (random) pour les cas non cryptographiques</li>
+                                <li>Aucune vulnérabilité détectée dans le code accounts/ (1738 lignes analysées)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Détection de secrets</strong> : Intégration de Gitleaks
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Hook Gitleaks activé pour la détection des secrets dans le code</li>
+                                <li>Mode protect avec redaction pour la sécurité</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Maintenance -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-slate-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Maintenance
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Optimisation des hooks pre-commit pour éviter les timeouts</li>
+                        <li>Désactivation temporaire de detect-secrets (problèmes de compatibilité avec .secrets.baseline)</li>
+                        <li>Hooks lents (Semgrep, Django check) commentés pour exécution manuelle</li>
+                        <li>Configuration fail_fast: false pour exécuter tous les hooks même si un échoue</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- Version 1.3.0 - Production -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">

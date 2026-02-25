@@ -7,7 +7,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from accounts.models import User
-from events.models import Event, EventChangeLog, EventComment, EventImage, Sector
+from events.models import (Event, EventChangeLog, EventComment, EventImage,
+                           Sector)
 
 
 class SectorModelTest(TestCase):
@@ -123,12 +124,16 @@ class EventModelTest(TestCase):
 
     def test_event_str_representation(self):
         """Test la représentation string de l'événement."""
-        expected = f"Fête de la musique - {self.event.start_datetime.strftime('%d/%m/%Y')}"
+        expected = (
+            f"Fête de la musique - {self.event.start_datetime.strftime('%d/%m/%Y')}"
+        )
         self.assertEqual(str(self.event), expected)
 
     def test_event_get_absolute_url(self):
         """Test la méthode get_absolute_url."""
-        self.assertEqual(self.event.get_absolute_url(), f"/evenements/{self.event.slug}/")
+        self.assertEqual(
+            self.event.get_absolute_url(), f"/evenements/{self.event.slug}/"
+        )
 
     def test_event_is_upcoming(self):
         """Test la propriété is_upcoming."""
@@ -247,7 +252,9 @@ class EventCommentModelTest(TestCase):
             author=self.user,
             content="Deuxième commentaire",
         )
-        comments = list(EventComment.objects.filter(event=self.event).order_by("-created_at"))
+        comments = list(
+            EventComment.objects.filter(event=self.event).order_by("-created_at")
+        )
         # Vérifier que les deux commentaires sont présents
         self.assertEqual(len(comments), 2)
         self.assertIn(self.comment, comments)
@@ -302,7 +309,9 @@ class EventChangeLogModelTest(TestCase):
             old_value="Ancien lieu",
             new_value="Nouveau lieu",
         )
-        logs = list(EventChangeLog.objects.filter(event=self.event).order_by("-changed_at"))
+        logs = list(
+            EventChangeLog.objects.filter(event=self.event).order_by("-changed_at")
+        )
         # Vérifier que les deux changelogs sont présents
         self.assertEqual(len(logs), 2)
         self.assertIn(self.changelog, logs)

@@ -23,7 +23,9 @@ class ShortenedURLListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Retourne uniquement les liens de l'utilisateur connecté."""
-        return ShortenedURL.objects.filter(created_by=self.request.user).order_by("-created_at")
+        return ShortenedURL.objects.filter(created_by=self.request.user).order_by(
+            "-created_at"
+        )
 
     def get_context_data(self, **kwargs):
         """Ajoute des données contextuelles."""
@@ -110,7 +112,9 @@ class ShortenedURLRedirectView(View):
 @login_required
 def shortened_url_list(request):
     """Vue fonctionnelle alternative pour la liste des URLs."""
-    shortened_urls = ShortenedURL.objects.filter(created_by=request.user).order_by("-created_at")
+    shortened_urls = ShortenedURL.objects.filter(created_by=request.user).order_by(
+        "-created_at"
+    )
 
     context = {"shortened_urls": shortened_urls, "title": "Mes liens raccourcis"}
 
