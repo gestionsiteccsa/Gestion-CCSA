@@ -77,9 +77,7 @@ def role_create_view(request):
 
         except Exception as e:
             logger.error(f"Erreur création rôle: {e}")
-            messages.error(
-                request, "Une erreur est survenue lors de la création du rôle."
-            )
+            messages.error(request, "Une erreur est survenue lors de la création du rôle.")
 
     context = {
         "color_choices": Role.COLOR_CHOICES,
@@ -212,9 +210,7 @@ def user_assign_roles_view(request, user_id):
 
     # GET: Afficher la page
     all_roles = Role.objects.filter(is_active=True).order_by("name")
-    user_roles = UserRole.objects.filter(user=user, is_active=True).select_related(
-        "role"
-    )
+    user_roles = UserRole.objects.filter(user=user, is_active=True).select_related("role")
 
     context = {
         "target_user": user,

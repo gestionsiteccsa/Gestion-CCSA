@@ -3,8 +3,13 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 
-from accounts.forms import (PasswordChangeForm, UserLoginForm, UserProfileForm,
-                            UserRegistrationForm, UserUpdateForm)
+from accounts.forms import (
+    PasswordChangeForm,
+    UserLoginForm,
+    UserProfileForm,
+    UserRegistrationForm,
+    UserUpdateForm,
+)
 
 User = get_user_model()
 

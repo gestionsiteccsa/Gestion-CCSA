@@ -21,15 +21,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="videorequestlog",
             name="confirmed",
-            field=models.BooleanField(
-                default=False, verbose_name="Validé par le caméraman"
-            ),
+            field=models.BooleanField(default=False, verbose_name="Validé par le caméraman"),
         ),
         migrations.AddField(
             model_name="videorequestlog",
             name="confirmed_at",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Date de validation"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Date de validation"),
         ),
     ]

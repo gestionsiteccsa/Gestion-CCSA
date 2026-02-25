@@ -63,16 +63,12 @@ class EventListViewTest(TestCase):
             created_by=self.user,
         )
         event2.sectors.add(sector2)
-        response = self.client.get(
-            reverse("events:event_archives"), {"sector": self.sector.pk}
-        )
+        response = self.client.get(reverse("events:event_archives"), {"sector": self.sector.pk})
         self.assertIn("events", response.context)
 
     def test_list_view_filter_by_city(self):
         """Test le filtrage par ville (utilise la vue archives)."""
-        response = self.client.get(
-            reverse("events:event_archives"), {"city": "Saint-Quentin"}
-        )
+        response = self.client.get(reverse("events:event_archives"), {"city": "Saint-Quentin"})
         self.assertIn("events", response.context)
 
     def test_list_view_pagination(self):
@@ -170,23 +166,17 @@ class EventDetailViewTest(TestCase):
 
     def test_detail_view_status_code(self):
         """Test que la vue retourne 200."""
-        response = self.client.get(
-            reverse("events:event_detail", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_detail", kwargs={"slug": self.event.slug}))
         self.assertEqual(response.status_code, 200)
 
     def test_detail_view_template(self):
         """Test que le bon template est utilisé."""
-        response = self.client.get(
-            reverse("events:event_detail", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_detail", kwargs={"slug": self.event.slug}))
         self.assertTemplateUsed(response, "events/event_detail.html")
 
     def test_detail_view_context(self):
         """Test que l'événement est dans le contexte."""
-        response = self.client.get(
-            reverse("events:event_detail", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_detail", kwargs={"slug": self.event.slug}))
         self.assertIn("event", response.context)
         self.assertEqual(response.context["event"], self.event)
 
@@ -214,9 +204,7 @@ class EventCreateViewTest(TestCase):
             "description": "Description",
             "location": "Salle polyvalente",
             "city": "Saint-Quentin",
-            "start_datetime": (timezone.now() + timedelta(days=1)).strftime(
-                "%Y-%m-%dT%H:%M"
-            ),
+            "start_datetime": (timezone.now() + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M"),
             "end_datetime": (timezone.now() + timedelta(days=1, hours=3)).strftime(
                 "%Y-%m-%dT%H:%M"
             ),
@@ -285,25 +273,19 @@ class EventUpdateViewTest(TestCase):
 
     def test_update_view_redirects_if_not_logged_in(self):
         """Test que la vue redirige si l'utilisateur n'est pas connecté."""
-        response = self.client.get(
-            reverse("events:event_update", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_update", kwargs={"slug": self.event.slug}))
         self.assertEqual(response.status_code, 302)
 
     def test_update_view_forbidden_if_not_creator(self):
         """Test que la vue retourne 403 si l'utilisateur n'est pas le créateur."""
         self.client.login(email="other@cc-sudavesnois.fr", password="testpass123")
-        response = self.client.get(
-            reverse("events:event_update", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_update", kwargs={"slug": self.event.slug}))
         self.assertEqual(response.status_code, 403)
 
     def test_update_view_get_creator(self):
         """Test que le créateur peut accéder à la vue."""
         self.client.login(email="test@cc-sudavesnois.fr", password="testpass123")
-        response = self.client.get(
-            reverse("events:event_update", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_update", kwargs={"slug": self.event.slug}))
         self.assertEqual(response.status_code, 200)
 
     def test_update_view_post_valid_data(self):
@@ -354,17 +336,13 @@ class EventDeleteViewTest(TestCase):
 
     def test_delete_view_redirects_if_not_logged_in(self):
         """Test que la vue redirige si l'utilisateur n'est pas connecté."""
-        response = self.client.get(
-            reverse("events:event_delete", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_delete", kwargs={"slug": self.event.slug}))
         self.assertEqual(response.status_code, 302)
 
     def test_delete_view_forbidden_if_not_creator(self):
         """Test que la vue retourne 403 si l'utilisateur n'est pas le créateur."""
         self.client.login(email="other@cc-sudavesnois.fr", password="testpass123")
-        response = self.client.get(
-            reverse("events:event_delete", kwargs={"slug": self.event.slug})
-        )
+        response = self.client.get(reverse("events:event_delete", kwargs={"slug": self.event.slug}))
         self.assertEqual(response.status_code, 403)
 
     def test_delete_view_post_creator(self):

@@ -42,9 +42,7 @@ class NotificationService:
         Notifie un utilisateur specifique en respectant ses preferences.
         """
         # Verifier si la notification in-app est autorisee
-        if UserNotificationPreference.is_notification_allowed(
-            user, notification_type, "in_app"
-        ):
+        if UserNotificationPreference.is_notification_allowed(user, notification_type, "in_app"):
             Notification.objects.create(
                 user=user,
                 notification_type=notification_type,
@@ -69,9 +67,7 @@ class NotificationService:
             )
 
     @staticmethod
-    def _send_email_notification(
-        user, notification_type, title, message, event=None, link=""
-    ):
+    def _send_email_notification(user, notification_type, title, message, event=None, link=""):
         """Envoie une notification par email avec template HTML."""
         try:
             # Construire l'URL absolue
@@ -79,9 +75,7 @@ class NotificationService:
                 link = f"{settings.SITE_URL}{link}"
 
             # URL des préférences
-            preferences_url = (
-                f"{settings.SITE_URL}{reverse('accounts:notification_preferences')}"
-            )
+            preferences_url = f"{settings.SITE_URL}{reverse('accounts:notification_preferences')}"
 
             # Préparer le contexte pour le template
             context = {
@@ -182,9 +176,7 @@ class NotificationService:
         )
 
     @staticmethod
-    def notify_video_request_sent(
-        video_request, event, is_relance=False, relance_num=0
-    ):
+    def notify_video_request_sent(video_request, event, is_relance=False, relance_num=0):
         """Notifie l'equipe Communication quand une demande de tournage est envoyee."""
         link = reverse("events:event_validation", kwargs={"slug": event.slug})
 
@@ -193,7 +185,9 @@ class NotificationService:
             message = f'Une relance (n°{relance_num}) a été envoyée au cameraman pour le tournage de "{event.title}".'
         else:
             title = f"Demande de tournage envoyée - {event.title}"
-            message = f'Une demande de tournage vidéo a été envoyée au cameraman pour "{event.title}".'
+            message = (
+                f'Une demande de tournage vidéo a été envoyée au cameraman pour "{event.title}".'
+            )
 
         NotificationService.notify_communication_team(
             notification_type="video_request_sent",

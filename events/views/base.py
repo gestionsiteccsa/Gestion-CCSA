@@ -65,9 +65,7 @@ class EventArchiveView(ListView):
 
         if result is None:
             try:
-                communication_role = Role.objects.get(
-                    name="Communication", is_active=True
-                )
+                communication_role = Role.objects.get(name="Communication", is_active=True)
                 result = UserRole.objects.filter(
                     user=self.request.user, role=communication_role, is_active=True
                 ).exists()
@@ -147,9 +145,7 @@ class EventArchiveView(ListView):
         if cities is None:
             cities_queryset = Event.objects.filter(is_active=True)
             cities = list(
-                cities_queryset.values_list("city", flat=True)
-                .distinct()
-                .order_by("city")
+                cities_queryset.values_list("city", flat=True).distinct().order_by("city")
             )
             cache.set(cache_key, cities, 3600)  # Cache pendant 1 heure
 
@@ -261,9 +257,26 @@ class EventDetailView(DetailView):
         )
 
     def get_context_data(self, **kwargs):
-        """Ajoute le formulaire de commentaire au contexte."""
+        """Ajoute le formulaire de commentaire et URL Outlook au contexte."""
         context = super().get_context_data(**kwargs)
         context["comment_form"] = EventCommentForm()
+
+        # Générer l'URL Outlook avec le format correct (ISO 8601)
+        event = self.object
+        if event.end_datetime:
+            end_dt = event.end_datetime
+        else:
+            end_dt = event.start_datetime + timedelta(hours=1)
+
+        outlook_params = {
+            "subject": event.title,
+            "startdt": event.start_datetime.isoformat(),
+            "enddt": end_dt.isoformat(),
+            "body": event.description or "",
+            "location": event.location or event.city or "",
+        }
+        context["outlook_url"] = f"https://outlook.office.com/calendar/0/deeplink/compose?{urlencode(outlook_params)}"
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -274,13 +287,9 @@ class EventDetailView(DetailView):
         if not request.user.is_authenticated:
             from django.contrib import messages
 
-            messages.error(
-                request, "Vous devez être connecté pour ajouter un commentaire."
-            )
+            messages.error(request, "Vous devez être connecté pour ajouter un commentaire.")
             return redirect(
-                "{}?next={}".format(
-                    reverse("accounts:login"), self.object.get_absolute_url()
-                )
+                "{}?next={}".format(reverse("accounts:login"), self.object.get_absolute_url())
             )
 
         form = EventCommentForm(request.POST)
@@ -346,19 +355,13 @@ class MyEventsView(LoginRequiredMixin, ListView):
         user_events = Event.objects.filter(created_by=self.request.user, is_active=True)
 
         context["total_events"] = user_events.count()
-        context["validated_count"] = user_events.filter(
-            validation__is_validated=True
-        ).count()
+        context["validated_count"] = user_events.filter(validation__is_validated=True).count()
         context["pending_count"] = user_events.filter(validation__isnull=True).count()
-        context["rejected_count"] = user_events.filter(
-            validation__is_validated=False
-        ).count()
+        context["rejected_count"] = user_events.filter(validation__is_validated=False).count()
 
         # Événements à venir
         today = timezone.now()
-        context["upcoming_count"] = user_events.filter(
-            start_datetime__gte=today
-        ).count()
+        context["upcoming_count"] = user_events.filter(start_datetime__gte=today).count()
 
         # Filtres actuels
         context["current_status"] = self.request.GET.get("status", "")

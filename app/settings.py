@@ -167,12 +167,8 @@ LOGOUT_REDIRECT_URL = "/"
 
 # Configuration des inscriptions
 # TODO: Ces paramètres seront modifiables par le super admin via l'interface d'administration
-ACCOUNTS_RESTRICT_EMAIL_DOMAIN = (
-    True  # Restreindre les inscriptions à un domaine spécifique
-)
-ACCOUNTS_ALLOWED_EMAIL_DOMAIN = (
-    "cc-sudavesnois.fr"  # Domaine autorisé pour les inscriptions
-)
+ACCOUNTS_RESTRICT_EMAIL_DOMAIN = True  # Restreindre les inscriptions à un domaine spécifique
+ACCOUNTS_ALLOWED_EMAIL_DOMAIN = "cc-sudavesnois.fr"  # Domaine autorisé pour les inscriptions
 ACCOUNTS_REGISTRATION_OPEN = True  # Autoriser les nouvelles inscriptions
 
 # ============================================================================
@@ -227,9 +223,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 # Pour déboguer les emails en développement, décommentez la ligne suivante :
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-DEFAULT_FROM_EMAIL = os.environ.get(
-    "DEFAULT_FROM_EMAIL", "nepasrepondre@cc-sudavesnois.fr"
-)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "nepasrepondre@cc-sudavesnois.fr")
 
 # URL du site pour les liens dans les emails
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")

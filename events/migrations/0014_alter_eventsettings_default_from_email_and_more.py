@@ -34,9 +34,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="event",
-            index=models.Index(
-                fields=["end_datetime"], name="events_even_end_dat_53a75f_idx"
-            ),
+            index=models.Index(fields=["end_datetime"], name="events_even_end_dat_53a75f_idx"),
         ),
         migrations.AddIndex(
             model_name="event",
@@ -59,9 +57,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="eventvalidation",
-            index=models.Index(
-                fields=["is_validated"], name="events_even_is_vali_40e147_idx"
-            ),
+            index=models.Index(fields=["is_validated"], name="events_even_is_vali_40e147_idx"),
         ),
         migrations.AddIndex(
             model_name="eventvalidation",
@@ -71,15 +67,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="eventvalidation",
-            index=models.Index(
-                fields=["validated_at"], name="events_even_validat_cf9b22_idx"
-            ),
+            index=models.Index(fields=["validated_at"], name="events_even_validat_cf9b22_idx"),
         ),
         migrations.AddIndex(
             model_name="videorequestlog",
-            index=models.Index(
-                fields=["event", "-sent_at"], name="events_vide_event_i_c37af0_idx"
-            ),
+            index=models.Index(fields=["event", "-sent_at"], name="events_vide_event_i_c37af0_idx"),
         ),
         migrations.AddIndex(
             model_name="videorequestlog",

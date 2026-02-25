@@ -31,9 +31,7 @@ class AccueilRequiredMixinTests(TestCase):
             name="Accueil",
             description="Rôle accueil",
         )
-        UserRole.objects.create(
-            user=self.user_with_accueil, role=self.role_accueil, is_active=True
-        )
+        UserRole.objects.create(user=self.user_with_accueil, role=self.role_accueil, is_active=True)
 
     def test_access_denied_without_role(self):
         """Teste que l'accès est refusé sans le rôle."""
@@ -107,9 +105,7 @@ class DailyTrackingViewTests(TestCase):
         """Teste le pointage pour une date spécifique."""
         yesterday = date.today() - timedelta(days=1)
         response = self.client.get(
-            reverse(
-                "pointage:daily_tracking_date", kwargs={"date": yesterday.isoformat()}
-            )
+            reverse("pointage:daily_tracking_date", kwargs={"date": yesterday.isoformat()})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -119,9 +115,7 @@ class DailyTrackingViewTests(TestCase):
         """Teste la limite de rétroactivité (30 jours)."""
         too_old = date.today() - timedelta(days=31)
         response = self.client.get(
-            reverse(
-                "pointage:daily_tracking_date", kwargs={"date": too_old.isoformat()}
-            )
+            reverse("pointage:daily_tracking_date", kwargs={"date": too_old.isoformat()})
         )
 
         self.assertEqual(response.status_code, 403)
@@ -267,9 +261,7 @@ class SectionManagementViewTests(TestCase):
         """Teste l'activation/désactivation d'une section."""
         section = SectionType.objects.create(name="Test", is_active=True)
 
-        response = self.client.post(
-            reverse("pointage:section_toggle", kwargs={"pk": section.pk})
-        )
+        response = self.client.post(reverse("pointage:section_toggle", kwargs={"pk": section.pk}))
 
         self.assertEqual(response.status_code, 302)
         section.refresh_from_db()

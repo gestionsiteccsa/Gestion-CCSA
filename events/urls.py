@@ -68,9 +68,7 @@ urlpatterns = [
     path("creer/", views.EventCreateView.as_view(), name="event_create"),
     path("<slug:slug>/", views.EventDetailView.as_view(), name="event_detail"),
     path("<slug:slug>/modifier/", views.EventUpdateView.as_view(), name="event_update"),
-    path(
-        "<slug:slug>/supprimer/", views.EventDeleteView.as_view(), name="event_delete"
-    ),
+    path("<slug:slug>/supprimer/", views.EventDeleteView.as_view(), name="event_delete"),
     # Gestion des images
     path(
         "<slug:slug>/images/reorder/",

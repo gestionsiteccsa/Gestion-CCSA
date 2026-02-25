@@ -92,9 +92,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "app_name",
-                    models.CharField(
-                        db_index=True, max_length=100, verbose_name="nom de l'app"
-                    ),
+                    models.CharField(db_index=True, max_length=100, verbose_name="nom de l'app"),
                 ),
                 (
                     "view_name",
@@ -102,9 +100,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "url_name",
-                    models.CharField(
-                        db_index=True, max_length=200, verbose_name="nom de l'URL"
-                    ),
+                    models.CharField(db_index=True, max_length=200, verbose_name="nom de l'URL"),
                 ),
                 (
                     "url_pattern",
@@ -141,9 +137,7 @@ class Migration(migrations.Migration):
                 ("is_active", models.BooleanField(default=True, verbose_name="actif")),
                 (
                     "auto_detected",
-                    models.BooleanField(
-                        default=True, verbose_name="détecté automatiquement"
-                    ),
+                    models.BooleanField(default=True, verbose_name="détecté automatiquement"),
                 ),
                 (
                     "created_at",
@@ -163,9 +157,7 @@ class Migration(migrations.Migration):
                         fields=["app_name", "is_active"],
                         name="accounts_pa_app_nam_822984_idx",
                     ),
-                    models.Index(
-                        fields=["codename"], name="accounts_pa_codenam_f13395_idx"
-                    ),
+                    models.Index(fields=["codename"], name="accounts_pa_codenam_f13395_idx"),
                 ],
                 "unique_together": {("app_name", "url_name", "http_method")},
             },
@@ -206,9 +198,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ip_address",
-                    models.GenericIPAddressField(
-                        blank=True, null=True, verbose_name="adresse IP"
-                    ),
+                    models.GenericIPAddressField(blank=True, null=True, verbose_name="adresse IP"),
                 ),
                 (
                     "page_permission",

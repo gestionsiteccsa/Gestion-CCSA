@@ -288,7 +288,7 @@
                         Voir le calendrier
                     </a>
                     
-                    <a href="https://outlook.office.com/calendar/0/deeplink/compose?subject={{ event.title|urlencode }}&startdt={{ event.start_datetime|date:'c' }}{% if event.end_datetime %}&enddt={{ event.end_datetime|date:'c' }}{% endif %}&body={{ event.description|truncatewords:100|urlencode }}&location={{ event.location|default:event.city|urlencode }}" 
+                    <a href="{{ outlook_url }}"
                        class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
                        target="_blank"
                        rel="noopener noreferrer">

@@ -202,20 +202,17 @@
                         Tous les statuts
                     </a>
                     <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}status=validated"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-green-500 text-green-700 hover:bg-green-50 {% if request.GET.status == 'validated' %}active{% endif %}"
-                       {% if request.GET.status == 'validated' %}style="background-color: #22c55e; color: white;"{% endif %}
+                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-green-500 hover:bg-green-50 {% if request.GET.status == 'validated' %}bg-green-500 text-white{% else %}text-green-700{% endif %}"
                        aria-pressed="{% if request.GET.status == 'validated' %}true{% else %}false{% endif %}">
                         Validé
                     </a>
                     <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}status=pending"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-yellow-500 text-yellow-700 hover:bg-yellow-50 {% if request.GET.status == 'pending' %}active{% endif %}"
-                       {% if request.GET.status == 'pending' %}style="background-color: #eab308; color: white;"{% endif %}
+                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-yellow-500 hover:bg-yellow-50 {% if request.GET.status == 'pending' %}bg-yellow-500 text-white{% else %}text-yellow-700{% endif %}"
                        aria-pressed="{% if request.GET.status == 'pending' %}true{% else %}false{% endif %}">
                         En attente
                     </a>
                     <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.sector %}sector={{ request.GET.sector }}&{% endif %}status=rejected"
-                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-red-500 text-red-700 hover:bg-red-50 {% if request.GET.status == 'rejected' %}active{% endif %}"
-                       {% if request.GET.status == 'rejected' %}style="background-color: #ef4444; color: white;"{% endif %}
+                       class="filter-btn px-3 py-1.5 text-sm font-medium rounded-full border border-red-500 hover:bg-red-50 {% if request.GET.status == 'rejected' %}bg-red-500 text-white{% else %}text-red-700{% endif %}"
                        aria-pressed="{% if request.GET.status == 'rejected' %}true{% else %}false{% endif %}">
                         Rejeté
                     </a>

@@ -25,9 +25,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="event",
-            index=models.Index(
-                fields=["is_active"], name="events_even_is_acti_82811f_idx"
-            ),
+            index=models.Index(fields=["is_active"], name="events_even_is_acti_82811f_idx"),
         ),
         migrations.AddIndex(
             model_name="event",
@@ -35,9 +33,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="event",
-            index=models.Index(
-                fields=["start_datetime"], name="events_even_start_d_b72861_idx"
-            ),
+            index=models.Index(fields=["start_datetime"], name="events_even_start_d_b72861_idx"),
         ),
         migrations.AddIndex(
             model_name="event",

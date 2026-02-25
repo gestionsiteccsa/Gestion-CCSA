@@ -41,9 +41,7 @@ class Sector(models.Model):
         """Valide le format du code couleur."""
         if self.color_code and not re.match(r"^#[0-9A-Fa-f]{6}$", self.color_code):
             raise ValidationError(
-                {
-                    "color_code": "Le code couleur doit être au format hexadécimal (#RRGGBB)"
-                }
+                {"color_code": "Le code couleur doit être au format hexadécimal (#RRGGBB)"}
             )
 
 
@@ -84,20 +82,14 @@ class Event(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="Actif")
 
     # Communication en amont (checkboxes multiples)
-    comm_before = models.BooleanField(
-        default=False, verbose_name="Communication avant l'événement"
-    )
+    comm_before = models.BooleanField(default=False, verbose_name="Communication avant l'événement")
     comm_during = models.BooleanField(
         default=False, verbose_name="Communication pendant l'événement"
     )
-    comm_after = models.BooleanField(
-        default=False, verbose_name="Communication après l'événement"
-    )
+    comm_after = models.BooleanField(default=False, verbose_name="Communication après l'événement")
 
     # Options additionnelles
-    needs_filming = models.BooleanField(
-        default=False, verbose_name="Intervention pour filmer"
-    )
+    needs_filming = models.BooleanField(default=False, verbose_name="Intervention pour filmer")
     needs_poster = models.BooleanField(default=False, verbose_name="Demande d'affiche")
 
     # Notification
@@ -160,9 +152,7 @@ class Event(models.Model):
         """Valide les dates de l'événement."""
         if self.end_datetime and self.start_datetime:
             if self.end_datetime <= self.start_datetime:
-                raise ValidationError(
-                    "La date de fin doit être postérieure à la date de début."
-                )
+                raise ValidationError("La date de fin doit être postérieure à la date de début.")
 
     def get_absolute_url(self):
         """Retourne l'URL de détail de l'événement."""
@@ -319,9 +309,7 @@ class EventValidation(models.Model):
         verbose_name="Événement",
         related_name="validation",
     )
-    is_validated = models.BooleanField(
-        default=False, verbose_name="Validé par la communication"
-    )
+    is_validated = models.BooleanField(default=False, verbose_name="Validé par la communication")
     validated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -384,9 +372,7 @@ class EventDocument(models.Model):
         related_name="uploaded_documents",
     )
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Uploadé le")
-    file_size = models.PositiveIntegerField(
-        null=True, blank=True, verbose_name="Taille (octets)"
-    )
+    file_size = models.PositiveIntegerField(null=True, blank=True, verbose_name="Taille (octets)")
 
     class Meta:
         verbose_name = "Document d'événement"
@@ -441,9 +427,7 @@ class EventDocument(models.Model):
             # Vérifier la taille (max 20 Mo)
             max_size = 20 * 1024 * 1024  # 20 Mo
             if hasattr(self.document, "size") and self.document.size > max_size:
-                raise ValidationError(
-                    "La taille du fichier ne doit pas dépasser 20 Mo."
-                )
+                raise ValidationError("La taille du fichier ne doit pas dépasser 20 Mo.")
 
 
 class EventRecurrence(models.Model):
@@ -541,9 +525,7 @@ class EventRecurrence(models.Model):
 
         # Heures de l'événement parent
         start_time = parent_event.start_datetime.time()
-        end_time = (
-            parent_event.end_datetime.time() if parent_event.end_datetime else None
-        )
+        end_time = parent_event.end_datetime.time() if parent_event.end_datetime else None
 
         # Nombre d'occurrences à générer
         max_count = count or self.max_occurrences or 52  # Par défaut, 1 an max
@@ -576,9 +558,7 @@ class EventRecurrence(models.Model):
             if should_generate and current_date > parent_event.start_datetime.date():
                 # Créer l'occurrence
                 start_datetime = datetime.combine(current_date, start_time)
-                end_datetime = (
-                    datetime.combine(current_date, end_time) if end_time else None
-                )
+                end_datetime = datetime.combine(current_date, end_time) if end_time else None
 
                 occurrence = Event(
                     title=parent_event.title,
@@ -624,9 +604,7 @@ class EventRecurrence(models.Model):
                             year=current_date.year + 1, month=1, day=1
                         )
                     else:
-                        current_date = current_date.replace(
-                            month=current_date.month + 1, day=1
-                        )
+                        current_date = current_date.replace(month=current_date.month + 1, day=1)
                     # Aller au jour souhaité
                     try:
                         current_date = current_date.replace(day=day)
@@ -635,12 +613,8 @@ class EventRecurrence(models.Model):
                         pass
             elif self.recurrence_type == "yearly":
                 # Passer à l'année suivante
-                if current_date.month > (
-                    self.month_of_year or parent_event.start_datetime.month
-                ):
-                    current_date = current_date.replace(
-                        year=current_date.year + 1, month=1, day=1
-                    )
+                if current_date.month > (self.month_of_year or parent_event.start_datetime.month):
+                    current_date = current_date.replace(year=current_date.year + 1, month=1, day=1)
 
         return occurrences
 

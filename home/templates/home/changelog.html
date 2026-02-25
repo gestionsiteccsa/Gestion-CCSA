@@ -11,6 +11,55 @@
     </div>
 
     <div class="space-y-8">
+        <!-- Version 1.2.1 - Production -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[1.2.1] - 2026-02-25</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full">En production</span>
+            </div>
+            <div class="space-y-6">
+                <!-- Améliorations -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                        Améliorations
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Intégration Outlook</strong> : Amélioration de l'intégration avec Outlook Calendar
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Nouveau bloc "Calendrier" dans la page de validation avec bouton "Ajouter à Outlook"</li>
+                                <li>Correction du format des dates pour Outlook (ISO 8601) dans la page détail</li>
+                                <li>Génération côté serveur des URLs Outlook pour plus de fiabilité</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Corrections -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Corrections
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Qualité du code</strong> : Formatage et organisation du code
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Formatage complet du code Python avec Black (line-length: 100)</li>
+                                <li>Organisation des imports avec isort</li>
+                                <li>Correction des imports mal placés dans accounts/views.py</li>
+                                <li>Extraction du JavaScript inline de base.html vers static/js/main.js</li>
+                                <li>Remplacement des CSS inline statiques par des classes Tailwind</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- Version 1.2.0 - Production -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">

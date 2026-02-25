@@ -159,9 +159,7 @@ class StatsDataView(LoginRequiredMixin, AccueilRequiredMixin, View):
         min_day_date = labels[min_day_index] if labels else "-"
 
         # Trouver la section la plus populaire
-        top_section = (
-            max(section_stats, key=lambda x: x["total"]) if section_stats else None
-        )
+        top_section = max(section_stats, key=lambda x: x["total"]) if section_stats else None
 
         # Calculer les stats de la période précédente pour comparaison
         prev_start = start_date - timedelta(days=num_days)
@@ -171,9 +169,9 @@ class StatsDataView(LoginRequiredMixin, AccueilRequiredMixin, View):
         current_date = prev_start
         while current_date <= prev_end:
             daily_sum = (
-                DailyTracking.objects.filter(date=current_date).aggregate(
-                    total=Sum("count")
-                )["total"]
+                DailyTracking.objects.filter(date=current_date).aggregate(total=Sum("count"))[
+                    "total"
+                ]
                 or 0
             )
             prev_total += daily_sum

@@ -114,9 +114,7 @@ def create_backup_ajax(request):
                     "message": "Sauvegarde créée avec succès",
                     "history_id": history.id,
                     "file_path": history.file_path,
-                    "file_size": (
-                        history.get_file_size_display() if history.file_size else "N/A"
-                    ),
+                    "file_size": (history.get_file_size_display() if history.file_size else "N/A"),
                 }
             )
         else:
@@ -136,9 +134,7 @@ def create_backup_ajax(request):
         history.error_message = "Timeout - La sauvegarde a pris trop de temps"
         history.completed_at = timezone.now()
         history.save()
-        return JsonResponse(
-            {"success": False, "message": "La sauvegarde a pris trop de temps"}
-        )
+        return JsonResponse({"success": False, "message": "La sauvegarde a pris trop de temps"})
     except Exception as e:
         history.status = "failed"
         history.error_message = str(e)
@@ -198,9 +194,7 @@ def delete_backup(request, filename):
     try:
         if os.path.exists(filepath):
             os.remove(filepath)
-            return JsonResponse(
-                {"success": True, "message": f"Fichier {filename} supprimé"}
-            )
+            return JsonResponse({"success": True, "message": f"Fichier {filename} supprimé"})
         else:
             return JsonResponse({"success": False, "message": "Fichier non trouvé"})
     except Exception as e:

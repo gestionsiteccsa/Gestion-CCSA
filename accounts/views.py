@@ -1,23 +1,26 @@
 """Views pour l'app accounts."""
 
 from django.contrib import messages
-from django.contrib.auth import (authenticate, login, logout,
-                                 update_session_auth_hash)
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import \
-    PasswordResetCompleteView as BasePasswordResetCompleteView
-from django.contrib.auth.views import \
-    PasswordResetConfirmView as BasePasswordResetConfirmView
-from django.contrib.auth.views import \
-    PasswordResetDoneView as BasePasswordResetDoneView
-from django.contrib.auth.views import \
-    PasswordResetView as BasePasswordResetView
+from django.contrib.auth.views import PasswordResetCompleteView as BasePasswordResetCompleteView
+from django.contrib.auth.views import PasswordResetConfirmView as BasePasswordResetConfirmView
+from django.contrib.auth.views import PasswordResetDoneView as BasePasswordResetDoneView
+from django.contrib.auth.views import PasswordResetView as BasePasswordResetView
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 
-from .forms import (PasswordChangeForm, UserLoginForm, UserProfileForm,
-                    UserRegistrationForm, UserUpdateForm)
-from .models import LoginHistory, User, UserSession
+from .forms import (
+    PasswordChangeForm,
+    UserLoginForm,
+    UserProfileForm,
+    UserRegistrationForm,
+    UserUpdateForm,
+)
+from .models import LoginHistory, Notification, User, UserSession
 
 
 def get_client_ip(request):
@@ -247,13 +250,6 @@ def sessions_view(request):
 
 # Vues pour les notifications
 
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-
-from .models import Notification
-
 
 @login_required
 def notification_list(request):
@@ -268,12 +264,8 @@ def notification_list(request):
     # Marquer comme lues les notifications affichées
     if request.method == "POST":
         if "mark_all_read" in request.POST:
-            Notification.objects.filter(user=request.user, is_read=False).update(
-                is_read=True
-            )
-            messages.success(
-                request, "Toutes les notifications ont été marquées comme lues."
-            )
+            Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+            messages.success(request, "Toutes les notifications ont été marquées comme lues.")
             return redirect("accounts:notification_list")
 
     return render(
@@ -346,9 +338,7 @@ def notification_mark_read(request, notification_id):
             status=429,
         )
 
-    notification = get_object_or_404(
-        Notification, id=notification_id, user=request.user
-    )
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.mark_as_read()
 
     return JsonResponse(
@@ -410,9 +400,7 @@ def notification_preferences(request):
             updated = True
 
         if updated:
-            messages.success(
-                request, "Vos préférences de notification ont été mises à jour."
-            )
+            messages.success(request, "Vos préférences de notification ont été mises à jour.")
 
         return redirect("accounts:notification_preferences")
 
@@ -457,9 +445,7 @@ def logs_view(request):
                                     else "INFO"
                                 ),
                                 "module": (
-                                    parts[3].split(":")[0]
-                                    if ":" in parts[3]
-                                    else "unknown"
+                                    parts[3].split(":")[0] if ":" in parts[3] else "unknown"
                                 ),
                                 "message": (
                                     parts[3].split(":", 1)[1].strip()

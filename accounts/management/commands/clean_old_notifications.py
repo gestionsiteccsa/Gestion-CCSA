@@ -27,9 +27,7 @@ class Command(BaseCommand):
         cutoff_date = timezone.now() - timedelta(days=days)
 
         # Supprimer les notifications anciennes
-        deleted_count = Notification.objects.filter(
-            created_at__lt=cutoff_date
-        ).delete()[0]
+        deleted_count = Notification.objects.filter(created_at__lt=cutoff_date).delete()[0]
 
         self.stdout.write(
             self.style.SUCCESS(

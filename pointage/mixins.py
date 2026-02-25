@@ -14,12 +14,8 @@ class AccueilRequiredMixin(UserPassesTestMixin):
             return False
 
         # Vérification insensible à la casse avec __iexact
-        return user.user_roles.filter(
-            role__name__iexact="accueil", is_active=True
-        ).exists()
+        return user.user_roles.filter(role__name__iexact="accueil", is_active=True).exists()
 
     def handle_no_permission(self):
         """Gère le cas où l'utilisateur n'a pas la permission."""
-        raise PermissionDenied(
-            "Vous devez avoir le rôle Accueil pour accéder à cette page."
-        )
+        raise PermissionDenied("Vous devez avoir le rôle Accueil pour accéder à cette page.")

@@ -5,26 +5,42 @@ organisées par domaine fonctionnel.
 """
 
 # Vues de base (liste, détail, calendrier, archives)
-from events.views.base import (EventArchiveView, EventCalendarView,
-                               EventDetailView, EventListView, MyEventsView)
+from events.views.base import (
+    EventArchiveView,
+    EventCalendarView,
+    EventDetailView,
+    EventListView,
+    MyEventsView,
+)
+
 # CRUD événements
 from events.views.crud import EventCreateView, EventDeleteView, EventUpdateView
+
 # Tableau de bord Communication
 from events.views.dashboard import CommunicationDashboardView
+
 # Duplication d'événements
 from events.views.duplicate import EventDuplicateView
+
 # Gestion des médias
 from events.views.media import delete_document, delete_image, reorder_images
+
 # Paramètres
 from events.views.settings import EventSettingsView
+
 # Workflow de validation
-from events.views.validation import (EventValidationDetailView,
-                                     EventValidationListView)
+from events.views.validation import EventValidationDetailView, EventValidationListView
+
 # Workflow vidéo
-from events.views.video import (VideoEmailSettingsView, confirm_video_request,
-                                download_ics, escape_ics_value,
-                                generate_ics_file, refuse_video_request,
-                                send_video_request)
+from events.views.video import (
+    VideoEmailSettingsView,
+    confirm_video_request,
+    download_ics,
+    escape_ics_value,
+    generate_ics_file,
+    refuse_video_request,
+    send_video_request,
+)
 
 __all__ = [
     # Base views

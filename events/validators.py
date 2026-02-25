@@ -52,9 +52,7 @@ class ImageSizeValidator:
         """Valide la taille du fichier."""
         if value.size > self.max_size:
             max_size_mb = self.max_size // (1024 * 1024)
-            raise ValidationError(
-                f"La taille du fichier ne doit pas dépasser {max_size_mb} Mo."
-            )
+            raise ValidationError(f"La taille du fichier ne doit pas dépasser {max_size_mb} Mo.")
 
     def __eq__(self, other):
         """Compare deux validateurs."""

@@ -12,9 +12,7 @@ urlpatterns = [
     # Création d'un nouveau lien
     path("creer/", views.ShortenedURLCreateView.as_view(), name="create"),
     # Suppression d'un lien
-    path(
-        "supprimer/<slug:code>/", views.ShortenedURLDeleteView.as_view(), name="delete"
-    ),
+    path("supprimer/<slug:code>/", views.ShortenedURLDeleteView.as_view(), name="delete"),
     # Redirection vers l'URL originale (accessible sans login)
     path("r/<slug:code>/", views.ShortenedURLRedirectView.as_view(), name="redirect"),
 ]

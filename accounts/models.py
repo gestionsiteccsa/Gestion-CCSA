@@ -17,9 +17,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     Le premier utilisateur créé devient automatiquement superutilisateur.
     """
 
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, verbose_name="ID"
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, verbose_name="ID")
 
     email = models.EmailField(
         "adresse email",
@@ -44,9 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         "numéro de téléphone", validators=[phone_regex], max_length=17, blank=True
     )
 
-    avatar = models.ImageField(
-        "avatar", upload_to="avatars/%Y/%m/", blank=True, null=True
-    )
+    avatar = models.ImageField("avatar", upload_to="avatars/%Y/%m/", blank=True, null=True)
 
     is_active = models.BooleanField(
         "actif",
@@ -60,9 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text="Détermine si l'utilisateur peut accéder à l'admin.",
     )
 
-    is_verified = models.BooleanField(
-        "vérifié", default=False, help_text="Email vérifié."
-    )
+    is_verified = models.BooleanField("vérifié", default=False, help_text="Email vérifié.")
 
     date_joined = models.DateTimeField("date d'inscription", default=timezone.now)
 
@@ -244,9 +238,7 @@ class PagePermission(models.Model):
     url_name = models.CharField("nom de l'URL", max_length=200, db_index=True)
     url_pattern = models.CharField("pattern d'URL", max_length=500)
     description = models.TextField("description", blank=True)
-    codename = models.CharField(
-        "code unique", max_length=300, unique=True, db_index=True
-    )
+    codename = models.CharField("code unique", max_length=300, unique=True, db_index=True)
     http_method = models.CharField(
         "méthode HTTP", max_length=10, choices=HTTP_METHODS, default="GET"
     )
@@ -270,9 +262,7 @@ class PagePermission(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.codename:
-            self.codename = (
-                f"{self.app_name}_{self.url_name}_{self.http_method.lower()}"
-            )
+            self.codename = f"{self.app_name}_{self.url_name}_{self.http_method.lower()}"
         super().save(*args, **kwargs)
 
 
@@ -296,9 +286,7 @@ class Role(models.Model):
 
     name = models.CharField("nom", max_length=100, unique=True)
     description = models.TextField("description", blank=True)
-    color = models.CharField(
-        "couleur", max_length=7, choices=COLOR_CHOICES, default="#3B82F6"
-    )
+    color = models.CharField("couleur", max_length=7, choices=COLOR_CHOICES, default="#3B82F6")
     is_default = models.BooleanField(
         "rôle par défaut",
         default=False,
@@ -323,9 +311,7 @@ class Role(models.Model):
 class RolePagePermission(models.Model):
     """Association entre un rôle et une permission de page."""
 
-    role = models.ForeignKey(
-        Role, on_delete=models.CASCADE, related_name="page_permissions"
-    )
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="page_permissions")
     page_permission = models.ForeignKey(
         PagePermission, on_delete=models.CASCADE, related_name="role_permissions"
     )
@@ -350,9 +336,7 @@ class UserRole(models.Model):
     """Association entre un utilisateur et un rôle."""
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_roles")
-    role = models.ForeignKey(
-        Role, on_delete=models.CASCADE, related_name="assigned_users"
-    )
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="assigned_users")
     assigned_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -443,9 +427,7 @@ class Notification(models.Model):
         verbose_name="utilisateur",
     )
 
-    notification_type = models.CharField(
-        "type", max_length=50, choices=NOTIFICATION_TYPES
-    )
+    notification_type = models.CharField("type", max_length=50, choices=NOTIFICATION_TYPES)
 
     title = models.CharField("titre", max_length=200)
 
@@ -554,9 +536,7 @@ class UserNotificationPreference(models.Model):
     def get_user_preferences(cls, user):
         """Récupère ou crée les préférences pour un utilisateur."""
         # Vérifier si l'utilisateur a le rôle Communication
-        is_comm = user.user_roles.filter(
-            role__name="Communication", is_active=True
-        ).exists()
+        is_comm = user.user_roles.filter(role__name="Communication", is_active=True).exists()
 
         if is_comm:
             # Communication : toutes les notifications, configurables
@@ -586,9 +566,7 @@ class UserNotificationPreference(models.Model):
             return False
 
         # Vérifier si le type est dans les types disponibles pour l'utilisateur
-        is_comm = user.user_roles.filter(
-            role__name="Communication", is_active=True
-        ).exists()
+        is_comm = user.user_roles.filter(role__name="Communication", is_active=True).exists()
 
         if not is_comm and notification_type not in cls.BASIC_USER_TYPES:
             return False

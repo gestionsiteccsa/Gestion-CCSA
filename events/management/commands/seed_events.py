@@ -40,17 +40,13 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(email=user_email)
             except User.DoesNotExist:
-                self.stdout.write(
-                    self.style.ERROR(f"Utilisateur {user_email} non trouvé")
-                )
+                self.stdout.write(self.style.ERROR(f"Utilisateur {user_email} non trouvé"))
                 return
         else:
             user = User.objects.first()
             if not user:
                 self.stdout.write(
-                    self.style.ERROR(
-                        "Aucun utilisateur trouvé. Créez un utilisateur d'abord."
-                    )
+                    self.style.ERROR("Aucun utilisateur trouvé. Créez un utilisateur d'abord.")
                 )
                 return
 
@@ -167,9 +163,7 @@ class Command(BaseCommand):
                 )
             )
 
-        self.stdout.write(
-            self.style.SUCCESS(f"\n{created_count} événement(s) créé(s) avec succès")
-        )
+        self.stdout.write(self.style.SUCCESS(f"\n{created_count} événement(s) créé(s) avec succès"))
 
         if num_overlapping_pairs > 0:
             self.stdout.write(

@@ -166,9 +166,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified_at",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name="Date de modification"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name="Date de modification"),
                 ),
                 (
                     "reason",
@@ -206,9 +204,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="dailytracking",
-            index=models.Index(
-                fields=["date", "section"], name="pointage_da_date_e2c85f_idx"
-            ),
+            index=models.Index(fields=["date", "section"], name="pointage_da_date_e2c85f_idx"),
         ),
         migrations.AddIndex(
             model_name="dailytracking",
@@ -216,9 +212,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="dailytracking",
-            index=models.Index(
-                fields=["section"], name="pointage_da_section_c07141_idx"
-            ),
+            index=models.Index(fields=["section"], name="pointage_da_section_c07141_idx"),
         ),
         migrations.AlterUniqueTogether(
             name="dailytracking",

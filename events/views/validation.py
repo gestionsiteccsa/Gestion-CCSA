@@ -2,6 +2,7 @@
 
 import logging
 import urllib.parse
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
@@ -15,8 +16,7 @@ from django.views.generic import DetailView, ListView
 
 from accounts.services import NotificationService
 from events.mixins import CommunicationRequiredMixin
-from events.models import (Event, EventChangeLog, EventSettings,
-                           EventValidation, VideoRequestLog)
+from events.models import Event, EventChangeLog, EventSettings, EventValidation, VideoRequestLog
 
 logger = logging.getLogger(__name__)
 
@@ -54,9 +54,7 @@ class EventValidationListView(CommunicationRequiredMixin, ListView):
 
         # Utiliser le paginator pour obtenir le count sans refaire la requête
         context["pending_count"] = (
-            context["paginator"].count
-            if context.get("paginator")
-            else self.get_queryset().count()
+            context["paginator"].count if context.get("paginator") else self.get_queryset().count()
         )
 
         # Compter les événements validés via EventValidation (is_validated=True)
@@ -85,9 +83,7 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
 
     def get_queryset(self):
         """Inclut les relations pour optimisation."""
-        return Event.objects.filter(is_active=True).prefetch_related(
-            "sectors", "created_by"
-        )
+        return Event.objects.filter(is_active=True).prefetch_related("sectors", "created_by")
 
     def _get_validation_status(self, validation):
         """Retourne le statut textuel de la validation."""
@@ -145,6 +141,21 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
             f"https://www.linkedin.com/sharing/share-offsite/?url={encoded_event_url}"
         )
 
+        # URL pour ajouter à Outlook avec le format correct (ISO 8601)
+        if self.object.end_datetime:
+            end_dt = self.object.end_datetime
+        else:
+            end_dt = self.object.start_datetime + timedelta(hours=1)
+
+        outlook_params = {
+            "subject": self.object.title,
+            "startdt": self.object.start_datetime.isoformat(),
+            "enddt": end_dt.isoformat(),
+            "body": self.object.description or "",
+            "location": self.object.location or self.object.city or "",
+        }
+        context["outlook_url"] = f"https://outlook.office.com/calendar/0/deeplink/compose?{urllib.parse.urlencode(outlook_params)}"
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -200,9 +211,7 @@ class EventValidationDetailView(CommunicationRequiredMixin, DetailView):
             if action == "validate":
                 NotificationService.notify_event_validated(self.object, request.user)
             else:
-                NotificationService.notify_event_rejected(
-                    self.object, request.user, comment
-                )
+                NotificationService.notify_event_rejected(self.object, request.user, comment)
 
             messages.success(request, message)
             return redirect("events:event_validation_list")

@@ -28,9 +28,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    models.CharField(
-                        default="Configuration principale", max_length=100
-                    ),
+                    models.CharField(default="Configuration principale", max_length=100),
                 ),
                 (
                     "backup_type",
@@ -129,9 +127,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "file_path",
-                    models.CharField(
-                        blank=True, max_length=500, verbose_name="Chemin du fichier"
-                    ),
+                    models.CharField(blank=True, max_length=500, verbose_name="Chemin du fichier"),
                 ),
                 (
                     "file_size",
@@ -145,9 +141,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "completed_at",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="Terminé à"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name="Terminé à"),
                 ),
                 (
                     "error_message",

@@ -28,9 +28,7 @@ class SecurityTests(TestCase):
 
         # Referrer-Policy (peut être 'same-origin' ou 'strict-origin-when-cross-origin')
         referrer_policy = response.get("Referrer-Policy")
-        self.assertIn(
-            referrer_policy, ["strict-origin-when-cross-origin", "same-origin"]
-        )
+        self.assertIn(referrer_policy, ["strict-origin-when-cross-origin", "same-origin"])
 
     def test_csp_headers_present(self):
         """Test que les headers CSP sont présents"""

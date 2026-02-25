@@ -133,9 +133,7 @@ class TestEventDuplication:
         client.force_login(user)
 
         # Récupérer la page de duplication pour obtenir les valeurs initiales
-        response = client.get(
-            reverse("events:event_duplicate", kwargs={"slug": event.slug})
-        )
+        response = client.get(reverse("events:event_duplicate", kwargs={"slug": event.slug}))
         assert response.status_code == 200
 
         # Utiliser le format de date attendu par le formulaire (datetime-local)

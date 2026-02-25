@@ -13,15 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="videorequestlog",
             name="refused",
-            field=models.BooleanField(
-                default=False, verbose_name="Refuse par le cameraman"
-            ),
+            field=models.BooleanField(default=False, verbose_name="Refuse par le cameraman"),
         ),
         migrations.AddField(
             model_name="videorequestlog",
             name="refused_at",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Date de refus"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Date de refus"),
         ),
     ]
