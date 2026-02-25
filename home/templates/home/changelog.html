@@ -11,6 +11,83 @@
     </div>
 
     <div class="space-y-8">
+        <!-- Version 1.3.0 - Production -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[1.3.0] - 2026-02-25</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full">En production</span>
+            </div>
+            <div class="space-y-6">
+                <!-- Fonctionnalités -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-purple-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Nouvelles fonctionnalités
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Application Feedback</strong> : Système complet de gestion des tickets de support
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Création de tickets avec type (Bug, Amélioration, Question) et priorité (Faible à Critique)</li>
+                                <li>Upload de captures d'écran (JPG/PNG, max 2MB)</li>
+                                <li>Système de commentaires avec distinction "Réponse du support"</li>
+                                <li>Notifications email et in-app pour le support</li>
+                                <li>Bouton flottant accessible sur toutes les pages pour créer rapidement un ticket</li>
+                                <li>Interface d'administration dédiée pour le rôle "Support"</li>
+                                <li>Configuration des destinataires d'emails (superadmin)</li>
+                                <li>Workflow de statuts : Nouveau → En cours → Résolu/Fermé</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tests -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Tests
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 ml-4">
+                        <li>Implémentation complète en TDD (Test Driven Development)</li>
+                        <li>61 tests unitaires et d'intégration (100% pass)</li>
+                        <li>Tests des modèles, formulaires et vues</li>
+                        <li>Tests de permissions (propriétaire vs support)</li>
+                        <li>Tests d'envoi d'emails et de notifications</li>
+                    </ul>
+                </div>
+
+                <!-- Améliorations Interface -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                        Améliorations Interface
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Navigation</strong> : Ajout des liens Feedback
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Lien "Support" dans le header pour les utilisateurs avec le rôle Support</li>
+                                <li>Lien "Mes tickets" dans le footer pour tous les utilisateurs connectés</li>
+                                <li>Lien "Mes tickets" dans le menu utilisateur (desktop et mobile)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Design TailwindCSS</strong> : Templates responsive et cohérents
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Liste des tickets avec filtres et pagination</li>
+                                <li>Formulaire de création avec drag-and-drop pour les images</li>
+                                <li>Page détail avec commentaires et informations latérales</li>
+                                <li>Interface admin pour la gestion des tickets</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- Version 1.2.1 - Production -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">

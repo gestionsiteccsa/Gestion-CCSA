@@ -1,0 +1,124 @@
+/* Styles pour l'app feedback */
+
+/* Bouton flottant bug */
+.feedback-floating-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.feedback-floating-button:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.feedback-floating-button svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* Infobulle */
+.feedback-tooltip {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.feedback-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 20px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.feedback-floating-button:hover + .feedback-tooltip,
+.feedback-tooltip:hover {
+    opacity: 1;
+    visibility: visible;
+    bottom: 100px;
+}
+
+/* Badges de priorité */
+.badge-priority-low {
+    background-color: #6c757d;
+}
+
+.badge-priority-medium {
+    background-color: #0dcaf0;
+    color: #000;
+}
+
+.badge-priority-high {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-priority-critical {
+    background-color: #dc3545;
+}
+
+/* Badges de statut */
+.badge-status-new {
+    background-color: #0d6efd;
+}
+
+.badge-status-in_progress {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-status-resolved {
+    background-color: #198754;
+}
+
+.badge-status-closed {
+    background-color: #6c757d;
+}
+
+/* Commentaire du support */
+.comment-staff {
+    background-color: #e7f3ff;
+    border-left: 4px solid #0d6efd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .feedback-floating-button {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .feedback-floating-button svg {
+        width: 24px;
+        height: 24px;
+    }
+}

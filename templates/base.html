@@ -183,8 +183,9 @@
                      {% endif %}
                      
                      {% has_communication_role as user_has_comm_role %}
-                    {% get_pending_validation_count as pending_count %}
-                    {% if user_has_comm_role %}
+                     {% has_support_role as user_has_support_role %}
+                     {% get_pending_validation_count as pending_count %}
+                     {% if user_has_comm_role %}
                     <!-- Communication Dropdown -->
                     <div class="relative" id="communication-nav-menu-container">
                         <button type="button" id="communication-nav-menu-button" class="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.url_name == 'event_validation_list' or request.resolver_match.url_name == 'event_validation' %}text-primary-600 bg-primary-50{% endif %}">
@@ -238,9 +239,21 @@
                         </div>
                     </div>
                     {% endif %}
-                    
-                    {% if user.is_authenticated %}
-                        <!-- Notifications Dropdown -->
+                     
+                     {% if user_has_support_role %}
+                     <!-- Support Administration Link -->
+                     <a href="{% url 'feedback:admin_list' %}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'feedback' and request.resolver_match.url_name == 'admin_list' %}text-primary-600 bg-primary-50{% endif %}">
+                         <span class="flex items-center">
+                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                             </svg>
+                             Support
+                         </span>
+                     </a>
+                     {% endif %}
+                     
+                     {% if user.is_authenticated %}
+                         <!-- Notifications Dropdown -->
                         {% include "accounts/notification_dropdown.html" %}
                         
                         <div class="relative ml-4" id="user-menu-container">
@@ -258,6 +271,14 @@
                             <div id="user-menu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
                                 <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
                                     Mon profil
+                                </a>
+                                <a href="{% url 'feedback:ticket_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                        </svg>
+                                        Mes tickets
+                                    </span>
                                 </a>
                                 <a href="{% url 'events:my_events' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
                                     <span class="flex items-center">
@@ -443,8 +464,9 @@
                  {% endif %}
                  
                  {% has_communication_role as user_has_comm_role %}
-                {% get_pending_validation_count as pending_count %}
-                {% if user_has_comm_role %}
+                 {% has_support_role as user_has_support_role_mobile %}
+                 {% get_pending_validation_count as pending_count %}
+                 {% if user_has_comm_role %}
                     <div class="border-t border-slate-100 my-2 pt-2">
                         <div class="px-3 py-2 text-sm font-medium text-slate-500 flex items-center">
                         Communication
@@ -470,15 +492,37 @@
                     </a>
                 </div>
                 {% endif %}
-                {% endif %}
-                
-                {% if user.is_authenticated %}
+                 {% endif %}
+                 
+                 {% if user_has_support_role_mobile %}
+                 <!-- Support Mobile -->
+                 <div class="border-t border-slate-100 my-2 pt-2">
+                     <a href="{% url 'feedback:admin_list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'feedback' and request.resolver_match.url_name == 'admin_list' %}text-primary-600 bg-primary-50{% endif %}">
+                         <span class="flex items-center">
+                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                             </svg>
+                             Administration Support
+                         </span>
+                     </a>
+                 </div>
+                 {% endif %}
+                 
+                 {% if user.is_authenticated %}
                     <div class="border-t border-slate-100 my-2 pt-2">
                         <div class="px-3 py-2 text-sm text-slate-500">
                             Connecté en tant que <span class="font-medium text-slate-700">{{ user.get_full_name|default:user.email }}</span>
                         </div>
                         <a href="{% url 'accounts:profile' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
                             Mon profil
+                        </a>
+                        <a href="{% url 'feedback:ticket_list' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                </svg>
+                                Mes tickets
+                            </span>
                         </a>
                         <a href="{% url 'events:my_events' %}" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors">
                             <span class="flex items-center">
@@ -589,6 +633,14 @@
                     <span class="text-sm text-slate-500">© {% now "Y" %} Communauté de Communes Sud-Avesnois</span>
                 </div>
                 <div class="flex items-center space-x-6 text-sm text-slate-500">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'feedback:ticket_list' %}" class="hover:text-primary-600 transition-colors flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        Mes tickets
+                    </a>
+                    {% endif %}
                     <a href="{% url 'changelog' %}" class="hover:text-primary-600 transition-colors flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -599,6 +651,20 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Feedback CSS -->
+    <link rel="stylesheet" href="{% static 'feedback/css/feedback.css' %}">
+    
+    <!-- Bouton flottant de feedback (pour utilisateurs connectés) -->
+    {% if user.is_authenticated %}
+        <a href="{% url 'feedback:ticket_create' %}" class="feedback-floating-button" aria-label="Signaler un problème">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-2h2v2h-2zm0-4V7h2v6h-2z" />
+            </svg>
+        </a>
+        <div class="feedback-tooltip">Signaler un problème</div>
+    {% endif %}
     
     <!-- JavaScript -->
     <script src="{% static 'js/main.js' %}" defer></script>

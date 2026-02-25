@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier le statut - Ticket #{{ object.id }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- En-tête -->
+        <div class="mb-6">
+            <div class="flex items-center space-x-2 mb-4">
+                <a href="{% url 'feedback:admin_list' %}" class="text-sm text-slate-500 hover:text-primary-600 transition-colors flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Retour à l'administration
+                </a>
+            </div>
+            
+            <h1 class="text-3xl font-bold text-slate-900">Modifier le statut</h1>
+        </div>
+
+        <!-- Informations du ticket -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <div class="flex items-start space-x-4">
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold text-slate-900 mb-2">{{ object.title }}</h2>
+                    
+                    <p class="text-slate-600 mb-4">
+                        Créé par <span class="font-medium">{{ object.created_by.email }}</span> 
+                        le <span class="font-medium">{{ object.created_at|date:"d/m/Y" }}</span>
+                    </p>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <span class="text-sm text-slate-500">Statut actuel :</span>
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if object.status == 'new' %}bg-blue-100 text-blue-800{% elif object.status == 'in_progress' %}bg-yellow-100 text-yellow-800{% elif object.status == 'resolved' %}bg-green-100 text-green-800{% else %}bg-slate-100 text-slate-800{% endif %}">
+                                {{ object.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-6 sm:p-8">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+
+                    <div>
+                        <label for="{{ form.status.id_for_label }}" class="block text-sm font-semibold text-slate-700 mb-2">
+                            Nouveau statut
+                            <span class="text-red-500">*</span>
+                        </label>
+                        
+                        <div class="relative">
+                            {{ form.status }}
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        {% if form.status.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.status.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-6 border-t border-slate-200">
+                        <a href="{% url 'feedback:admin_list' %}" 
+                           class="px-6 py-3 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors text-center">
+                            Annuler
+                        </a>
+                        
+                        <button type="submit" 
+                                class="px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                            Mettre à jour
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Ajouter les classes Tailwind au select généré par Django
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('{{ form.status.id_for_label }}');
+        if (select) {
+            select.className = 'w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-primary-500 focus:border-primary-500 transition-colors appearance-none bg-white';
+        }
+    });
+</script>
+{% endblock %}

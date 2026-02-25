@@ -57,6 +57,23 @@ def has_accueil_role(context):
     return user.user_roles.filter(role__name__iexact="accueil", is_active=True).exists()
 
 
+@register.simple_tag(takes_context=True)
+def has_support_role(context):
+    """Vérifie si l'utilisateur a le rôle 'Support'.
+
+    Usage dans le template:
+        {% has_support_role as user_has_support_role %}
+        {% if user_has_support_role %}
+            ...
+        {% endif %}
+    """
+    user = context.get("user")
+    if not user or not user.is_authenticated:
+        return False
+
+    return user.user_roles.filter(role__name="Support", is_active=True).exists()
+
+
 @register.simple_tag
 def get_pending_validation_count():
     """Retourne le nombre d'événements en attente de validation.

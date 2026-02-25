@@ -416,6 +416,8 @@ class Notification(models.Model):
         ("event_validated", "Événement validé"),
         ("event_rejected", "Événement rejeté"),
         ("video_request_sent", "Demande de tournage envoyée"),
+        ("feedback_new_ticket", "Nouveau ticket de feedback"),
+        ("feedback_status_changed", "Statut de ticket modifié"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -498,6 +500,8 @@ class UserNotificationPreference(models.Model):
         ("event_validated", "Événement validé"),
         ("event_rejected", "Événement rejeté"),
         ("video_request_sent", "Demande de tournage envoyée"),
+        ("feedback_new_ticket", "Nouveau ticket de feedback"),
+        ("feedback_status_changed", "Statut de ticket modifié"),
     ]
 
     # Types accessibles aux utilisateurs basiques

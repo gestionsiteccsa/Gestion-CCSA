@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "backup",
     "url_shortener",
     "pointage",
+    "feedback",
 ]
 
 # Whitenoise pour servir les fichiers statiques en production
