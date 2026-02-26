@@ -7,8 +7,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from accounts.models import User
-from events.models import (Event, EventChangeLog, EventComment, EventImage,
-                           Sector)
+from events.models import Event, EventChangeLog, EventComment, EventImage, Sector
 
 
 class SectorModelTest(TestCase):

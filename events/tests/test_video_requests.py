@@ -4,6 +4,7 @@ from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone

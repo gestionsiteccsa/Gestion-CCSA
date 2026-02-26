@@ -206,7 +206,10 @@ class NotificationService:
         NotificationService.notify_communication_team(
             notification_type="event_created",
             title=f"Nouvel événement - {event.title}",
-            message=f'Un nouvel événement "{event.title}" a été créé par {created_by.get_full_name() or created_by.email}.',
+            message=(
+                f'Un nouvel événement "{event.title}" a été créé par '
+                f"{created_by.get_full_name() or created_by.email}."
+            ),
             event=event,
             link=link,
         )
@@ -219,7 +222,10 @@ class NotificationService:
         NotificationService.notify_communication_team(
             notification_type="event_updated",
             title=f"Événement modifié - {event.title}",
-            message=f'L\'événement "{event.title}" a été modifié par {updated_by.get_full_name() or updated_by.email}.',
+            message=(
+                f'L\'événement "{event.title}" a été modifié par '
+                f"{updated_by.get_full_name() or updated_by.email}."
+            ),
             event=event,
             link=link,
         )
@@ -232,7 +238,10 @@ class NotificationService:
         NotificationService.notify_communication_team(
             notification_type="event_deleted",
             title=f"Événement supprimé - {event_title}",
-            message=f'L\'événement "{event_title}" a été supprimé par {deleted_by.get_full_name() or deleted_by.email}.',
+            message=(
+                f'L\'événement "{event_title}" a été supprimé par '
+                f"{deleted_by.get_full_name() or deleted_by.email}."
+            ),
             link=link,
         )
 
@@ -247,7 +256,10 @@ class NotificationService:
         NotificationService.notify_communication_team(
             notification_type="event_commented",
             title=f"Nouveau commentaire - {event.title}",
-            message=f'{author.get_full_name() or author.email} a commenté l\'événement "{event.title}".',
+            message=(
+                f"{author.get_full_name() or author.email} a commenté "
+                f'l\'événement "{event.title}".'
+            ),
             event=event,
             link=link,
         )
@@ -258,7 +270,10 @@ class NotificationService:
                 user=event.created_by,
                 notification_type="event_commented",
                 title=f"Nouveau commentaire sur votre événement - {event.title}",
-                message=f'{author.get_full_name() or author.email} a commenté votre événement "{event.title}".',
+                message=(
+                    f"{author.get_full_name() or author.email} a commenté "
+                    f'votre événement "{event.title}".'
+                ),
                 event=event,
                 link=link,
             )
@@ -272,7 +287,10 @@ class NotificationService:
             user=event.created_by,
             notification_type="event_validated",
             title=f"Événement validé - {event.title}",
-            message=f'Votre événement "{event.title}" a été validé par {validated_by.get_full_name() or validated_by.email}.',
+            message=(
+                f'Votre événement "{event.title}" a été validé par '
+                f"{validated_by.get_full_name() or validated_by.email}."
+            ),
             event=event,
             link=link,
         )
@@ -281,7 +299,10 @@ class NotificationService:
         NotificationService.notify_communication_team(
             notification_type="event_validated",
             title=f"Événement validé - {event.title}",
-            message=f'L\'événement "{event.title}" a été validé par {validated_by.get_full_name() or validated_by.email}.',
+            message=(
+                f'L\'événement "{event.title}" a été validé par '
+                f"{validated_by.get_full_name() or validated_by.email}."
+            ),
             event=event,
             link=link,
         )
@@ -291,7 +312,10 @@ class NotificationService:
         """Notifie le createur de l'evenement quand il est rejete."""
         link = reverse("events:event_detail", kwargs={"slug": event.slug})
 
-        message = f'Votre événement "{event.title}" a été rejeté par {rejected_by.get_full_name() or rejected_by.email}.'
+        message = (
+            f'Votre événement "{event.title}" a été rejeté par '
+            f"{rejected_by.get_full_name() or rejected_by.email}."
+        )
         if reason:
             message += f"\n\nMotif : {reason}"
 
@@ -305,7 +329,10 @@ class NotificationService:
         )
 
         # Notifier aussi l'equipe Communication
-        comm_message = f'L\'événement "{event.title}" a été rejeté par {rejected_by.get_full_name() or rejected_by.email}.'
+        comm_message = (
+            f'L\'événement "{event.title}" a été rejeté par '
+            f"{rejected_by.get_full_name() or rejected_by.email}."
+        )
         if reason:
             comm_message += f"\n\nMotif : {reason}"
 

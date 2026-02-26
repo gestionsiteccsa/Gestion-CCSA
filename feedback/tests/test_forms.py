@@ -1,11 +1,11 @@
 """Tests pour les formulaires de l'app feedback."""
 
 import pytest
+
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from feedback.forms import (FeedbackCommentForm, FeedbackSettingsForm,
-                            FeedbackTicketForm)
+from feedback.forms import FeedbackCommentForm, FeedbackSettingsForm, FeedbackTicketForm
 from feedback.models import FeedbackSettings, FeedbackTicket
 
 User = get_user_model()

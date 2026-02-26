@@ -1,8 +1,5 @@
 """Modèles pour la gestion des sauvegardes."""
 
-import os
-from datetime import datetime
-
 from django.conf import settings
 from django.db import models
 

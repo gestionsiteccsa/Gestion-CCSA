@@ -3,373 +3,21 @@
 {% block title %}Événements - {{ block.super }}{% endblock %}
 
 {% block content %}
-<style>
-    /* Animations d'apparition */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    @keyframes fadeInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.5;
-        }
-    }
-    
-    .animate-fade-in-up {
-        animation: fadeInUp 0.5s ease-out forwards;
-    }
-    
-    .animate-fade-in-left {
-        animation: fadeInLeft 0.4s ease-out forwards;
-    }
-    
-    /* Délai progressif pour l'effet cascade */
-    .delay-100 { animation-delay: 100ms; }
-    .delay-200 { animation-delay: 200ms; }
-    .delay-300 { animation-delay: 300ms; }
-    .delay-400 { animation-delay: 400ms; }
-    .delay-500 { animation-delay: 500ms; }
-    
-    /* Timeline et scroll */
-    .timeline-card {
-        overflow: visible !important;
-    }
-    
-    .timeline-scroll-container {
-        scroll-behavior: smooth;
-        scrollbar-width: thin;
-        scrollbar-color: #cbd5e1 transparent;
-    }
-    
-    .timeline-scroll-container::-webkit-scrollbar {
-        height: 6px;
-    }
-    
-    .timeline-scroll-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    
-    .timeline-scroll-container::-webkit-scrollbar-thumb {
-        background-color: #cbd5e1;
-        border-radius: 3px;
-    }
-    
-    .timeline-scroll-container::-webkit-scrollbar-thumb:hover {
-        background-color: #94a3b8;
-    }
-    
-    /* Flèches de scroll */
-    .scroll-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 40px;
-        height: 40px;
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
-        z-index: 20;
-    }
-    
-    .scroll-arrow:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-        transform: translateY(-50%) scale(1.1);
-    }
-    
-    .scroll-arrow:focus {
-        outline: 2px solid #3b82f6;
-        outline-offset: 2px;
-    }
-    
-    .scroll-arrow-left {
-        left: -10px;
-    }
-    
-    .scroll-arrow-right {
-        right: -10px;
-    }
-    
-    /* Tooltips accessibles */
-    .tooltip-container {
-        position: relative;
-    }
-    
-    .tooltip {
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-8px);
-        padding: 8px 12px;
-        background-color: #0f172a;
-        color: white;
-        font-size: 12px;
-        font-weight: 500;
-        white-space: nowrap;
-        border-radius: 6px;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.2s ease;
-        z-index: 9999;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        pointer-events: none;
-        min-width: max-content;
-    }
-    
-    .tooltip::after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 5px;
-        border-style: solid;
-        border-color: #0f172a transparent transparent transparent;
-    }
-    
-    .tooltip-container:hover .tooltip,
-    .tooltip-container:focus .tooltip,
-    .tooltip-container:focus-within .tooltip {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(-4px);
-    }
-    
-    /* Badges améliorés */
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 10px;
-        border-radius: 9999px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.025em;
-        transition: all 0.2s ease;
-    }
-    
-    .badge-icon {
-        width: 14px;
-        height: 14px;
-    }
-    
-    /* Effet hover sur les cartes */
-    .event-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .event-card:hover {
-        transform: translateY(-4px);
-    }
-    
-    /* Barre de recherche */
-    .search-input {
-        transition: all 0.2s ease;
-    }
-    
-    .search-input:focus {
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    /* Filtres */
-    .filter-btn {
-        transition: all 0.2s ease;
-    }
-    
-    .filter-btn:focus {
-        outline: 2px solid #3b82f6;
-        outline-offset: 2px;
-    }
-    
-    .filter-btn.active {
-        background-color: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
-    
-    /* Bouton calendrier */
-    .calendar-btn {
-        transition: all 0.2s ease;
-    }
-    
-    .calendar-btn:hover {
-        background-color: #f0fdf4;
-        border-color: #22c55e;
-        color: #16a34a;
-    }
-    
-    /* Accessibilité - Focus visible */
-    *:focus-visible {
-        outline: 2px solid #3b82f6;
-        outline-offset: 2px;
-    }
-    
-    /* Skip link pour accessibilité */
-    .skip-link {
-        position: absolute;
-        top: -40px;
-        left: 0;
-        background: #1e293b;
-        color: white;
-        padding: 8px;
-        text-decoration: none;
-        z-index: 10000;
-    }
-    
-    .skip-link:focus {
-        top: 0;
-    }
-    
-    /* Indicateur de scroll horizontal */
-    .scroll-hint {
-        animation: pulse 2s infinite;
-    }
-
-    /* Regroupement par semaine */
-    .week-separator {
-        position: relative;
-        padding: 20px 0 10px;
-        margin-bottom: 10px;
-        border-left: 3px solid #e2e8f0;
-        padding-left: 15px;
-    }
-
-    .week-label {
-        position: absolute;
-        top: 0;
-        left: 15px;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-        z-index: 5;
-    }
-
-    .week-separator-current {
-        border-left-color: #22c55e;
-    }
-
-    .week-separator-current .week-label {
-        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-        box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
-    }
-
-    /* Indicateur Aujourd'hui - SUPPRIMÉ */
-    .today-indicator {
-        display: none;
-    }
-
-    /* Mode compact */
-    .timeline-container.compact-mode .event-card {
-        min-height: auto;
-    }
-
-    .timeline-container.compact-mode .event-card .p-4 {
-        padding: 8px;
-    }
-
-    .timeline-container.compact-mode .event-card h3 {
-        font-size: 12px;
-        margin-bottom: 4px;
-    }
-
-    .timeline-container.compact-mode .event-card .badge {
-        padding: 2px 6px;
-        font-size: 9px;
-    }
-
-    .timeline-container.compact-mode .event-card .badge-icon {
-        width: 10px;
-        height: 10px;
-    }
-
-    .timeline-container.compact-mode .city-location {
-        display: none;
-    }
-
-    /* Toggle mode bouton */
-    .view-toggle-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 500;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .view-toggle-btn:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-    }
-
-    .view-toggle-btn.active {
-        background: #eff6ff;
-        border-color: #3b82f6;
-        color: #3b82f6;
-    }
-
-    .view-toggle-btn svg {
-        width: 16px;
-        height: 16px;
-    }
-</style>
-
-<!-- Skip link pour accessibilité -->
-<a href="#main-content" class="skip-link">Aller au contenu principal</a>
-
-<div id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
-    <header class="mb-8 animate-fade-in-up" role="banner">
+    <header class="mb-10">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-slate-900" id="page-title">Événements</h1>
-                <p class="mt-1 text-slate-600">Découvrez tous les événements de la CCSA</p>
+                <h1 class="text-3xl font-bold text-slate-900">Événements</h1>
+                <p class="mt-1 text-slate-600">Découvrez tous les événements à venir</p>
             </div>
+            
             {% if user.is_authenticated %}
             <a href="{% url 'events:event_create' %}" 
-               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-               aria-label="Créer un nouvel événement">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 Créer un événement
             </a>
@@ -377,330 +25,180 @@
         </div>
     </header>
 
-    <!-- Timeline des événements à venir -->
     {% if upcoming_events %}
-    <section class="mb-8 animate-fade-in-up delay-200" aria-labelledby="upcoming-title">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 id="upcoming-title" class="text-xl font-bold text-slate-900">À venir dans les 30 prochains jours</h2>
-                <p class="text-sm text-slate-500 mt-1">{{ upcoming_events|length }} événement{{ upcoming_events|length|pluralize }} trouvé{{ upcoming_events|length|pluralize }}</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <!-- Toggle Vue Compacte/Détaillée -->
-                <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-                    <button type="button" 
-                            id="viewCompact"
-                            class="view-toggle-btn active"
-                            aria-pressed="true"
-                            aria-label="Mode compact">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                        </svg>
-                        Compact
-                    </button>
-                    <button type="button" 
-                            id="viewExpanded"
-                            class="view-toggle-btn"
-                            aria-pressed="false"
-                            aria-label="Mode détaillé">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                        Détaillé
-                    </button>
-                </div>
-                <a href="{% url 'events:event_calendar' %}" 
-                   class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium focus:outline-none focus:underline"
-                   aria-label="Voir le calendrier complet">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    Voir le calendrier
-                </a>
-            </div>
-        </div>
+    
+    <!-- Vue Calendrier Chronologique -->
+    <div class="space-y-12">
         
-        <!-- Timeline horizontale avec scroll -->
-        <div class="relative">
-            <!-- Ligne de timeline -->
-            <div class="absolute top-8 left-0 right-0 h-0.5 bg-slate-200" aria-hidden="true"></div>
+        {% regroup upcoming_events by start_datetime|date:"Y" as events_by_year %}
+        {% for year_group in events_by_year %}
+        
+            {% regroup year_group.list by start_datetime|date:"F" as events_by_month %}
+            {% for month_group in events_by_month %}
             
-            <!-- Flèches de navigation -->
-            <button type="button" 
-                    class="scroll-arrow scroll-arrow-left hidden sm:flex" 
-                    id="scrollLeft"
-                    aria-label="Défiler vers la gauche"
-                    title="Défiler vers la gauche">
-                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-            </button>
-            <button type="button" 
-                    class="scroll-arrow scroll-arrow-right hidden sm:flex" 
-                    id="scrollRight"
-                    aria-label="Défiler vers la droite"
-                    title="Défiler vers la droite">
-                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </button>
-            
-            <!-- Conteneur scrollable -->
-            <div class="overflow-x-auto pb-4 timeline-scroll-container timeline-container compact-mode" id="timelineContainer" tabindex="0" role="region" aria-label="Timeline des événements à venir - Utilisez les flèches pour naviguer">
-                <div class="flex gap-6 min-w-max px-2 relative">
+            <!-- Section Mois -->
+            <section class="animate-fade-in">
+                <div class="flex items-center gap-4 mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">
+                        {{ month_group.grouper|capfirst }} {{ year_group.grouper }}
+                    </h2>
+                    <div class="flex-1 h-0.5 bg-gradient-to-r from-slate-200 to-transparent"></div>
+                    <span class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                        {{ month_group.list|length }} événement{{ month_group.list|length|pluralize }}
+                    </span>
+                </div>
+                
+                <!-- Jours du mois -->
+                <div class="space-y-8">
+                    {% regroup month_group.list by start_datetime|date:"j l" as events_by_day %}
+                    {% for day_group in events_by_day %}
                     
-                    {% regroup upcoming_events by start_datetime|date:"W" as events_by_week %}
-                    
-                    {% for week_group in events_by_week %}
-                        <div class="week-separator {% if week_group.grouper == now|date:'W' %}week-separator-current{% endif %}">
-                            <div class="week-label">
-                                {% if week_group.grouper == now|date:"W" %}
-                                    Cette semaine
-                                {% elif week_group.grouper == now|date:"W"|add:1 %}
-                                    Semaine prochaine
-                                {% else %}
-                                    Semaine {{ week_group.grouper }}
-                                {% endif %}
+                    <!-- Section Jour -->
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex flex-col items-center justify-center font-bold shadow-sm">
+                                    <span class="text-lg leading-none">{{ day_group.list.0.start_datetime|date:"j" }}</span>
+                                    <span class="text-xs opacity-90">{{ day_group.list.0.start_datetime|date:"D" }}</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-900">{{ day_group.list.0.start_datetime|date:"l" }}</h3>
+                                    <p class="text-sm text-slate-500">{{ day_group.list|length }} événement{{ day_group.list|length|pluralize }}</p>
+                                </div>
                             </div>
                         </div>
                         
-{% for event in week_group.list %}
-{% with first_sector=event.sectors.all.0 %}
-                    <article class="relative flex-shrink-0 w-64 group animate-fade-in-left delay-{{ forloop.counter|add:2|divisibleby:5 }}00" style="animation-delay: {{ forloop.counter0 }}00ms;">
-                        <a href="{{ event.get_absolute_url }}" 
-                           class="block"
-                           aria-labelledby="event-title-{{ event.id }}">
-                            <!-- Point sur la timeline -->
-                            <div class="absolute top-6 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 border-white shadow-sm z-10"
-                                 style="background-color: {{ first_sector.color_code|default:'#64748b' }};"
-                                 aria-hidden="true"></div>
-                            
-                            <!-- Date au-dessus -->
-                            <div class="text-center mb-6">
-                                <time datetime="{{ event.start_datetime|date:'Y-m-d' }}" class="block">
-                                    <span class="text-2xl font-bold text-slate-900">{{ event.start_datetime|date:"d" }}</span>
-                                    <span class="text-sm text-slate-500 pt-3 uppercase block">{{ event.start_datetime|date:"M" }}</span>
-                                    <span class="text-xs text-slate-400 block">{{ event.start_datetime|date:"H:i" }}</span>
-                                </time>
-                            </div>
-                            
-                            <!-- Card de l'événement -->
-                            <div class="timeline-card event-card bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border-l-4 {% if event.validation and event.validation.is_validated %}border-green-500{% elif event.validation %}border-red-500{% else %}border-yellow-500{% endif %}">
-                                <div class="p-4">
-                                    <!-- Badges d'information -->
-                                    <div class="flex flex-wrap gap-1.5 mb-2">
-                                        {% if event.needs_filming %}
-                                        {% with video_request=event.video_requests.first %}
-                                        {% if video_request.confirmed %}
-                                        <span class="tooltip-container badge bg-green-100 text-green-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                            </svg>
-                                            Vidéo
-                                            <span class="tooltip" role="tooltip">Tournage vidéo confirmé</span>
-                                        </span>
-                                        {% elif video_request.refused %}
-                                        <span class="tooltip-container badge bg-red-100 text-red-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                            </svg>
-                                            Vidéo
-                                            <span class="tooltip" role="tooltip">Tournage vidéo refusé</span>
-                                        </span>
-                                        {% else %}
-                                        <span class="tooltip-container badge bg-orange-100 text-orange-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                            </svg>
-                                            Vidéo
-                                            <span class="tooltip" role="tooltip">Tournage vidéo en attente</span>
-                                        </span>
-                                        {% endif %}
-                                        {% endwith %}
-                                        {% endif %}
-                                        
-                                        {% if event.needs_poster %}
-                                        <span class="tooltip-container badge bg-pink-100 text-pink-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                            Affiche
-                                            <span class="tooltip" role="tooltip">Affiche demandée</span>
-                                        </span>
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- Secteur et badge Mon événement -->
-                                    <div class="flex flex-wrap gap-2 mb-2">
-                                        {% if first_sector %}
-                                        <span class="badge" 
-                                              style="background-color: {{ first_sector.color_code }}20; color: {{ first_sector.color_code }}; border: 1px solid {{ first_sector.color_code }}40;">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                            </svg>
-                                            {{ first_sector.name }}
-                                        </span>
-                                        {% endif %}
-                                        {% if request.user.is_authenticated and event.created_by == request.user %}
-                                        <span class="tooltip-container badge bg-blue-100 text-blue-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                                            </svg>
-                                            Mon événement
-                                            <span class="tooltip" role="tooltip">Vous avez créé cet événement</span>
-                                        </span>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Titre -->
-                                    <h3 id="event-title-{{ event.id }}" class="text-sm font-semibold text-slate-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
-                                        {{ event.title }}
-                                    </h3>
-                                    
-                                    <!-- Ville -->
-                                    <div class="flex items-center justify-between text-xs text-slate-500 city-location">
-                                        <div class="flex items-center">
-                                            <svg class="w-3 h-3 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            </svg>
-                                            {{ event.city }}
+                        <!-- Grille d'événements -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                
+                                {% for event in day_group.list %}
+                                {% with first_sector=event.sectors.all.0 %}
+                                
+                                <!-- Carte événement -->
+                                <article class="group bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 overflow-hidden">
+                                    <a href="{{ event.get_absolute_url }}" class="block h-full">
+                                        <div class="p-4 h-full flex flex-col">
+                                            
+                                            <!-- Heure -->
+                                            <div class="text-sm font-semibold text-blue-600 mb-3">
+                                                {{ event.start_datetime|time:"H:i" }}
+                                            </div>
+                                            
+                                            <!-- Badges d'action -->
+                                            {% if event.needs_filming or event.needs_poster %}
+                                            <div class="flex flex-wrap gap-2 mb-3">
+                                                {% if event.needs_filming %}
+                                                {% with video_request=event.video_requests.first %}
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium
+                                                    {% if video_request.confirmed %}bg-green-100 text-green-700
+                                                    {% elif video_request.refused %}bg-red-100 text-red-700
+                                                    {% else %}bg-orange-100 text-orange-700{% endif %}">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    {% if video_request.confirmed %}Confirmé{% elif video_request.refused %}Refusé{% else %}En attente{% endif %}
+                                                </span>
+                                                {% endwith %}
+                                                {% endif %}
+                                                
+                                                {% if event.needs_poster %}
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-pink-100 text-pink-700">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    Affiche
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <!-- Secteur -->
+                                            {% if first_sector %}
+                                            <div class="mb-2">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border"
+                                                      style="background-color: {{ first_sector.color_code }}15; color: {{ first_sector.color_code }}; border-color: {{ first_sector.color_code }}30;">
+                                                    {{ first_sector.name }}
+                                                </span>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <!-- Titre -->
+                                            <h4 class="text-base font-semibold text-slate-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                                {{ event.title }}
+                                            </h4>
+                                            
+                                            <!-- Footer -->
+                                            <div class="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between text-sm">
+                                                <!-- Ville -->
+                                                <div class="flex items-center text-slate-500">
+                                                    <svg class="w-4 h-4 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                    <span class="truncate max-w-[100px]">{{ event.city }}</span>
+                                                </div>
+                                                
+                                                <!-- Statut + Mon événement -->
+                                                <div class="flex items-center gap-2">
+                                                    {% if request.user.is_authenticated and event.created_by == request.user %}
+                                                    <span class="text-blue-600" title="Vous avez créé cet événement">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </span>
+                                                    {% endif %}
+                                                    
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium
+                                                        {% if event.validation and event.validation.is_validated %}bg-green-100 text-green-700
+                                                        {% elif event.validation %}bg-red-100 text-red-700
+                                                        {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                                                        {% if event.validation and event.validation.is_validated %}
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        Validé
+                                                        {% elif event.validation %}
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        Rejeté
+                                                        {% else %}
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        En attente
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        
-                                        <!-- Badge de statut de validation -->
-                                        {% if event.validation and event.validation.is_validated %}
-                                        <span class="tooltip-container badge bg-green-100 text-green-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            Validé
-                                            <span class="tooltip" role="tooltip">Événement validé par la communication</span>
-                                        </span>
-                                        {% elif event.validation %}
-                                        <span class="tooltip-container badge bg-red-100 text-red-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            Rejeté
-                                            <span class="tooltip" role="tooltip">Événement rejeté</span>
-                                        </span>
-                                        {% else %}
-                                        <span class="tooltip-container badge bg-yellow-100 text-yellow-800 cursor-help" tabindex="0">
-                                            <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            En attente
-                                            <span class="tooltip" role="tooltip">En attente de validation</span>
-                                        </span>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                                    </a>
+                                </article>
+                                
+                                {% endwith %}
+                                {% endfor %}
+                                
                             </div>
-                        </a>
-                    </article>
-                        {% endwith %}
-                        {% endfor %}
+                        </div>
+                    </div>
+                    
                     {% endfor %}
                 </div>
-            </div>
+            </section>
             
-            <!-- Indicateur de scroll -->
-            <div class="flex justify-center mt-4 sm:hidden">
-                <div class="flex items-center gap-1 text-xs text-slate-400 scroll-hint">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
-                    </svg>
-                    <span>Faites défiler pour voir plus</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
+            {% endfor %}
+        {% endfor %}
         
-        <!-- Légende des badges -->
-        <div class="mt-6 bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <h3 class="text-sm font-semibold text-slate-700 mb-3">Légende</h3>
-            <div class="flex flex-wrap gap-4 text-xs">
-                <!-- Statuts de validation -->
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-green-100 text-green-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Validé
-                    </span>
-                    <span class="text-slate-500">Événement validé</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-yellow-100 text-yellow-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        En attente
-                    </span>
-                    <span class="text-slate-500">En attente de validation</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-red-100 text-red-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Rejeté
-                    </span>
-                    <span class="text-slate-500">Événement rejeté</span>
-                </div>
-                
-                <!-- Vidéo -->
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-green-100 text-green-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Vidéo
-                    </span>
-                    <span class="text-slate-500">Tournage confirmé</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-orange-100 text-orange-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Vidéo
-                    </span>
-                    <span class="text-slate-500">Tournage en attente</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-red-100 text-red-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Vidéo
-                    </span>
-                    <span class="text-slate-500">Tournage refusé</span>
-                </div>
-                
-                <!-- Affiche -->
-                <div class="flex items-center gap-2">
-                    <span class="badge bg-pink-100 text-pink-800">
-                        <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        Affiche
-                    </span>
-                    <span class="text-slate-500">Affiche demandée</span>
-                </div>
-            </div>
-        </div>
-    </section>
-    {% endif %}
+    </div>
     
-    <!-- Section vide si pas d'événements -->
-    {% if not upcoming_events %}
-    <section class="text-center py-16 animate-fade-in-up">
-        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+    {% else %}
+    
+    <!-- Aucun événement -->
+    <div class="text-center py-16">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
         </div>
         <h3 class="text-lg font-medium text-slate-900 mb-2">Aucun événement à venir</h3>
@@ -709,88 +207,29 @@
         {% if user.is_authenticated %}
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="{% url 'events:event_create' %}" 
-               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                 Créer un événement
             </a>
             <a href="{% url 'events:event_archives' %}" 
-               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-primary-600 bg-white border border-primary-600 hover:bg-primary-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                 Consulter les archives
             </a>
         </div>
         {% endif %}
-    </section>
+    </div>
+    
     {% endif %}
+
 </div>
 
-<script>
-// Gestion du scroll horizontal de la timeline
-document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('timelineContainer');
-    const scrollLeft = document.getElementById('scrollLeft');
-    const scrollRight = document.getElementById('scrollRight');
-    const viewCompactBtn = document.getElementById('viewCompact');
-    const viewExpandedBtn = document.getElementById('viewExpanded');
-    
-    // Gestion du mode compact/détaillé
-    function setViewMode(mode) {
-        if (!container) return;
-        
-        if (mode === 'compact') {
-            container.classList.add('compact-mode');
-            viewCompactBtn.classList.add('active');
-            viewCompactBtn.setAttribute('aria-pressed', 'true');
-            viewExpandedBtn.classList.remove('active');
-            viewExpandedBtn.setAttribute('aria-pressed', 'false');
-        } else {
-            container.classList.remove('compact-mode');
-            viewCompactBtn.classList.remove('active');
-            viewCompactBtn.setAttribute('aria-pressed', 'false');
-            viewExpandedBtn.classList.add('active');
-            viewExpandedBtn.setAttribute('aria-pressed', 'true');
-        }
-        
-        localStorage.setItem('timelineViewMode', mode);
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
-    // Restaurer le mode depuis localStorage
-    const savedMode = localStorage.getItem('timelineViewMode') || 'compact';
-    setViewMode(savedMode);
-    
-    if (viewCompactBtn && viewExpandedBtn) {
-        viewCompactBtn.addEventListener('click', () => setViewMode('compact'));
-        viewExpandedBtn.addEventListener('click', () => setViewMode('expanded'));
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
     }
-    
-    if (container && scrollLeft && scrollRight) {
-        const scrollAmount = 300;
-        
-        scrollLeft.addEventListener('click', () => {
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        });
-        
-        scrollRight.addEventListener('click', () => {
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        });
-        
-        // Navigation au clavier
-        container.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-            } else if (e.key === 'ArrowRight') {
-                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            }
-        });
-        
-        // Afficher/masquer les flèches en fonction du scroll
-        function updateArrows() {
-            scrollLeft.style.opacity = container.scrollLeft > 0 ? '1' : '0.3';
-            scrollRight.style.opacity = 
-                container.scrollLeft < container.scrollWidth - container.clientWidth ? '1' : '0.3';
-        }
-        
-        container.addEventListener('scroll', updateArrows);
-        updateArrows();
-    }
-});
-</script>
+</style>
 {% endblock %}

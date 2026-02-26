@@ -230,7 +230,7 @@
 .timeline__item {
     position: relative !important;
     flex-shrink: 0 !important;
-    width: 16rem !important;
+    width: 20rem !important;
 }
 
 .timeline__point {

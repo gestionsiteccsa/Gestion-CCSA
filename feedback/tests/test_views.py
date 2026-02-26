@@ -1,6 +1,7 @@
 """Tests pour les vues de l'app feedback."""
 
 import pytest
+
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.urls import reverse

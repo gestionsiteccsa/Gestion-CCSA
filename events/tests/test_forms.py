@@ -4,10 +4,11 @@ from datetime import timedelta
 from io import BytesIO
 from unittest.mock import patch
 
+from PIL import Image
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
-from PIL import Image
 
 from accounts.models import User
 from events.forms import EventCommentForm, EventForm, EventImageForm

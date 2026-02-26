@@ -9,7 +9,7 @@ class EventListPage {
         this.scrollLeft = document.getElementById('scrollLeft');
         this.scrollRight = document.getElementById('scrollRight');
         
-        this.scrollAmount = 300;
+        this.scrollAmount = 350;
         
         this.init();
     }

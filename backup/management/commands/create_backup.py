@@ -235,7 +235,7 @@ class Command(BaseCommand):
             config = BackupConfiguration.objects.first()
             if config:
                 keep_last = config.keep_last_n
-        except:
+        except Exception:
             pass
 
         # Lister tous les fichiers de sauvegarde

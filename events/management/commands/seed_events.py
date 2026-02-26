@@ -3,9 +3,10 @@
 import random
 from datetime import datetime, timedelta
 
+from faker import Faker
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from faker import Faker
 
 from accounts.models import User
 from events.models import Event, Sector

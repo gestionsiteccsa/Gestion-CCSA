@@ -5,11 +5,17 @@ import os
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils import timezone
 
-from events.models import (Event, EventComment, EventDocument, EventImage,
-                           EventRecurrence, EventSettings, Sector,
-                           VideoNotificationSettings)
+from events.models import (
+    Event,
+    EventComment,
+    EventDocument,
+    EventImage,
+    EventRecurrence,
+    EventSettings,
+    Sector,
+    VideoNotificationSettings,
+)
 from events.widgets import ColoredCheckboxSelectMultiple
 
 

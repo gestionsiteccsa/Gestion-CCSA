@@ -21,8 +21,12 @@ from accounts.models import Role, UserRole
 from accounts.services import NotificationService
 from events.forms import VideoNotificationSettingsForm
 from events.mixins import CommunicationRequiredMixin
-from events.models import (Event, EventSettings, VideoNotificationSettings,
-                           VideoRequestLog)
+from events.models import (
+    Event,
+    EventSettings,
+    VideoNotificationSettings,
+    VideoRequestLog,
+)
 
 logger = logging.getLogger(__name__)
 

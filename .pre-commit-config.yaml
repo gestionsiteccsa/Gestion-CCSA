@@ -57,9 +57,11 @@ repos:
         additional_dependencies: [
           'flake8-docstrings',
           'flake8-comprehensions',
-          'flake8-bugbear'
+          'flake8-bugbear',
+          'flake8-pyproject'
         ]
         exclude: ^(migrations/|env/|venv/|__pycache__/)
+        args: ['--max-line-length=120', '--extend-ignore=E203,W503,D100,D104,D401']
 
   # ============================================================================
   # HOOKS DE SÉCURITÉ PYTHON

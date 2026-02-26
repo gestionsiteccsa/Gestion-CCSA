@@ -7,8 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from feedback.forms import (FeedbackCommentForm, FeedbackSettingsForm,
-                            FeedbackTicketForm)
+from feedback.forms import FeedbackCommentForm, FeedbackSettingsForm, FeedbackTicketForm
 from feedback.models import FeedbackSettings, FeedbackTicket
 
 

@@ -76,7 +76,7 @@
 .timeline__item {
     position: relative;
     flex-shrink: 0;
-    width: 16rem;
+    width: 20rem;
 }
 
 .timeline__point {

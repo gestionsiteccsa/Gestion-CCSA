@@ -209,7 +209,7 @@ class PreCommitChecker:
         exclude = ",".join(self.config["checks"]["linter"]["exclude"])
         max_line_length = self.config["checks"]["linter"]["max_line_length"]
 
-        # Ignorer les erreurs de docstrings (D100-D104, D400, D401)
+        # Ignorer les erreurs de docstrings (D100-D104, D400, D401) et W503
         returncode, stdout, stderr = self._run_command(
             [
                 "flake8",
@@ -218,8 +218,8 @@ class PreCommitChecker:
                 exclude,
                 "--max-line-length",
                 str(max_line_length),
-                "--ignore",
-                "D100,D101,D102,D103,D104,D400,D401",
+                "--extend-ignore",
+                "D100,D101,D102,D103,D104,D105,D106,D400,D401,W503,E203",
             ]
         )
 

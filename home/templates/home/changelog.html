@@ -11,6 +11,129 @@
     </div>
 
     <div class="space-y-8">
+        <!-- Version 1.3.2 - Production -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">[1.3.2] - 2026-02-26</h2>
+                <span class="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full">En production</span>
+            </div>
+            <div class="space-y-6">
+                <!-- Tests -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Tests
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Events</strong> : Ajout et mise à jour des tests
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Tests des formulaires avec validation renforcée</li>
+                                <li>Tests des modèles avec nouvelles contraintes</li>
+                                <li>Tests de sécurité complémentaires</li>
+                                <li>Tests des demandes de tournage vidéo avec scénarios edge cases</li>
+                            </ul>
+                        </li>
+                        <li><strong>Feedback</strong> : Couverture de tests complète
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Tests des formulaires de création et mise à jour de tickets</li>
+                                <li>Tests des modèles avec validation des statuts et priorités</li>
+                                <li>Tests des vues avec permissions et workflows</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Fonctionnalités -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-purple-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Fonctionnalités
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Events</strong> : Améliorations du système de gestion d'événements
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Nouvelle commande de création d'événements de test</li>
+                                <li>Amélioration de la commande seed_events avec données plus réalistes</li>
+                                <li>Optimisation de l'admin avec filtres et recherche avancés</li>
+                                <li>Refonte du template event_list avec interface responsive</li>
+                            </ul>
+                        </li>
+                        <li><strong>Pointage</strong> : Mise à jour des URLs
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Refactoring des patterns d'URL pour meilleure cohérence</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Améliorations Interface -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-blue-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                        Améliorations Interface
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>CSS Timeline</strong> : Nouveau composant timeline
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Styles dédiés pour l'affichage chronologique des événements</li>
+                                <li>Animations et transitions fluides</li>
+                            </ul>
+                        </li>
+                        <li><strong>CSS Event List</strong> : Optimisation de la liste des événements
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Amélioration du responsive design</li>
+                                <li>Nouveaux styles pour les filtres et la pagination</li>
+                            </ul>
+                        </li>
+                        <li><strong>JavaScript Event List</strong> : Interactivité améliorée
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Filtres dynamiques sans rechargement de page</li>
+                                <li>Gestion améliorée de la pagination AJAX</li>
+                                <li>Animations de transition pour les mises à jour</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Corrections -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Corrections
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Events Forms</strong> : Validation et UX
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Correction des validateurs de dates</li>
+                                <li>Amélioration des messages d'erreur</li>
+                            </ul>
+                        </li>
+                        <li><strong>Feedback Views</strong> : Gestion des tickets
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Correction du workflow de changement de statut</li>
+                                <li>Amélioration de la gestion des permissions</li>
+                            </ul>
+                        </li>
+                        <li><strong>Events Views</strong> : Corrections diverses
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Optimisation des requêtes dans les vues de validation</li>
+                                <li>Correction de l'export vidéo</li>
+                                <li>Amélioration de la gestion des erreurs</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- Version 1.3.1 - Production -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">

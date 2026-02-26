@@ -16,8 +16,13 @@ from django.views.generic import DetailView, ListView
 
 from accounts.services import NotificationService
 from events.mixins import CommunicationRequiredMixin
-from events.models import (Event, EventChangeLog, EventSettings,
-                           EventValidation, VideoRequestLog)
+from events.models import (
+    Event,
+    EventChangeLog,
+    EventSettings,
+    EventValidation,
+    VideoRequestLog,
+)
 
 logger = logging.getLogger(__name__)
 

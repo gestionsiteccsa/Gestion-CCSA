@@ -25,22 +25,44 @@ class EventListView(ListView):
     context_object_name = "upcoming_events"
 
     def get_queryset(self):
-        """Retourne uniquement les événements à venir pour la timeline."""
+        """Retourne les événements du mois en cours et du mois suivant."""
         today = timezone.now().date()
-        thirty_days_later = today + timedelta(days=30)
+
+        # Premier jour du mois en cours
+        start_of_month = today.replace(day=1)
+
+        # Dernier jour du mois suivant
+        if today.month == 12:
+            end_of_next_month = today.replace(
+                year=today.year + 1, month=2, day=1
+            ) - timedelta(days=1)
+        elif today.month == 11:
+            end_of_next_month = today.replace(year=today.year + 1, month=1, day=31)
+        else:
+            # Pour les autres mois, on calcule le dernier jour du mois suivant
+            next_month = today.month + 1
+            year = today.year
+            if next_month > 12:
+                next_month = 1
+                year += 1
+            # Premier jour du mois après le mois suivant, moins 1 jour
+            if next_month == 12:
+                end_of_next_month = date(year + 1, 1, 1) - timedelta(days=1)
+            else:
+                end_of_next_month = date(year, next_month + 1, 1) - timedelta(days=1)
 
         return (
             Event.objects.filter(
                 is_active=True,
-                start_datetime__date__gte=today,
-                start_datetime__date__lte=thirty_days_later,
+                start_datetime__date__gte=start_of_month,
+                start_datetime__date__lte=end_of_next_month,
             )
             .prefetch_related("sectors", "validation", "video_requests")
-            .order_by("start_datetime")[:10]
+            .order_by("start_datetime")
         )
 
     def get_context_data(self, **kwargs):
-        """Ajoute la date actuelle pour le regroupement par semaine."""
+        """Ajoute la date actuelle pour les regroupements dans le template."""
         context = super().get_context_data(**kwargs)
         context["now"] = timezone.now()
         return context
