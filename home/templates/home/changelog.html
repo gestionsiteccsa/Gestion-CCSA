@@ -11,13 +11,61 @@
     </div>
 
     <div class="space-y-8">
-        <!-- Version 1.3.3 - En développement -->
+        <!-- Version 1.4.0 - En développement -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-slate-900">[1.3.3] - 2026-02-27</h2>
+                <h2 class="text-xl font-semibold text-slate-900">[1.4.0] - 2026-02-27</h2>
                 <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-700 rounded-full">En développement</span>
             </div>
             <div class="space-y-6">
+                <!-- Nouvelle Application Leave -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-purple-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Nouvelle Application : Gestion des Congés
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Module Leave</strong> : Système complet de gestion des congés
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Création de calendriers de congés (rôle "Accueil")</li>
+                                <li>Vue calendrier interactive avec FullCalendar</li>
+                                <li>Poser des congés par journée entière, matin ou après-midi</li>
+                                <li>Page "Mes Congés" avec interface en cartes modernes</li>
+                                <li>Sélection multiple pour suppression en masse</li>
+                                <li>Export Excel des congés</li>
+                                <li>Gestion des jours fériés français (calcul automatique)</li>
+                                <li>Historique des modifications des demandes</li>
+                            </ul>
+                        </li>
+                        <li><strong>Interface utilisateur</strong> : UX moderne et intuitive
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Sélecteur de dates multi-sélection avec FullCalendar</li>
+                                <li>Cartes visuelles avec indicateurs de période (journée/matin/après-midi)</li>
+                                <li>Modales de confirmation pour les suppressions</li>
+                                <li>Barre d'actions flottante pour les suppressions multiples</li>
+                                <li>Tableau récapitulatif en lecture seule</li>
+                            </ul>
+                        </li>
+                        <li><strong>Permissions</strong> : Contrôle d'accès granulaire
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Rôle "Accueil" : création/modification/suppression des calendriers</li>
+                                <li>Tous les utilisateurs : poser/modifier/supprimer leurs propres congés</li>
+                                <li>Menu "Congés" visible uniquement quand un calendrier est actif (sauf Accueil)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Modèles de données</strong> : Architecture robuste
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>LeaveCalendar : calendriers avec période de visibilité</li>
+                                <li>LeaveRequest : demandes de congés avec période (full/morning/afternoon)</li>
+                                <li>LeaveHistory : audit trail des modifications</li>
+                                <li>FrenchHoliday : jours fériés avec calcul automatique</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
                 <!-- Refactoring SRP -->
                 <div>
                     <h3 class="flex items-center text-sm font-semibold text-indigo-600 uppercase tracking-wider mb-3">

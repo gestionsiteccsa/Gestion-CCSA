@@ -27,6 +27,7 @@ urlpatterns = [
     path("pointage/", include("pointage.urls")),
     path("feedback/", include("feedback.urls")),
     path("backup/", include("backup.urls")),
+    path("conges/", include("leave.urls")),
     path("liens/", include("url_shortener.urls")),
     path("r/<slug:code>/", redirect_short_url, name="short_redirect"),
     path("robots.txt", robots_txt, name="robots_txt"),

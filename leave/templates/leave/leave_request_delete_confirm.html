@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmer la suppression - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-lg">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="text-center mb-6">
+            <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">Confirmer la suppression</h1>
+            <p class="text-gray-600">
+                Êtes-vous sûr de vouloir supprimer votre demande de congés ?
+            </p>
+            <div class="bg-gray-50 rounded p-4 mt-4 text-left">
+                <p><strong>Date :</strong> {{ object.date|date:"d/m/Y" }}</p>
+                <p><strong>Période :</strong> {{ object.get_period_display }}</p>
+                {% if object.notes %}
+                <p><strong>Notes :</strong> {{ object.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="flex justify-center gap-4">
+                <a href="{{ object.calendar.get_absolute_url }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded">
+                    Annuler
+                </a>
+                
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">
+                    <i class="fas fa-trash-alt mr-2"></i>Supprimer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Congés - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-calendar-check mr-2"></i>Mes Congés
+            </h1>
+            <p class="text-gray-600 mt-1">Gérez toutes vos demandes de congés</p>
+        </div>
+
+        <a href="{% url 'leave:calendar_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded inline-flex items-center transition-colors">
+            <i class="fas fa-plus mr-2"></i>Poser de nouveaux congés
+        </a>
+    </div>
+
+    {% if requests %}
+    <!-- Barre d'actions flottante -->
+    <div id="action-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg px-6 py-4 border border-gray-200 hidden z-50">
+        <div class="flex items-center gap-4">
+            <span class="text-gray-700 font-medium">
+                <span id="selected-count">0</span> congé(s) sélectionné(s)
+            </span>
+            <button onclick="openDeleteModal()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors">
+                <i class="fas fa-trash-alt mr-2"></i>Supprimer la sélection
+            </button>
+        </div>
+    </div>
+
+    <!-- Case tout sélectionner -->
+    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <label class="flex items-center cursor-pointer">
+            <input type="checkbox" id="select-all" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+            <span class="ml-2 text-gray-700 font-medium">Tout sélectionner</span>
+        </label>
+    </div>
+
+    <!-- Liste par calendrier -->
+    {% for cal_id, data in requests_by_calendar.items %}
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <div class="w-4 h-4 rounded-full mr-2" style="background-color: #3788d8;"></div>
+            <h2 class="text-xl font-bold text-gray-800">{{ data.calendar.name }}</h2>
+            <span class="ml-3 text-sm text-gray-500">
+                {{ data.calendar.start_date|date:"d/m/Y" }} - {{ data.calendar.end_date|date:"d/m/Y" }}
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {% for req in data.requests %}
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200 relative group">
+                <!-- Checkbox -->
+                <div class="absolute top-3 left-3 z-10">
+                    <input type="checkbox" name="request_ids" value="{{ req.id }}" class="request-checkbox w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                </div>
+
+                <div class="p-5 pt-12">
+                    <!-- Date -->
+                    <div class="text-center mb-4">
+                        <div class="text-3xl font-bold text-gray-800">{{ req.date|date:"d" }}</div>
+                        <div class="text-sm text-gray-500 uppercase">{{ req.date|date:"F Y" }}</div>
+                        <div class="text-xs text-gray-400">{{ req.date|date:"l" }}</div>
+                    </div>
+
+                    <!-- Période -->
+                    <div class="text-center mb-4">
+                        {% if req.period == 'full' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                            <i class="fas fa-sun mr-2"></i>Journée entière
+                        </span>
+                        {% elif req.period == 'morning' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-coffee mr-2"></i>Matin
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            <i class="fas fa-moon mr-2"></i>Après-midi
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Notes -->
+                    {% if req.notes %}
+                    <div class="text-sm text-gray-600 bg-gray-50 rounded p-2 mb-4">
+                        <i class="fas fa-sticky-note mr-1 text-gray-400"></i>
+                        {{ req.notes|truncatechars:50 }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="flex gap-2 mt-4">
+                        <a href="{% url 'leave:request_update' req.pk %}" class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium py-2 px-3 rounded text-center text-sm transition-colors">
+                            <i class="fas fa-edit mr-1"></i>Modifier
+                        </a>
+                        <button onclick="openSingleDeleteModal('{{ req.id }}', '{{ req.date|date:"d/m/Y" }}')" class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-medium py-2 px-3 rounded text-center text-sm transition-colors">
+                            <i class="fas fa-trash-alt mr-1"></i>Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <!-- Message si aucun congé -->
+    <div class="bg-gray-50 rounded-lg p-12 text-center">
+        <div class="text-6xl text-gray-300 mb-4">
+            <i class="fas fa-calendar-times"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-2">Aucun congé posé</h2>
+        <p class="text-gray-500 mb-6">Vous n'avez pas encore posé de congés sur les calendriers actifs.</p>
+        <a href="{% url 'leave:calendar_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded inline-flex items-center transition-colors">
+            <i class="fas fa-calendar-plus mr-2"></i>Poser mes premiers congés
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de confirmation suppression multiple -->
+<div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 transform transition-all">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Confirmer la suppression</h3>
+            <p class="text-gray-600">
+                Êtes-vous sûr de vouloir supprimer <span id="modal-delete-count" class="font-bold text-red-600">0</span> demande(s) de congés ?
+            </p>
+            <p class="text-sm text-gray-500 mt-2">Cette action est irréversible.</p>
+        </div>
+
+        <form method="post" action="{% url 'leave:bulk_delete_requests' %}" id="delete-form">
+            {% csrf_token %}
+            <div id="delete-form-inputs"></div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors">
+                    Annuler
+                </button>
+                <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                    <i class="fas fa-trash-alt mr-2"></i>Supprimer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de confirmation suppression simple -->
+<div id="single-delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 transform transition-all">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-trash-alt text-3xl text-red-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Supprimer ce congé ?</h3>
+            <p class="text-gray-600">
+                Vous allez supprimer le congé du <span id="single-delete-date" class="font-bold"></span>.
+            </p>
+            <p class="text-sm text-gray-500 mt-2">Cette action est irréversible.</p>
+        </div>
+
+        <form method="post" id="single-delete-form">
+            {% csrf_token %}
+            <input type="hidden" name="request_ids[]" id="single-delete-id">
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeSingleDeleteModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors">
+                    Annuler
+                </button>
+                <button type="submit" formaction="{% url 'leave:bulk_delete_requests' %}" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                    <i class="fas fa-trash-alt mr-2"></i>Supprimer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Gestion des checkboxes
+    const selectAllCheckbox = document.getElementById('select-all');
+    const requestCheckboxes = document.querySelectorAll('.request-checkbox');
+    const actionBar = document.getElementById('action-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    function updateSelectedCount() {
+        const selected = document.querySelectorAll('.request-checkbox:checked');
+        const count = selected.length;
+        selectedCountSpan.textContent = count;
+
+        if (count > 0) {
+            actionBar.classList.remove('hidden');
+        } else {
+            actionBar.classList.add('hidden');
+        }
+
+        // Mettre à jour la case "Tout sélectionner"
+        if (count === requestCheckboxes.length && count > 0) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else if (count === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+
+    // Event listener pour "Tout sélectionner"
+    selectAllCheckbox.addEventListener('change', function() {
+        requestCheckboxes.forEach(cb => {
+            cb.checked = this.checked;
+        });
+        updateSelectedCount();
+    });
+
+    // Event listeners pour chaque checkbox
+    requestCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+
+    // Modal suppression multiple
+    function openDeleteModal() {
+        const selected = document.querySelectorAll('.request-checkbox:checked');
+        if (selected.length === 0) return;
+
+        document.getElementById('modal-delete-count').textContent = selected.length;
+
+        // Créer les inputs cachés pour le formulaire
+        const formInputs = document.getElementById('delete-form-inputs');
+        formInputs.innerHTML = '';
+        selected.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'request_ids[]';
+            input.value = cb.value;
+            formInputs.appendChild(input);
+        });
+
+        document.getElementById('delete-modal').classList.remove('hidden');
+        document.getElementById('delete-modal').classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.add('hidden');
+        document.getElementById('delete-modal').classList.remove('flex');
+    }
+
+    // Modal suppression simple
+    function openSingleDeleteModal(id, date) {
+        document.getElementById('single-delete-id').value = id;
+        document.getElementById('single-delete-date').textContent = date;
+        document.getElementById('single-delete-modal').classList.remove('hidden');
+        document.getElementById('single-delete-modal').classList.add('flex');
+    }
+
+    function closeSingleDeleteModal() {
+        document.getElementById('single-delete-modal').classList.add('hidden');
+        document.getElementById('single-delete-modal').classList.remove('flex');
+    }
+
+    // Fermer les modals en cliquant en dehors
+    document.getElementById('delete-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+    });
+    document.getElementById('single-delete-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeSingleDeleteModal();
+    });
+</script>
+{% endblock %}

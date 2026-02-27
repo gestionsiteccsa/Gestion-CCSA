@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ calendar.name }} - Calendrier de congés{% endblock %}
+
+{% block extra_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />
+<style>
+    #calendar {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    .fc-day-sat, .fc-day-sun {
+        background-color: #f3f4f6 !important;
+    }
+    .fc-holiday {
+        background-color: #fee2e2 !important;
+    }
+    .leave-full {
+        background-color: #f97316;
+    }
+    .leave-morning, .leave-afternoon {
+        background-color: #fdba74;
+    }
+    .table-container {
+        overflow-x: auto;
+    }
+    .user-sector-badge {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">{{ calendar.name }}</h1>
+            <p class="text-gray-600 mt-1">
+                Du <span class="font-semibold">{{ calendar.start_date|date:"d/m/Y" }}</span> 
+                au <span class="font-semibold">{{ calendar.end_date|date:"d/m/Y" }}</span>
+            </p>
+        </div>
+        
+        <div class="flex gap-2">
+            {% if is_accueil %}
+            <div class="flex gap-2 border-r border-gray-300 pr-2 mr-2">
+                <span class="text-xs text-gray-500 self-center mr-1">Gestion calendrier:</span>
+                <a href="{% url 'leave:calendar_export' calendar.pk %}" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-3 rounded inline-flex items-center">
+                    <i class="fas fa-file-excel mr-1"></i>Export
+                </a>
+                <a href="{% url 'leave:calendar_update' calendar.pk %}" class="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold py-2 px-3 rounded inline-flex items-center">
+                    <i class="fas fa-edit mr-1"></i>Modifier
+                </a>
+            </div>
+            {% endif %}
+            
+            <div class="flex gap-2">
+                <button id="btn-modify-leaves" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-edit mr-2"></i>Modifier mes congés
+                </button>
+                <a href="{% url 'leave:request_create' calendar.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                    <i class="fas fa-plus mr-2"></i>Poser mes congés
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if calendar.description %}
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded">
+        <p class="text-blue-800">{{ calendar.description }}</p>
+    </div>
+    {% endif %}
+
+        <!-- Toggle Vue -->
+        <div class="mb-6">
+            <div class="flex space-x-4 border-b">
+                <button id="view-calendar-btn" class="px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-semibold">
+                    <i class="fas fa-calendar-alt mr-2"></i>Calendrier
+                </button>
+                <button id="view-table-btn" class="px-4 py-2 border-b-2 border-transparent text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-table mr-2"></i>Tableau récapitulatif
+                </button>
+            </div>
+        </div>
+
+    <!-- Vue Calendrier -->
+    <div id="calendar-view" class="bg-white rounded-lg shadow-md p-4">
+        <div id="calendar"></div>
+        
+        <!-- Légende -->
+        <div class="mt-6 flex flex-wrap gap-4 items-center">
+            <span class="text-sm font-semibold text-gray-600">Légende :</span>
+            <div class="flex items-center">
+                <span class="w-4 h-4 rounded mr-2" style="background-color: #f97316;"></span>
+                <span class="text-sm text-gray-600">Journée entière</span>
+            </div>
+            <div class="flex items-center">
+                <span class="w-4 h-4 rounded mr-2" style="background-color: #fdba74;"></span>
+                <span class="text-sm text-gray-600">Demi-journée</span>
+            </div>
+            <div class="flex items-center">
+                <span class="w-4 h-4 rounded mr-2 bg-red-400"></span>
+                <span class="text-sm text-gray-600">Jour férié</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue Tableau -->
+    <div id="table-view" class="hidden bg-white rounded-lg shadow-md p-4">
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        Ce tableau affiche tous les agents ayant posé des congés. Pour modifier ou supprimer vos propres congés, utilisez la page <a href="{% url 'leave:user_requests' %}" class="font-bold underline">Mes Congés</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agent</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates posées</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in users_with_requests %}
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    {% if user.avatar %}
+                                    <img class="h-10 w-10 rounded-full" src="{{ user.avatar.url }}" alt="">
+                                    {% else %}
+                                    <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">
+                                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ user.first_name }} {{ user.last_name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td class="px-4 py-4">
+                            {% with user_requests=all_requests|dictsort:"date" %}
+                            <div class="space-y-1">
+                                {% for req in user_requests %}
+                                {% if req.user == user %}
+                                <div class="flex items-center text-sm">
+                                    <span class="px-2 py-1 rounded text-xs font-medium {% if req.period == 'full' %}bg-orange-100 text-orange-800{% else %}bg-orange-50 text-orange-600{% endif %} mr-2">
+                                        {{ req.get_period_display }}
+                                    </span>
+                                    <span class="text-gray-600">{{ req.date|date:"d/m/Y" }}</span>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+    function showCalendar() {
+        document.getElementById('calendar-view').classList.remove('hidden');
+        document.getElementById('table-view').classList.add('hidden');
+        document.getElementById('view-calendar').classList.add('border-blue-600', 'text-blue-600');
+        document.getElementById('view-calendar').classList.remove('border-transparent', 'text-gray-600');
+        document.getElementById('view-table').classList.remove('border-blue-600', 'text-blue-600');
+        document.getElementById('view-table').classList.add('border-transparent', 'text-gray-600');
+    }
+
+    function showTable() {
+        document.getElementById('calendar-view').classList.add('hidden');
+        document.getElementById('table-view').classList.remove('hidden');
+        document.getElementById('view-table').classList.add('border-blue-600', 'text-blue-600');
+        document.getElementById('view-table').classList.remove('border-transparent', 'text-gray-600');
+        document.getElementById('view-calendar').classList.remove('border-blue-600', 'text-blue-600');
+        document.getElementById('view-calendar').classList.add('border-transparent', 'text-gray-600');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter les event listeners pour les boutons de navigation
+        var btnModifyLeaves = document.getElementById('btn-modify-leaves');
+        if (btnModifyLeaves) {
+            btnModifyLeaves.addEventListener('click', showTable);
+        }
+        
+        var calendarEl = document.getElementById('calendar');
+        var holidays = {{ holidays|safe }};
+        
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            firstDay: 1, // Lundi
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            buttonText: {
+                today: 'Aujourd\'hui',
+                month: 'Mois',
+                week: 'Semaine'
+            },
+            validRange: {
+                start: '{{ calendar.start_date|date:"Y-m-d" }}',
+                end: '{{ calendar.end_date|date:"Y-m-d" }}'
+            },
+            events: '{% url "leave:calendar_events_api" calendar.pk %}',
+            eventClick: function(info) {
+                if (!info.event.extendedProps.is_holiday) {
+                    // Afficher les détails de l'événement
+                    alert(info.event.title + '\\n' + 
+                          'Date: ' + info.event.start.toLocaleDateString('fr-FR') + '\\n' +
+                          'Période: ' + info.event.extendedProps.period + '\\n' +
+                          (info.event.extendedProps.notes ? 'Notes: ' + info.event.extendedProps.notes : ''));
+                }
+            },
+            dayCellClassNames: function(arg) {
+                var dateStr = arg.date.toISOString().split('T')[0];
+                if (holidays[dateStr]) {
+                    return ['fc-holiday'];
+                }
+                var day = arg.date.getDay();
+                if (day === 0 || day === 6) {
+                    return ['fc-weekend'];
+                }
+                return [];
+            },
+            dayCellContent: function(arg) {
+                var dateStr = arg.date.toISOString().split('T')[0];
+                if (holidays[dateStr]) {
+                    return {
+                        html: arg.dayNumberText + '<div class="text-xs text-red-600 mt-1">' + holidays[dateStr] + '</div>'
+                    };
+                }
+                return arg.dayNumberText;
+            }
+        });
+        
+        calendar.render();
+    });
+</script>
+{% endblock %}

@@ -178,11 +178,61 @@
                                      Gérer les sections
                                  </span>
                              </a>
-                         </div>
-                     </div>
-                     {% endif %}
-                     
-                     {% has_communication_role as user_has_comm_role %}
+                          </div>
+                      </div>
+                      {% endif %}
+                      
+                       {% if user.is_authenticated %}
+                       {% has_accueil_role as user_has_accueil_role %}
+                       {% if has_active_leave_calendar or user_has_accueil_role %}
+                       <!-- Congés Dropdown -->
+                       <div class="relative" id="conges-nav-menu-container">
+                          <button type="button" id="conges-nav-menu-button" class="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-lg transition-colors {% if request.resolver_match.namespace == 'leave' %}text-primary-600 bg-primary-50{% endif %}">
+                              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                              </svg>
+                              <span>Congés</span>
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                              </svg>
+                          </button>
+                          
+                          <!-- Congés Dropdown Menu -->
+                          <div id="conges-nav-menu" class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+                              <a href="{% url 'leave:user_requests' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                  <span class="flex items-center">
+                                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                      </svg>
+                                      Mes congés
+                                  </span>
+                              </a>
+                              {% has_accueil_role as user_has_accueil_role %}
+                              {% if user_has_accueil_role %}
+                              <div class="border-t border-slate-200 my-1"></div>
+                              <a href="{% url 'leave:calendar_create' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                  <span class="flex items-center">
+                                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                      </svg>
+                                      Ajouter un calendrier
+                                  </span>
+                              </a>
+                              <a href="{% url 'leave:calendar_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary-600">
+                                  <span class="flex items-center">
+                                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                      </svg>
+                                      Historique
+                                  </span>
+                              </a>
+                               {% endif %}
+                           </div>
+                       </div>
+                       {% endif %}
+                       {% endif %}
+                       
+                       {% has_communication_role as user_has_comm_role %}
                      {% has_support_role as user_has_support_role %}
                      {% get_pending_validation_count as pending_count %}
                      {% if user_has_comm_role %}

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "url_shortener",
     "pointage",
     "feedback",
+    "leave",
 ]
 
 # Whitenoise pour servir les fichiers statiques en production
@@ -81,6 +82,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "accounts.context_processors.notifications",
+                "leave.context_processors.active_leave_calendar",
             ],
         },
     },
@@ -258,13 +260,17 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "'unsafe-inline'",
             "https://fonts.googleapis.com",
+            "https://cdn.jsdelivr.net",
+            "https://cdnjs.cloudflare.com",
         ),
         "style-src-elem": (
             "'self'",
             "'unsafe-inline'",
             "https://fonts.googleapis.com",
+            "https://cdn.jsdelivr.net",
+            "https://cdnjs.cloudflare.com",
         ),
-        "font-src": ("'self'", "https://fonts.gstatic.com", "data:"),
+        "font-src": ("'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "data:"),
         "img-src": ("'self'", "data:", "https:"),
         "connect-src": (
             "'self'",

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_update %}Modifier{% else %}Poser{% endif %} des congés - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />
+<style>
+    .fc-day-sat, .fc-day-sun {
+        background-color: #f3f4f6 !important;
+    }
+    .fc-holiday {
+        background-color: #fee2e2 !important;
+    }
+    .fc-day-selected {
+        background-color: #dbeafe !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">
+            {% if is_update %}
+            <i class="fas fa-edit mr-2"></i>Modifier ma demande
+            {% else %}
+            <i class="fas fa-calendar-plus mr-2"></i>Poser des congés
+            {% endif %}
+        </h1>
+        <p class="text-gray-600 mt-2">
+            Calendrier : <strong>{{ calendar.name }}</strong>
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 {% if not is_update %}lg:grid-cols-2{% endif %} gap-8">
+        {% if not is_update %}
+        <!-- Sélection des dates -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Sélectionnez les dates</h2>
+            <div id="date-picker"></div>
+            
+            <p class="text-sm text-gray-600 mt-4">
+                <i class="fas fa-info-circle mr-1"></i>
+                Cliquez sur les dates pour les sélectionner/désélectionner.
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Formulaire -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Détails des congés</h2>
+            
+            <form method="post" id="leave-form" novalidate>
+                {% csrf_token %}
+                
+                <input type="hidden" name="selected_dates" id="selected-dates" value="">
+
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                    {% for error in form.non_field_errors %}
+                    <p class="text-red-700">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Dates sélectionnées -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-bold mb-2">
+                        {% if is_update %}
+                            Date de la demande
+                        {% else %}
+                            Dates sélectionnées
+                        {% endif %}
+                    </label>
+                    <div id="selected-dates-display" class="bg-gray-50 rounded p-3 min-h-[3rem] flex flex-wrap gap-2">
+                        {% if is_update %}
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                {{ object.date|date:"d/m/Y" }}
+                            </span>
+                            <input type="hidden" name="selected_dates" id="selected-dates" value="{{ object.date|date:"Y-m-d" }}">
+                        {% else %}
+                            <span class="text-gray-400 text-sm">Aucune date sélectionnée</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Période -->
+                <div class="mb-6">
+                    <label for="{{ form.period.id_for_label }}" class="block text-gray-700 font-bold mb-2">
+                        {{ form.period.label }}
+                    </label>
+                    {{ form.period }}
+                    {% if form.period.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.period.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="mb-6">
+                    <label for="{{ form.notes.id_for_label }}" class="block text-gray-700 font-bold mb-2">
+                        {{ form.notes.label }}
+                    </label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.notes.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <a href="{{ calendar.get_absolute_url }}" class="text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-arrow-left mr-2"></i>Annuler
+                    </a>
+                    
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded" id="submit-btn" {% if not is_update %}disabled{% endif %}>
+                        {% if is_update %}
+                        Enregistrer les modifications
+                        {% else %}
+                        Poser les congés
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not is_update %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+{% endif %}
+<script>
+    {% if not is_update %}
+    let selectedDates = new Set();
+    {% endif %}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if not is_update %}
+        var calendarEl = document.getElementById('date-picker');
+        
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            firstDay: 1,
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: ''
+            },
+            validRange: {
+                start: '{{ calendar.start_date|date:"Y-m-d" }}',
+                end: '{{ calendar.end_date|date:"Y-m-d" }}'
+            },
+            dateClick: function(info) {
+                var dateStr = info.dateStr;
+                
+                // Ignorer les weekends
+                var day = info.date.getDay();
+                if (day === 0 || day === 6) {
+                    return;
+                }
+                
+                if (selectedDates.has(dateStr)) {
+                    selectedDates.delete(dateStr);
+                    info.dayEl.classList.remove('fc-day-selected');
+                } else {
+                    selectedDates.add(dateStr);
+                    info.dayEl.classList.add('fc-day-selected');
+                }
+                
+                updateSelectedDatesDisplay();
+            },
+            dayCellClassNames: function(arg) {
+                var day = arg.date.getDay();
+                if (day === 0 || day === 6) {
+                    return ['fc-weekend'];
+                }
+                return [];
+            }
+        });
+        
+        calendar.render();
+        
+        // Mettre à jour l'affichage des dates sélectionnées
+        function updateSelectedDatesDisplay() {
+            var display = document.getElementById('selected-dates-display');
+            var input = document.getElementById('selected-dates');
+            var submitBtn = document.getElementById('submit-btn');
+            
+            input.value = Array.from(selectedDates).join(',');
+            
+            if (selectedDates.size === 0) {
+                display.innerHTML = '<span class="text-gray-400 text-sm">Aucune date sélectionnée</span>';
+                submitBtn.disabled = true;
+            } else {
+                display.innerHTML = '';
+                var sortedDates = Array.from(selectedDates).sort();
+                sortedDates.forEach(function(date) {
+                    var dateObj = new Date(date);
+                    var formatted = dateObj.toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    
+                    var badge = document.createElement('span');
+                    badge.className = 'bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded';
+                    badge.textContent = formatted;
+                    display.appendChild(badge);
+                });
+                submitBtn.disabled = false;
+            }
+        }
+        {% endif %}
+    });
+</script>
+{% endblock %}

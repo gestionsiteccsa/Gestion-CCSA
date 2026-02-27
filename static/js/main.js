@@ -32,6 +32,7 @@
       },
       { button: "tools-nav-menu-button", menu: "tools-nav-menu" },
       { button: "pointage-nav-menu-button", menu: "pointage-nav-menu" },
+      { button: "conges-nav-menu-button", menu: "conges-nav-menu" },
     ];
 
     // Function to close all menus except the specified one

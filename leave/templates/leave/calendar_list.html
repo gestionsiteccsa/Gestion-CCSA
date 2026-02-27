@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Calendriers de congés - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-calendar-alt mr-2"></i>Calendriers de congés
+        </h1>
+        {% if is_accueil %}
+        <a href="{% url 'leave:calendar_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <i class="fas fa-plus mr-2"></i>Créer un calendrier
+        </a>
+        {% endif %}
+    </div>
+
+    {% if calendars %}
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% for calendar in calendars %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+                <h2 class="text-xl font-bold text-white">{{ calendar.name }}</h2>
+                <p class="text-blue-100 text-sm mt-1">
+                    Du {{ calendar.start_date|date:"d/m/Y" }} au {{ calendar.end_date|date:"d/m/Y" }}
+                </p>
+            </div>
+            <div class="p-4">
+                {% if calendar.description %}
+                <p class="text-gray-600 mb-4">{{ calendar.description|truncatewords:30 }}</p>
+                {% endif %}
+
+                <a href="{{ calendar.get_absolute_url }}" class="block w-full text-center bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold py-2 px-4 rounded transition-colors mb-3">
+                    <i class="fas fa-eye mr-2"></i>Voir le calendrier
+                </a>
+
+                {% if is_accueil %}
+                <div class="flex gap-2">
+                    <a href="{% url 'leave:calendar_update' calendar.pk %}" class="flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-semibold py-2 px-3 rounded text-center text-sm transition-colors">
+                        <i class="fas fa-edit mr-1"></i>Modifier
+                    </a>
+                    <a href="{% url 'leave:calendar_delete' calendar.pk %}" class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-2 px-3 rounded text-center text-sm transition-colors">
+                        <i class="fas fa-trash-alt mr-1"></i>Supprimer
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                    Aucun calendrier de congés n'est actuellement actif.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if is_accueil and archived_calendars %}
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Calendriers archivés</h2>
+        <div class="bg-gray-50 rounded-lg p-4">
+            <ul class="divide-y divide-gray-200">
+                {% for calendar in archived_calendars %}
+                <li class="py-3 flex justify-between items-center">
+                    <div>
+                        <span class="font-medium text-gray-700">{{ calendar.name }}</span>
+                        <span class="text-sm text-gray-500 ml-2">
+                            ({{ calendar.start_date|date:"d/m/Y" }} - {{ calendar.end_date|date:"d/m/Y" }})
+                        </span>
+                    </div>
+                    <a href="{{ calendar.get_absolute_url }}" class="text-blue-600 hover:text-blue-800 text-sm">
+                        <i class="fas fa-eye mr-1"></i>Voir
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'leave:calendar_archives' %}" class="mt-4 inline-block text-blue-600 hover:text-blue-800 text-sm">
+                <i class="fas fa-archive mr-1"></i>Voir tous les archives
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
