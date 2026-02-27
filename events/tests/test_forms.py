@@ -182,7 +182,7 @@ class EventImageFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("image", form.errors)
 
-    @patch("events.forms.EventImage.objects.filter")
+    @patch("events.models.EventImage.objects.filter")
     def test_form_max_images_limit(self, mock_filter):
         """Test la limite de 10 images."""
         # Simuler qu'il y a déjà 10 images
