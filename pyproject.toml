@@ -2,15 +2,6 @@
 requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "Gestion-ccsa"
-version = "1.0.0"
-description = "Application de gestion CCSA"
-requires-python = ">=3.10"
-dependencies = [
-    "Django>=5.0",
-]
-
 [tool.black]
 line-length = 88
 target-version = ['py310']
@@ -38,20 +29,6 @@ line_length = 88
 skip = ["migrations", ".venv", "venv", "env", "__pycache__"]
 known_django = "django"
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "DJANGO", "FIRSTPARTY", "LOCALFOLDER"]
-
-[tool.flake8]
-max-line-length = 88
-extend-ignore = ["E203", "W503", "D100", "D104", "D401"]
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    ".venv",
-    "venv",
-    "env",
-    "migrations",
-]
 
 [tool.bandit]
 exclude_dirs = [

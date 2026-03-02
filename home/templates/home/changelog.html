@@ -136,6 +136,32 @@
                         <li>Compatibilité rétrograde complète préservée</li>
                     </ul>
                 </div>
+
+                <!-- Corrections -->
+                <div>
+                    <h3 class="flex items-center text-sm font-semibold text-green-600 uppercase tracking-wider mb-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Corrections
+                    </h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-600 ml-4">
+                        <li><strong>Configuration pyproject.toml</strong> : Correction de l'erreur de syntaxe
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Suppression de la section <code>[project]</code> qui causait une erreur de parsing avec flake8</li>
+                                <li>Déplacement de la configuration flake8 vers un fichier <code>.flake8</code> dédié</li>
+                                <li>Les outils de linting (Black, isort, flake8, bandit) fonctionnent maintenant correctement</li>
+                            </ul>
+                        </li>
+                        <li><strong>Séparation JavaScript/HTML</strong> : Extraction de la configuration Tailwind
+                            <ul class="list-circle list-inside ml-6 mt-1 text-sm text-slate-500">
+                                <li>Création du fichier <code>static/js/tailwind-config.js</code> pour la configuration Tailwind</li>
+                                <li>Suppression du JavaScript inline de <code>templates/base.html</code></li>
+                                <li>Conformité avec le workflow <code>django-javascript-separation.md</code> (ZERO JS inline)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
