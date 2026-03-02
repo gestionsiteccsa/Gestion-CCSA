@@ -157,54 +157,6 @@
             </div>
             {% endif %}
 
-            <!-- Actions (if owner or communication) -->
-            {% if user == event.created_by or user.is_staff %}
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-xl font-semibold text-slate-900 mb-4">Actions</h2>
-                <div class="flex flex-wrap gap-3">
-                    <a href="{% url 'events:event_update' event.slug %}" 
-                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                        Modifier
-                    </a>
-                    <a href="{% url 'events:event_duplicate' event.slug %}" 
-                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-secondary-700 bg-secondary-50 hover:bg-secondary-100 rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Dupliquer
-                    </a>
-                    <a href="{% url 'events:event_delete' event.slug %}" 
-                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                        Supprimer
-                    </a>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Validation (pour le rôle Communication) -->
-            {% load event_tags %}
-            {% has_communication_role as user_has_comm_role %}
-            {% if user_has_comm_role %}
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-xl font-semibold text-slate-900 mb-4">Validation Communication</h2>
-                <div class="flex flex-wrap gap-3">
-                    <a href="{% url 'events:event_validation' event.slug %}" 
-                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Valider cet événement
-                    </a>
-                </div>
-            </div>
-            {% endif %}
-
             <!-- Comments -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <h2 class="text-xl font-semibold text-slate-900 mb-4">Commentaires</h2>
@@ -298,6 +250,55 @@
                         Ajouter à Outlook
                     </a>
                 </div>
+
+                {% load event_tags %}
+
+                <!-- Actions (if owner or communication) -->
+                {% if user == event.created_by or user.is_staff %}
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-4">Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'events:event_update' event.slug %}" 
+                           class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Modifier
+                        </a>
+                        <a href="{% url 'events:event_duplicate' event.slug %}" 
+                           class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-secondary-700 bg-secondary-50 hover:bg-secondary-100 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Dupliquer
+                        </a>
+                        <a href="{% url 'events:event_delete' event.slug %}" 
+                           class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Supprimer
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Validation (pour le rôle Communication) -->
+                {% has_communication_role as user_has_comm_role %}
+                {% if user_has_comm_role %}
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-4">Validation Communication</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'events:event_validation' event.slug %}" 
+                           class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Valider cet événement
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
